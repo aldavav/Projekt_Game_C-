@@ -6,25 +6,178 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>940</width>
+    <height>635</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QStackedWidget" name="stackedWidget">
+    <property name="geometry">
+     <rect>
+      <x>-1</x>
+      <y>-30</y>
+      <width>941</width>
+      <height>591</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>1</number>
+    </property>
+    <widget class="QWidget" name="gameMap">
+     <widget class="QPushButton" name="pushButton">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>260</y>
+        <width>241</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TesMapButton</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="menu">
+     <property name="styleSheet">
+      <string notr="true">
+
+</string>
+     </property>
+     <widget class="QWidget" name="verticalLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>120</y>
+        <width>261</width>
+        <height>291</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="buttonStartGame">
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+    font-size: 24px;        /* Velikost písma */
+    padding: 15px 30px;     /* Vertikální a horizontální odsazení */
+    border-radius: 10px;    /* Zaoblené rohy */
+ 
+    color: black;           /* Bílé písmo */
+}
+
+QPushButton:hover {
+    background-color: green; /* Trochu tmavší modrá při najetí myší */
+}
+
+QPushButton:pressed {
+    background-color: #1c5980; /* Ještě tmavší modrá při stisku */
+}</string>
+         </property>
+         <property name="text">
+          <string>GamePlay</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+    font-size: 24px;        
+    padding: 15px 30px;     
+    border-radius: 10px;    
+ 
+    color: black;           
+}
+
+QPushButton:hover {
+    background-color: green; 
+}
+
+QPushButton:pressed {
+    background-color: #1c5980; 
+}</string>
+         </property>
+         <property name="text">
+          <string>Options</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="buttonQuit1">
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+    font-size: 24px;        
+    padding: 15px 30px;     
+    border-radius: 10px;    
+ 
+    color: black;           
+}
+
+QPushButton:hover {
+    background-color: green; 
+}
+
+QPushButton:pressed {
+    background-color: #1c5980; 
+}</string>
+         </property>
+         <property name="text">
+          <string>Quit</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>940</width>
      <height>39</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuGame">
+    <property name="title">
+     <string>Game</string>
+    </property>
+    <addaction name="actionMenu"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>About</string>
+    </property>
+   </widget>
+   <addaction name="menuGame"/>
+   <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionMenu">
+   <property name="text">
+    <string>Menu</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

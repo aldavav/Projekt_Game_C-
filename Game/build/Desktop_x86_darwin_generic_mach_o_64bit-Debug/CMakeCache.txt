@@ -340,8 +340,8 @@ Qt6Widgets_DIR:PATH=/Users/ales/Qt/6.8.0/macos/lib/cmake/Qt6Widgets
 //The directory containing a CMake configuration file for Qt6.
 Qt6_DIR:PATH=/Users/ales/Qt/6.8.0/macos/lib/cmake/Qt6
 
-//Path to a library.
-WrapOpenGL_AGL:FILEPATH=/System/Library/Frameworks/AGL.framework
+//No help, variable specified on the command line.
+WrapOpenGL_AGL:FILEPATH=
 
 
 ########################

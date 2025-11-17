@@ -6,9 +6,39 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    connect(ui->buttonQuit1, &QPushButton::clicked, this, &MainWindow::on_actionQuit_triggered);
+    connect(ui->buttonStartGame, &QPushButton::clicked, this, &MainWindow::on_buttonStartGame_clicked);
+
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_actionQuit_triggered()
+{
+    QApplication::quit();
+}
+
+
+
+
+void MainWindow::on_buttonStartGame_clicked()
+{
+    int index = ui->stackedWidget->indexOf(ui->gameMap);
+    if (index != -1) {
+        ui->stackedWidget->setCurrentIndex(index);
+         this->showFullScreen();
+    }
+}
+
+
+void MainWindow::on_actionMenu_triggered()
+{
+    ui->stackedWidget->setCurrentWidget(ui->menu);
+     this->showNormal();
+}
+

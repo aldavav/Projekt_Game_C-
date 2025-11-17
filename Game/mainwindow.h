@@ -2,7 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
+#include <QStackedWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -16,6 +18,14 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+private slots:
+    void on_actionQuit_triggered();
+
+
+    void on_buttonStartGame_clicked();
+
+    void on_actionMenu_triggered();
 
 private:
     Ui::MainWindow *ui;
