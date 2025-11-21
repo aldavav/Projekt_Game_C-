@@ -89,6 +89,46 @@ build CMakeFiles/Game.dir/unit.cpp.o: CXX_COMPILER__Game_unscanned_Debug /Users/
   OBJECT_DIR = CMakeFiles/Game.dir
   OBJECT_FILE_DIR = CMakeFiles/Game.dir
 
+build CMakeFiles/Game.dir/unitbuilder.cpp.o: CXX_COMPILER__Game_unscanned_Debug /Users/ales/CPP/CPP_PROJEKT/Game/unitbuilder.cpp || cmake_object_order_depends_target_Game
+  DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB
+  DEP_FILE = CMakeFiles/Game.dir/unitbuilder.cpp.o.d
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk -fcolor-diagnostics
+  INCLUDES = -I/Users/ales/CPP/CPP_PROJEKT/Game/build/Qt_6_10_0_for_macOS-Debug/Game_autogen/include -isystem /Users/ales/Qt/6.10.0/macos/lib/QtCore.framework/Headers -iframework /Users/ales/Qt/6.10.0/macos/lib -isystem /Users/ales/Qt/6.10.0/macos/mkspecs/macx-clang -isystem /Users/ales/Qt/6.10.0/macos/include -isystem /Users/ales/Qt/6.10.0/macos/lib/QtWidgets.framework/Headers -isystem /Users/ales/Qt/6.10.0/macos/lib/QtGui.framework/Headers
+  OBJECT_DIR = CMakeFiles/Game.dir
+  OBJECT_FILE_DIR = CMakeFiles/Game.dir
+
+build CMakeFiles/Game.dir/customunit.cpp.o: CXX_COMPILER__Game_unscanned_Debug /Users/ales/CPP/CPP_PROJEKT/Game/customunit.cpp || cmake_object_order_depends_target_Game
+  DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB
+  DEP_FILE = CMakeFiles/Game.dir/customunit.cpp.o.d
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk -fcolor-diagnostics
+  INCLUDES = -I/Users/ales/CPP/CPP_PROJEKT/Game/build/Qt_6_10_0_for_macOS-Debug/Game_autogen/include -isystem /Users/ales/Qt/6.10.0/macos/lib/QtCore.framework/Headers -iframework /Users/ales/Qt/6.10.0/macos/lib -isystem /Users/ales/Qt/6.10.0/macos/mkspecs/macx-clang -isystem /Users/ales/Qt/6.10.0/macos/include -isystem /Users/ales/Qt/6.10.0/macos/lib/QtWidgets.framework/Headers -isystem /Users/ales/Qt/6.10.0/macos/lib/QtGui.framework/Headers
+  OBJECT_DIR = CMakeFiles/Game.dir
+  OBJECT_FILE_DIR = CMakeFiles/Game.dir
+
+build CMakeFiles/Game.dir/infantry.cpp.o: CXX_COMPILER__Game_unscanned_Debug /Users/ales/CPP/CPP_PROJEKT/Game/infantry.cpp || cmake_object_order_depends_target_Game
+  DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB
+  DEP_FILE = CMakeFiles/Game.dir/infantry.cpp.o.d
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk -fcolor-diagnostics
+  INCLUDES = -I/Users/ales/CPP/CPP_PROJEKT/Game/build/Qt_6_10_0_for_macOS-Debug/Game_autogen/include -isystem /Users/ales/Qt/6.10.0/macos/lib/QtCore.framework/Headers -iframework /Users/ales/Qt/6.10.0/macos/lib -isystem /Users/ales/Qt/6.10.0/macos/mkspecs/macx-clang -isystem /Users/ales/Qt/6.10.0/macos/include -isystem /Users/ales/Qt/6.10.0/macos/lib/QtWidgets.framework/Headers -isystem /Users/ales/Qt/6.10.0/macos/lib/QtGui.framework/Headers
+  OBJECT_DIR = CMakeFiles/Game.dir
+  OBJECT_FILE_DIR = CMakeFiles/Game.dir
+
+build CMakeFiles/Game.dir/plane.cpp.o: CXX_COMPILER__Game_unscanned_Debug /Users/ales/CPP/CPP_PROJEKT/Game/plane.cpp || cmake_object_order_depends_target_Game
+  DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB
+  DEP_FILE = CMakeFiles/Game.dir/plane.cpp.o.d
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk -fcolor-diagnostics
+  INCLUDES = -I/Users/ales/CPP/CPP_PROJEKT/Game/build/Qt_6_10_0_for_macOS-Debug/Game_autogen/include -isystem /Users/ales/Qt/6.10.0/macos/lib/QtCore.framework/Headers -iframework /Users/ales/Qt/6.10.0/macos/lib -isystem /Users/ales/Qt/6.10.0/macos/mkspecs/macx-clang -isystem /Users/ales/Qt/6.10.0/macos/include -isystem /Users/ales/Qt/6.10.0/macos/lib/QtWidgets.framework/Headers -isystem /Users/ales/Qt/6.10.0/macos/lib/QtGui.framework/Headers
+  OBJECT_DIR = CMakeFiles/Game.dir
+  OBJECT_FILE_DIR = CMakeFiles/Game.dir
+
+build CMakeFiles/Game.dir/tank.cpp.o: CXX_COMPILER__Game_unscanned_Debug /Users/ales/CPP/CPP_PROJEKT/Game/tank.cpp || cmake_object_order_depends_target_Game
+  DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB
+  DEP_FILE = CMakeFiles/Game.dir/tank.cpp.o.d
+  FLAGS = -DQT_QML_DEBUG -g -std=gnu++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk -fcolor-diagnostics
+  INCLUDES = -I/Users/ales/CPP/CPP_PROJEKT/Game/build/Qt_6_10_0_for_macOS-Debug/Game_autogen/include -isystem /Users/ales/Qt/6.10.0/macos/lib/QtCore.framework/Headers -iframework /Users/ales/Qt/6.10.0/macos/lib -isystem /Users/ales/Qt/6.10.0/macos/mkspecs/macx-clang -isystem /Users/ales/Qt/6.10.0/macos/include -isystem /Users/ales/Qt/6.10.0/macos/lib/QtWidgets.framework/Headers -isystem /Users/ales/Qt/6.10.0/macos/lib/QtGui.framework/Headers
+  OBJECT_DIR = CMakeFiles/Game.dir
+  OBJECT_FILE_DIR = CMakeFiles/Game.dir
+
 build CMakeFiles/Game.dir/Game_autogen/EWIEGA46WW/qrc_resource.cpp.o: CXX_COMPILER__Game_unscanned_Debug /Users/ales/CPP/CPP_PROJEKT/Game/build/Qt_6_10_0_for_macOS-Debug/Game_autogen/EWIEGA46WW/qrc_resource.cpp || cmake_object_order_depends_target_Game
   DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB
   DEP_FILE = CMakeFiles/Game.dir/Game_autogen/EWIEGA46WW/qrc_resource.cpp.o.d
@@ -105,7 +145,7 @@ build CMakeFiles/Game.dir/Game_autogen/EWIEGA46WW/qrc_resource.cpp.o: CXX_COMPIL
 #############################################
 # Link the executable Game.app/Contents/MacOS/Game
 
-build Game.app/Contents/MacOS/Game: CXX_EXECUTABLE_LINKER__Game_Debug CMakeFiles/Game.dir/Game_autogen/mocs_compilation.cpp.o CMakeFiles/Game.dir/main.cpp.o CMakeFiles/Game.dir/mainwindow.cpp.o CMakeFiles/Game.dir/player.cpp.o CMakeFiles/Game.dir/unit.cpp.o CMakeFiles/Game.dir/Game_autogen/EWIEGA46WW/qrc_resource.cpp.o | /Users/ales/Qt/6.10.0/macos/lib/QtWidgets.framework/Versions/A/QtWidgets /Users/ales/Qt/6.10.0/macos/lib/QtGui.framework/Versions/A/QtGui /Users/ales/Qt/6.10.0/macos/lib/QtCore.framework/Versions/A/QtCore || Game_autogen Game_autogen_timestamp_deps
+build Game.app/Contents/MacOS/Game: CXX_EXECUTABLE_LINKER__Game_Debug CMakeFiles/Game.dir/Game_autogen/mocs_compilation.cpp.o CMakeFiles/Game.dir/main.cpp.o CMakeFiles/Game.dir/mainwindow.cpp.o CMakeFiles/Game.dir/player.cpp.o CMakeFiles/Game.dir/unit.cpp.o CMakeFiles/Game.dir/unitbuilder.cpp.o CMakeFiles/Game.dir/customunit.cpp.o CMakeFiles/Game.dir/infantry.cpp.o CMakeFiles/Game.dir/plane.cpp.o CMakeFiles/Game.dir/tank.cpp.o CMakeFiles/Game.dir/Game_autogen/EWIEGA46WW/qrc_resource.cpp.o | /Users/ales/Qt/6.10.0/macos/lib/QtWidgets.framework/Versions/A/QtWidgets /Users/ales/Qt/6.10.0/macos/lib/QtGui.framework/Versions/A/QtGui /Users/ales/Qt/6.10.0/macos/lib/QtCore.framework/Versions/A/QtCore || Game_autogen Game_autogen_timestamp_deps
   FLAGS = -DQT_QML_DEBUG -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk
   LINK_LIBRARIES = -Wl,-rpath,/Users/ales/Qt/6.10.0/macos/lib  /Users/ales/Qt/6.10.0/macos/lib/QtWidgets.framework/Versions/A/QtWidgets  /Users/ales/Qt/6.10.0/macos/lib/QtGui.framework/Versions/A/QtGui  -Xlinker -framework -Xlinker OpenGL  -framework AppKit  -framework OpenGL  -framework ImageIO  -framework Metal  /Users/ales/Qt/6.10.0/macos/lib/QtCore.framework/Versions/A/QtCore  -framework IOKit  -framework DiskArbitration  -framework UniformTypeIdentifiers
   LINK_PATH = -F/Users/ales/Qt/6.10.0/macos/lib

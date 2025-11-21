@@ -26,6 +26,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         resource.qrc
         player.h player.cpp
         unit.h unit.cpp
+        unitbuilder.h unitbuilder.cpp
+        customunit.h customunit.cpp
+        infantry.h infantry.cpp
+        plane.h plane.cpp
+        tank.h tank.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET Game APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

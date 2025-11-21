@@ -741,10 +741,24 @@ Game_autogen/timestamp: \
 	/Users/ales/CPP/CPP_PROJEKT/Game/build/Qt_6_10_0_for_macOS-Debug/CMakeFiles/3.26.3/CMakeCXXCompiler.cmake \
 	/Users/ales/CPP/CPP_PROJEKT/Game/build/Qt_6_10_0_for_macOS-Debug/CMakeFiles/3.26.3/CMakeSystem.cmake \
 	/Users/ales/CPP/CPP_PROJEKT/Game/build/Qt_6_10_0_for_macOS-Debug/Game_autogen/moc_predefs.h \
+	/Users/ales/CPP/CPP_PROJEKT/Game/customunit.cpp \
+	/Users/ales/CPP/CPP_PROJEKT/Game/customunit.h \
+	/Users/ales/CPP/CPP_PROJEKT/Game/infantry.cpp \
+	/Users/ales/CPP/CPP_PROJEKT/Game/infantry.h \
 	/Users/ales/CPP/CPP_PROJEKT/Game/main.cpp \
 	/Users/ales/CPP/CPP_PROJEKT/Game/mainwindow.cpp \
 	/Users/ales/CPP/CPP_PROJEKT/Game/mainwindow.h \
+	/Users/ales/CPP/CPP_PROJEKT/Game/plane.cpp \
+	/Users/ales/CPP/CPP_PROJEKT/Game/plane.h \
+	/Users/ales/CPP/CPP_PROJEKT/Game/player.cpp \
+	/Users/ales/CPP/CPP_PROJEKT/Game/player.h \
 	/Users/ales/CPP/CPP_PROJEKT/Game/resource.qrc \
+	/Users/ales/CPP/CPP_PROJEKT/Game/tank.cpp \
+	/Users/ales/CPP/CPP_PROJEKT/Game/tank.h \
+	/Users/ales/CPP/CPP_PROJEKT/Game/unit.cpp \
+	/Users/ales/CPP/CPP_PROJEKT/Game/unit.h \
+	/Users/ales/CPP/CPP_PROJEKT/Game/unitbuilder.cpp \
+	/Users/ales/CPP/CPP_PROJEKT/Game/unitbuilder.h \
 	/Users/ales/Qt/6.10.0/macos/lib/QtCore.framework/Versions/A/Headers/q17memory.h \
 	/Users/ales/Qt/6.10.0/macos/lib/QtCore.framework/Versions/A/Headers/q20functional.h \
 	/Users/ales/Qt/6.10.0/macos/lib/QtCore.framework/Versions/A/Headers/q20iterator.h \
