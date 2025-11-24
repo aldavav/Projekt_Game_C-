@@ -1,8 +1,0 @@
-# ninja log v6
-2	202	1763395837126644242	Game_autogen/timestamp	3bd9b41aa16751e6
-2	202	1763395837126644242	Game_autogen/mocs_compilation.cpp	3bd9b41aa16751e6
-2	202	1763395837126644242	/Users/ales/CPP/CPP_PROJEKT/Game/build/Qt_6_8_0_for_macOS-Debug/Game_autogen/timestamp	3bd9b41aa16751e6
-2	202	1763395837126644242	/Users/ales/CPP/CPP_PROJEKT/Game/build/Qt_6_8_0_for_macOS-Debug/Game_autogen/mocs_compilation.cpp	3bd9b41aa16751e6
-203	1065	1763395837136465203	CMakeFiles/Game.dir/Game_autogen/mocs_compilation.cpp.o	9c87b883b9de5b87
-203	1079	1763395837136745037	CMakeFiles/Game.dir/main.cpp.o	390d0937ceb482e1
-203	1097	1763395837136906912	CMakeFiles/Game.dir/mainwindow.cpp.o	ae7fac580cdda461
