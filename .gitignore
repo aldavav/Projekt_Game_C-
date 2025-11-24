@@ -12,7 +12,7 @@
 .qtc_clangd/
 
 # CMake build directories
-/Game/build
+/Game/build/
 /Game/cmake-build-*/
 
 # Object files (already in your list)
