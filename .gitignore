@@ -1,22 +1,47 @@
+## --- Build Artifacts ---
 # Build directories
-/build/
-/cmake-build-*/
+.idea/
+.qtcreator/
+.vscode/
 
-# Qt Creator files
+# Qt Creator specific files
 *.pro.user
 *.pro.user.*
 *.qmake.stash
 *.qmake.super
+.qtc_clangd/
 
-# Mac OS specifické
+# CMake build directories
+/Game/build
+/Game/cmake-build-*/
+
+# Object files (already in your list)
+*.o
+*.obj
+
+# Binary files (already in your list)
+*.exe
+*.dll
+*.lib
+*.pdb
+*.out
+*.app
+
+# Logs and temporary files (already in your list)
+*.log
+*.tmp
+*.temp
+
+# --- Operating System Specific Files ---
+# macOS
 .DS_Store
 
-# Windows specifické
+# Windows
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# Visual Studio
+# Visual Studio (Keeping this list clean, assuming MSVC is not your primary compiler)
 *.VC.db
 *.VC.VC.opendb
 *.sdf
@@ -28,33 +53,3 @@ Desktop.ini
 *.user
 *.suo
 *.sln.docstates
-
-# Objektové soubory
-*.o
-*.obj
-
-# Binární soubory
-*.exe
-*.dll
-*.lib
-*.pdb
-*.out
-*.app
-
-# Logy a temporary files
-*.log
-*.tmp
-*.temp
-
-# CMake files
-CMakeFiles/
-CMakeCache.txt
-cmake_install.cmake
-Makefile
-Testing/
-
-# Visual Studio Code
-.vscode/
-
-# Clangd cache
-.qtc_clangd/
