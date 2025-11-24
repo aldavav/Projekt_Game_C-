@@ -7,8 +7,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->buttonQuit1, &QPushButton::clicked, this, &MainWindow::on_actionQuit_triggered);
-    connect(ui->buttonStartGame, &QPushButton::clicked, this, &MainWindow::on_buttonStartGame_clicked);
+    connect(ui->buttonQuit, &QPushButton::clicked, this, &MainWindow::on_actionQuit_triggered);
+    connect(ui->buttonNewGame, &QPushButton::clicked, this, &MainWindow::on_buttonStartGame_clicked);
 
 
 }
