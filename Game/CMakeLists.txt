@@ -12,51 +12,44 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
+# --- 1. DEFINE ALL SOURCE FILES (.cpp and .qrc) ---
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow/mainwindow.cpp
-        mainwindow/mainwindow.h
-        mainwindow/mainwindow.ui
-        logger/LoggerTypes.h
-        logger/Logger.cpp
-        logger/Logger.h
-        logger/LoggerMacros.h
-        ansiCodes.h
+    main.cpp
+    mainwindow/mainwindow.cpp
+    logger/Logger.cpp
+    resource.qrc
+    player/player.cpp
+    unit/unit.cpp
+    map/map.cpp
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(Game
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-        resource.qrc
-        player/player.h player/player.cpp
-        unit/unit.h unit/unit.cpp
-    )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET Game APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
-else()
-    if(ANDROID)
-        add_library(Game SHARED
-            ${PROJECT_SOURCES}
-        )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else()
-        add_executable(Game
-            ${PROJECT_SOURCES}
-        )
-    endif()
-endif()
+# --- 2. USE STANDARD ADD_EXECUTABLE FOR COMPATIBILITY ---
+# This avoids the previous 'undefined reference to qMain' linker error.
+# We no longer need the 'if/else' block for Qt versions unless there are specific, non-standard needs.
+add_executable(Game ${PROJECT_SOURCES})
 
+# --- 3. SPECIFY INCLUDE DIRECTORIES FOR HEADERS ---
+# This is how CMake finds your header (.h) and UI (.ui) files in subfolders
+# and ensures CMAKE_AUTOUIC/AUTOMOC work correctly.
+target_include_directories(Game PRIVATE
+    ${CMAKE_SOURCE_DIR}              # For main.cpp and top-level files
+    ${CMAKE_SOURCE_DIR}/mainwindow
+    ${CMAKE_SOURCE_DIR}/logger
+    ${CMAKE_SOURCE_DIR}/player
+    ${CMAKE_SOURCE_DIR}/unit
+    ${CMAKE_SOURCE_DIR}/map
+)
+
+# --- 4. LINK LIBRARIES ---
 target_link_libraries(Game PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+
+# --- 5. TARGET PROPERTIES (Standard Qt/CMake settings) ---
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
 if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Game)
+    set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Game)
 endif()
 set_target_properties(Game PROPERTIES
     ${BUNDLE_ID_OPTION}
@@ -66,13 +59,10 @@ set_target_properties(Game PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+# --- 6. INSTALLATION ---
 include(GNUInstallDirs)
 install(TARGETS Game
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(Game)
-endif()
