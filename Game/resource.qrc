@@ -1,9 +1,7 @@
 <!DOCTYPE RCC>
 <RCC>
   <qresource prefix="/images">
-    <file>menuPicture.jpg</file>
-    <file>icon.png</file>
-    <file>icon0.png</file>
-    <file>icon1.png</file>
+    <file>assets/menuPicture.jpg</file>
+    <file>assets/icon0.png</file>
   </qresource>
 </RCC>

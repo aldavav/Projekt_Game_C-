@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Game Title</string>
+   <string>Command &amp; Conquer</string>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -42,7 +42,7 @@
        <property name="styleSheet">
         <string notr="true">
             QWidget#menu {
-                background-image: url(:/images/menuPicture.jpg);
+                background-image: url(:/images/assets/menuPicture.jpg);
                 background-position: center;
                 background-repeat: no-repeat;
             }

@@ -9,8 +9,9 @@
 #include <QDebug>
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
+namespace Ui
+{
+    class MainWindow;
 }
 QT_END_NAMESPACE
 
@@ -25,8 +26,15 @@ public:
 private slots:
     void on_actionQuit_triggered();
 
-
     void on_buttonStartGame_clicked();
+
+    void on_buttonLoadGame_clicked();
+
+    void on_buttonSettings_clicked();
+
+    void on_buttonHelp_clicked();
+
+    void on_buttonCredits_clicked();
 
     void on_actionMenu_triggered();
 

@@ -1,5 +1,5 @@
 #include "logger/LoggerMacros.h"
-#include "mainwindow.h"
+#include "mainwindow/mainwindow.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
