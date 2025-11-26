@@ -17,6 +17,11 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        logger/LoggerTypes.h
+        logger/Logger.cpp
+        logger/Logger.h
+        logger/LoggerMacros.h
+        ansiCodes.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

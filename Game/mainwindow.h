@@ -5,6 +5,9 @@
 #include <QStackedWidget>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QKeyEvent>
+#include <QDebug>
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -27,7 +30,10 @@ private slots:
 
     void on_actionMenu_triggered();
 
+    void keyPressEvent(QKeyEvent *event);
+
 private:
     Ui::MainWindow *ui;
 };
+
 #endif // MAINWINDOW_H

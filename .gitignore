@@ -14,6 +14,7 @@
 # CMake build directories
 /Game/build/
 /Game/cmake-build-*/
+/Game/logs/
 
 # Object files (already in your list)
 *.o
