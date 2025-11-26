@@ -123,6 +123,9 @@
               <height>50</height>
              </size>
             </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
         font-size: 24px;
@@ -130,6 +133,7 @@
         border-radius: 10px;
         color: white; /* Changed font color for better contrast */
         background-color: #337AB7; /* A nice primary color */
+		background: url(:/images/assets/button.jpg);
 }
 
 QPushButton:hover {

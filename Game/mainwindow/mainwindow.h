@@ -20,6 +20,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    void setupButton(QPushButton *button, bool disabled);
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
@@ -37,6 +38,8 @@ private slots:
     void on_buttonCredits_clicked();
 
     void on_actionMenu_triggered();
+
+    void showEvent(QShowEvent *event);
 
     void keyPressEvent(QKeyEvent *event);
 

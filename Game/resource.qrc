@@ -3,5 +3,6 @@
   <qresource prefix="/images">
     <file>assets/menuPicture.jpg</file>
     <file>assets/icon0.png</file>
+    <file>assets/button.jpg</file>
   </qresource>
 </RCC>
