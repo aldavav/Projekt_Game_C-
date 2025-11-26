@@ -128,21 +128,31 @@
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
-        font-size: 24px;
-        padding: 10px 30px;
-        border-radius: 10px;
-        color: white; /* Changed font color for better contrast */
-        background-color: #337AB7; /* A nice primary color */
-		background: url(:/images/assets/button.jpg);
-}
+            font-size: 24px;
+            padding: 10px 30px;
+            border-radius: 10px;
+            color: white; 
+            background: #337AB7 url(:/images/assets/button.jpg); 
+            background-repeat: no-repeat;
+            background-position: center;
+        }
 
-QPushButton:hover {
-        background-color: #286090;
-}
+        QPushButton:hover, QPushButton:focus {
+            background-color: #E68A00;
+            border: 2px solid white;
+            color: #FFFF99;
+            background-image: none; 
+        }
 
-QPushButton:pressed {
-        background-color: #1c5980;
-}</string>
+        QPushButton:pressed {
+            background-color: #CC7A00;
+        }
+        
+        QPushButton:disabled {
+            background-color: #666666;
+            color: #AAAAAA;
+            border: 1px solid #444444;
+        }</string>
             </property>
             <property name="text">
              <string>NEW GAME</string>
@@ -165,20 +175,31 @@ QPushButton:pressed {
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
-        font-size: 24px;
-        padding: 10px 30px;
-        border-radius: 10px;
-        color: white;
-        background-color: #337AB7;
-}
+            font-size: 24px;
+            padding: 10px 30px;
+            border-radius: 10px;
+            color: white; 
+            background: #337AB7 url(:/images/assets/button.jpg); 
+            background-repeat: no-repeat;
+            background-position: center;
+        }
 
-QPushButton:hover {
-        background-color: #286090;
-}
+        QPushButton:hover, QPushButton:focus {
+            background-color: #E68A00;
+            border: 2px solid white;
+            color: #FFFF99;
+            background-image: none; 
+        }
 
-QPushButton:pressed {
-        background-color: #1c5980;
-}</string>
+        QPushButton:pressed {
+            background-color: #CC7A00;
+        }
+        
+        QPushButton:disabled {
+            background-color: #666666;
+            color: #AAAAAA;
+            border: 1px solid #444444;
+        }</string>
             </property>
             <property name="text">
              <string>LOAD GAME</string>
@@ -201,20 +222,31 @@ QPushButton:pressed {
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
-        font-size: 24px;
-        padding: 10px 30px;
-        border-radius: 10px;
-        color: white;
-        background-color: #337AB7;
-}
+            font-size: 24px;
+            padding: 10px 30px;
+            border-radius: 10px;
+            color: white; 
+            background: #337AB7 url(:/images/assets/button.jpg); 
+            background-repeat: no-repeat;
+            background-position: center;
+        }
 
-QPushButton:hover {
-        background-color: #286090;
-}
+        QPushButton:hover, QPushButton:focus {
+            background-color: #E68A00;
+            border: 2px solid white;
+            color: #FFFF99;
+            background-image: none; 
+        }
 
-QPushButton:pressed {
-        background-color: #1c5980;
-}</string>
+        QPushButton:pressed {
+            background-color: #CC7A00;
+        }
+        
+        QPushButton:disabled {
+            background-color: #666666;
+            color: #AAAAAA;
+            border: 1px solid #444444;
+        }</string>
             </property>
             <property name="text">
              <string>SETTINGS</string>
@@ -237,20 +269,31 @@ QPushButton:pressed {
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
-        font-size: 24px;
-        padding: 10px 30px;
-        border-radius: 10px;
-        color: white;
-        background-color: #337AB7;
-}
+            font-size: 24px;
+            padding: 10px 30px;
+            border-radius: 10px;
+            color: white; 
+            background: #337AB7 url(:/images/assets/button.jpg); 
+            background-repeat: no-repeat;
+            background-position: center;
+        }
 
-QPushButton:hover {
-        background-color: #286090;
-}
+        QPushButton:hover, QPushButton:focus {
+            background-color: #E68A00;
+            border: 2px solid white;
+            color: #FFFF99;
+            background-image: none; 
+        }
 
-QPushButton:pressed {
-        background-color: #1c5980;
-}</string>
+        QPushButton:pressed {
+            background-color: #CC7A00;
+        }
+        
+        QPushButton:disabled {
+            background-color: #666666;
+            color: #AAAAAA;
+            border: 1px solid #444444;
+        }</string>
             </property>
             <property name="text">
              <string>HELP</string>
@@ -273,20 +316,31 @@ QPushButton:pressed {
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
-        font-size: 24px;
-        padding: 10px 30px;
-        border-radius: 10px;
-        color: white;
-        background-color: #337AB7;
-}
+            font-size: 24px;
+            padding: 10px 30px;
+            border-radius: 10px;
+            color: white; 
+            background: #337AB7 url(:/images/assets/button.jpg); 
+            background-repeat: no-repeat;
+            background-position: center;
+        }
 
-QPushButton:hover {
-        background-color: #286090;
-}
+        QPushButton:hover, QPushButton:focus {
+            background-color: #E68A00;
+            border: 2px solid white;
+            color: #FFFF99;
+            background-image: none; 
+        }
 
-QPushButton:pressed {
-        background-color: #1c5980;
-}</string>
+        QPushButton:pressed {
+            background-color: #CC7A00;
+        }
+        
+        QPushButton:disabled {
+            background-color: #666666;
+            color: #AAAAAA;
+            border: 1px solid #444444;
+        }</string>
             </property>
             <property name="text">
              <string>CREDITS</string>
@@ -309,20 +363,29 @@ QPushButton:pressed {
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton {
-        font-size: 24px;
-        padding: 10px 30px;
-        border-radius: 10px;
-        color: white;
-        background-color: #C9302C; /* Distinct color for Quit button */
-}
+            font-size: 24px;
+            padding: 10px 30px;
+            border-radius: 10px;
+            color: white; 
+            background: #C9302C; 
+        }
 
-QPushButton:hover {
-        background-color: #A92C28;
-}
+        QPushButton:hover, QPushButton:focus {
+            background-color: #A92C28;
+            border: 2px solid white;
+            color: #ff0059ff;
+            background-image: none; 
+        }
 
-QPushButton:pressed {
-        background-color: #902622;
-}</string>
+        QPushButton:pressed {
+            background-color: #902622;
+        }
+        
+        QPushButton:disabled {
+            background-color: #666666;
+            color: #AAAAAA;
+            border: 1px solid #444444;
+        }</string>
             </property>
             <property name="text">
              <string>QUIT</string>
