@@ -1,30 +1,48 @@
-//
-// Created by Michael Szotkowski on 6/17/2024.
-//
-
 #include "LocationDirector.h"
 
-LocationDirector::LocationDirector(LocationBuilder* builder) {
-    //LOG_INFO("Creating LocationDirector instance.");
-    m_builder = builder;
+LocationDirector::LocationDirector() : m_builder(nullptr)
+{
+    LOG_INFO("Creating LocationDirector instance with no initial builder.");
 }
 
-LocationDirector::~LocationDirector() {
-    //LOG_INFO("Destroying LocationDirector instance.");
+LocationDirector::LocationDirector(LocationBuilder *builder) : m_builder(builder)
+{
+    LOG_INFO("Creating LocationDirector instance.");
 }
 
-void LocationDirector::setBuilder(LocationBuilder* builder) {
-    m_builder = builder;
-}
-
-Location* LocationDirector::buildLocation(Side doorSide, bool firstLocation) {
-    m_builder->emptyLayout();
-    m_builder->setDoors(doorSide);
-    m_builder->setGold();
-    m_builder->setItems();
-    m_builder->setMonsters();
-    if (firstLocation) {
-        m_builder->setPlayer();
+LocationDirector::~LocationDirector()
+{
+    LOG_INFO("Destroying LocationDirector instance.");
+    if (m_builder)
+    {
+        delete m_builder;
+        m_builder = nullptr;
     }
-    //return new Location(*m_builder->getLocation());
+}
+
+void LocationDirector::setBuilder(LocationBuilder *builder)
+{
+    if (m_builder)
+    {
+        delete m_builder;
+    }
+    m_builder = builder;
+}
+
+Location *LocationDirector::buildLocation(Side doorSide, bool firstLocation)
+{
+    if (!m_builder)
+    {
+        LOG_ERROR("LocationBuilder is not set in LocationDirector.");
+        return nullptr;
+    }
+
+    m_builder->reset();
+    m_builder->buildName(doorSide);
+    m_builder->buildTiles();
+    m_builder->buildResources(doorSide);
+
+    Location *result = m_builder->getLocation();
+
+    return result;
 }

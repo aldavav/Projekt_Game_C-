@@ -1,420 +1,285 @@
-//
-// Created by Michael Szotkowski on 6/17/2024.
-//
-
 #include "Location.h"
 
-Location::Location(const std::string& name, const std::vector<std::vector<Tile*>>& tiles, const std::unordered_map<std::string, size_t>& destinations, int width, int height, Tile* tile) {
-    //LOG_INFO("Creating location with name: " + name + " and size: " + std::to_string(width) + "x" + std::to_string(height) + ".");
-    m_name = name;
-    m_tiles = tiles;
-    m_destinations = destinations;
-    m_width = width;
-    m_height = height;
-    //m_previousTile = tile;
+static size_t getLocationWidth(const std::vector<std::vector<Tile *>> &tiles)
+{
+    return tiles.empty() ? 0 : tiles[0].size();
 }
 
-/*Location::Location(std::string name) {
-    LOG_INFO("Creating location with name: " + name + ".");
-    m_name = std::move(name);
-}*/
+static size_t getLocationHeight(const std::vector<std::vector<Tile *>> &tiles)
+{
+    return tiles.size();
+}
 
-/*Location::~Location() {
-    LOG_INFO("Destroying location: " + m_name + ".");
-    // Delete all dynamically allocated Tile objects
-    for (auto& row : m_tiles) {
-        for (auto& tile : row) {
+Location::Location()
+{
+}
+
+Location::~Location()
+{
+    for (auto &row : m_tiles)
+    {
+        for (auto &tile : row)
+        {
             delete tile;
         }
     }
-
-    // Clear the vectors
     m_tiles.clear();
-    m_destinations.clear();
+}
 
-    // Delete the previous tile
-    delete m_previousTile;
-}*/
+void Location::setName(const std::string &name)
+{
+    m_name = name;
+}
 
-std::vector<std::vector<Tile*>> Location::getTiles() {
+void Location::setTiles(const std::vector<std::vector<Tile *>> &tiles)
+{
+    for (auto &row : m_tiles)
+    {
+        for (auto &tile : row)
+        {
+            delete tile;
+        }
+    }
+    m_tiles = tiles;
+}
+
+const std::vector<std::vector<Tile *>> &Location::getTiles() const
+{
     return m_tiles;
 }
 
-#include <sstream> // Required for std::stringstream for pointer logging
-#include <limits>
-// ... other includes
-
-Player* Location::getPlayer() {
-    // Note: The log below uses m_width and m_height which appear to be flipped in some logs (e.g., W=10, H=8 when the map creation logged 8x10).
-    // The actual array dimensions are the source of truth for iteration.
-    //LOG_INFO("Location::getPlayer: Searching for player in location " + m_name + " (Logged Width: " + std::to_string(m_width) + ", Logged Height: " + std::to_string(m_height) + ").");
-
-    // Explicitly check and log the internal vector dimensions (rows/Y count, and columns/X count)
-    size_t actual_rows = m_tiles.size();
-    size_t actual_cols = (actual_rows > 0 && !m_tiles[0].empty()) ? m_tiles[0].size() : 0;
-
-    //LOG_INFO("Location::getPlayer: Actual Array Dimensions: [Rows (Y)=" + std::to_string(actual_rows) + "][Cols (X)=" + std::to_string(actual_cols) + "].");
-
-
-    // Assuming m_tiles is indexed as m_tiles[row][col] (Y index then X index).
-    // Loop variables correspond to array indices (row=Y, col=X)
-    for (size_t row = 0; row < actual_rows; ++row) {
-        // Safety check: ensure the row is not empty before attempting to access columns
-        if (m_tiles[row].empty()) continue;
-
-        for (size_t col = 0; col < actual_cols; ++col) {
-
-            // For rapid debugging of player symbol vs. entity pointer (as per logs)
-            if (m_tiles[row][col] && m_tiles[row][col]->getSymbol() == 'P') {
-                Entity* entity = m_tiles[row][col]->getEntity();
-
-                // Convert pointer address to string for logging
-                std::stringstream ss;
-                ss << std::hex << (void*)entity;
-                std::string entity_address = ss.str();
-
-                // --- ADDED LOG FOR RAW ENTITY ADDRESS HERE ---
-                //LOG_INFO("Location::getPlayer: Found 'P' symbol at [row=" + std::to_string(row) + "][col=" + std::to_string(col) + "]. Raw Entity Address: 0x" + entity_address);
-
-                if (entity) {
-                    if (Player* player = dynamic_cast<Player*>(entity)) {
-                        // Log success using the captured address
-                        //LOG_INFO("Location::getPlayer: Player entity FOUND at internal index [row=" + std::to_string(row) + "][col=" + std::to_string(col) + "]. Address Confirmed: 0x" + entity_address);
-                        return player;
-                    }
-                } else {
-                    // This error indicates the Tile was created with 'P' but without the Player* entity pointer.
-                    //LOG_ERROR("Location::getPlayer: CRITICAL ERROR: Symbol 'P' found at [row=" + std::to_string(row) + "][col=" + std::to_string(col) + "], but Tile::getEntity() returned NULL. Player placement failed at index [" + std::to_string(row) + "][" + std::to_string(col) + "].");
-                }
-            }
-        }
-    }
-    //LOG_ERROR("No player found in the location: " + m_name);
-    //std::cerr << RED_TEXT << "Error: No player found in the location." << RESET_TEXT << std::endl;
-    return nullptr;
+std::string Location::getName() const
+{
+    return m_name;
 }
 
-void Location::setTile(int x, int y, Tile *tile) {
-    if (x >= 0 && y >= 0 && x <= m_width && y <= m_height) {
-        m_tiles[x][y] = tile;
-    }
+void Location::addDestination(const std::string &coords, size_t mapIndex)
+{
+    m_destinations[coords] = mapIndex;
 }
 
-bool Location::move(int currentX, int currentY, int newX, int newY, Tile* newTile) {
-    //LOG_INFO("Moving from (" + std::to_string(currentX) + ", " + std::to_string(currentY) + ") to (" + std::to_string(newX) + ", " + std::to_string(newY) + ").");
-    // Ensure both current and new positions are within bounds
-    if (currentY < 0 || currentX < 0 || currentY >= m_width || currentX >= m_height ||
-        newY < 0 || newX < 0 || newY >= m_width || newX >= m_height) {
-        //std::cerr << RED_TEXT << "Invalid move, out of bounds." << RED_TEXT << std::endl;
-        std::cout << 'b';
-        return false;
-    }
-    if (currentX == newX && currentY == newY) {
-        // --- START DEBUG BLOCK FOR LOCATION SWITCH/CREATE ---
-        //LOG_WARNING("Location::move: **Exit Tile Detected** at (" + std::to_string(newX) + ", " + std::to_string(newY) + "). Initiating Map Change.");
-
-        Player* playerBeforeSwitch = getPlayer();
-        if (playerBeforeSwitch) {
-            //LOG_INFO("Location::move: CHECKPOINT A: Player is present in OLD location BEFORE switch/create: " + m_name);
-        } else {
-            //LOG_ERROR("Location::move: CHECKPOINT A: Player is ALREADY MISSING from OLD location BEFORE switch/create! This should not happen.");
-        }
-
-        std::string destinationId = std::to_string(newX) + "," + std::to_string(newY);
-        size_t destinationIndex = getDestinationIndex(destinationId);
-        if (destinationIndex != std::numeric_limits<size_t>::max()) {
-            //LOG_INFO("Location::move: Switching to existing location index: " + std::to_string(destinationIndex));
-            //Map::getInstance().switchLocation(destinationIndex);
-        } else {
-            //LOG_INFO("Location::move: Creating new location.");
-            //Map::getInstance().createNewLocation();
-        }
-
-        // Post-action check to see if the player has been successfully placed in the new location
-        //Location* newCurrentLocation = Map::getInstance().getCurrentLocation();
-        //Player* playerAfterSwitch = newCurrentLocation->getPlayer();
-
-        //if (playerAfterSwitch) {
-            //LOG_WARNING("Location::move: CHECKPOINT B: Player successfully found in NEW location: " + newCurrentLocation->getName());
-        //} else {
-            //LOG_ERROR("Location::move: CRITICAL ERROR: Player NOT found in new location: " + newCurrentLocation->getName());
-        //}
-
-        // --- END DEBUG BLOCK FOR LOCATION SWITCH/CREATE ---
-        //Map::getInstance().displayCurrentMap();
-        //GameEngine::getInstance().saveGame();
-        return false;
-    }
-    // Check if the new tile at the destination is passable
-    if (m_tiles[newX][newY]->isPassable()) {
-        // Move the previous tile to the current position
-        //m_tiles[currentX][currentY] = m_previousTile;
-        // Store the symbol of the previous passable tile
-        //m_previousTile = m_tiles[newX][newY];
-        // Move the new tile to the destination
-        m_tiles[newX][newY] = newTile;
-        return true; // Move successful
-    }
-    // If the new tile is not passable, check if it contains a monster
-    //if (Monster* monster = dynamic_cast<Monster*>(m_tiles[newX][newY]->getEntity())) {
-        //Map::getInstance().displayCurrentMap();
-    //    std::cout << 'a';
-    //    return false; // Combat took place, but move not completed
-    //}
-    // Check if the tile contains gold
-    /*if (Gold* gold = dynamic_cast<Gold*>(m_tiles[newX][newY]->getEntity())) {
-        // Add the gold to the player's inventory
-        //Map::getInstance().getCurrentLocation()->getPlayer()->addGold(gold->getGoldAmount());
-        // Make the tile passable after picking up the gold
-        m_tiles[newX][newY] = new Tile(' ', true);
-        //Map::getInstance().displayCurrentMap();
-        std::cout << 'b';
-        return false; // Move not completed regardless of gold action
-    }
-    // Check if the tile contains an item
-    if (Item* item = dynamic_cast<Item*>(m_tiles[newX][newY]->getEntity())) {
-        // Check the type of item and print its properties accordingly
-        // Print common item properties
-        std::cout << item->getItemName() << ", Item price: " << item->getItemPrice() << ", Item rarity: " << item->getItemRarityString();
-        if (Potion* potion = dynamic_cast<Potion*>(item)) {
-            // Print potion properties
-            std::cout << ", Potion strength: " << potion->getPotionPower() << std::endl;
-        } else if (Weapon* weapon = dynamic_cast<Weapon*>(item)) {
-            // Print weapon properties
-            std::cout << ", Weapon attack: " << weapon->getWeaponAttack() << std::endl;
-        } else if (Armor* armor = dynamic_cast<Armor*>(item)) {
-            // Print armor properties
-            std::cout << ", Armor defense: " << armor->getArmorDefense() << std::endl;
-        }
-        std::cout << "Choose action: [1] Pick up  [2] Leave it" << std::endl;
-        int choice = 0;
-        while (true) {
-            //char input = _getch(); // Get a character from the keyboard without needing to press enter
-            //if (input >= '1' && input <= '2') {
-             //   choice = input - '0'; // Convert character to integer
-              //  break; // Exit the loop if a valid choice is entered
-            //} else {
-                //LOG_ERROR("Invalid input.");
-                //std::cerr << RED_TEXT << "Invalid input, please enter 1 or 2." << RESET_TEXT << std::endl;
-            //}
-        }
-        switch (choice) {
-            case 1:
-                // Add the item to the inventory if possible
-                if (Inventory::getInstance().addItem(item)) {
-                    // Make the tile passable after picking up the item
-                    m_tiles[newX][newY] = new Tile(' ', true);
-                }
-                break;
-            case 2:
-                break;
-            default:
-                //LOG_ERROR("Invalid choice.");
-                //std::cerr << RED_TEXT << "Invalid choice." << RESET_TEXT << std::endl;
-                break;
-        }
-        //Map::getInstance().displayCurrentMap();
-        std::cout << 'c';
-        return false; // Move not completed regardless of item action
-    }*/
-    return false; // Invalid destination, tile not passable
-}
-
-void Location::addDestination(const std::string& destinationId, size_t locationIndex) {
-    m_destinations[destinationId] = locationIndex;
-}
-
-std::pair<int, int> Location::getOppositeSidePosition(int x, int y, const Location* newLocation) {
-    Side playerSide = getSideFromPosition(x, y);
-
-    int newX = x;
-    int newY = y;
-
-    switch (playerSide) {
-        case Bottom:
-            newX = newLocation->m_height - 1;
-            for (int i = 0; i < newLocation->m_width; ++i) {
-                if (newLocation->m_tiles[newX][i]->isPassable() && newLocation->m_tiles[newX][i]->getSymbol() != '#') {
-                    newY = i;
-                    return std::make_pair(newX, newY);
-                }
-            }
-
-        case Top:
-            newX = 0;
-            for (int i = 0; i < newLocation->m_width; ++i) {
-                if (newLocation->m_tiles[newX][i]->isPassable() && newLocation->m_tiles[newX][i]->getSymbol() != '#') {
-                    newY = i;
-                    return std::make_pair(newX, newY);
-                }
-            }
-
-        case Right:
-            newY = newLocation->m_width - 1;
-            for (int i = 0; i < newLocation->m_height; ++i) {
-                if (newLocation->m_tiles[i][newY]->isPassable() && newLocation->m_tiles[i][newY]->getSymbol() != '#') {
-                    newX = i;
-                    return std::make_pair(newX, newY);
-                }
-            }
-
-        case Left:
-            newY = 0;
-            for (int i = 0; i < newLocation->m_height; ++i) {
-                if (newLocation->m_tiles[i][newY]->isPassable() && newLocation->m_tiles[i][newY]->getSymbol() != '#') {
-                    newX = i;
-                    return std::make_pair(newX, newY);
-                }
-            }
-    }
-
-    return std::make_pair(newX, newY);
-}
-
-Side Location::getSideFromPosition(int x, int y) {
-    int width = m_width;
-    int height = m_height;
-
-    if (x == 0) {
-        return Bottom;
-    } else if (x == height - 1) {
-        return Top;
-    } else if (y == 0) {
-        return Right;
-    } else if (y == width - 1) {
-        return Left;
-    } else {
-        return Random;
-    }
-}
-
-size_t Location::getDestinationIndex(const std::string& destinationId) {
+size_t Location::getDestinationIndex(const std::string &destinationId) const
+{
     auto it = m_destinations.find(destinationId);
-    if (it != m_destinations.end()) {
+    if (it != m_destinations.end())
+    {
         return it->second;
     }
     return std::numeric_limits<size_t>::max();
 }
 
-std::string Location::getName() {
-    return m_name;
-}
+void Location::setTile(int x, int y, Tile *newTile)
+{
+    size_t rows = getLocationHeight(m_tiles);
+    size_t cols = getLocationWidth(m_tiles);
 
-bool Location::setPreviousTile(Tile *tile) {
-    if (m_previousTile->getEntity() == nullptr) {
-        //m_previousTile = tile;
-        return true;
+    if (static_cast<size_t>(y) < rows && static_cast<size_t>(x) < cols)
+    {
+        delete m_tiles[y][x];
+        m_tiles[y][x] = newTile;
     }
-    return false;
+    else
+    {
+        LOG_ERROR("Attempted to set tile out of bounds at (" + std::to_string(x) + ", " + std::to_string(y) + ").");
+        delete newTile;
+    }
 }
 
-void Location::setHeight(int height) {
-    m_height = height;
+std::pair<int, int> Location::getOppositeSidePosition(int currentX, int currentY, Location *targetLocation) const
+{
+    Side playerSide = getSideFromPosition(currentX, currentY);
+
+    size_t targetRows = getLocationHeight(targetLocation->m_tiles);
+    size_t targetCols = getLocationWidth(targetLocation->m_tiles);
+
+    int newX = -1;
+    int newY = -1;
+
+    switch (playerSide)
+    {
+    case Side::North:
+        newY = targetRows - 1;
+        for (size_t col = 0; col < targetCols; ++col)
+        {
+            if (targetLocation->m_tiles[newY][col]->isTraversable())
+            {
+                newX = col;
+                return std::make_pair(newX, newY);
+            }
+        }
+        break;
+
+    case Side::South:
+        newY = 0;
+        for (size_t col = 0; col < targetCols; ++col)
+        {
+            if (targetLocation->m_tiles[newY][col]->isTraversable())
+            {
+                newX = col;
+                return std::make_pair(newX, newY);
+            }
+        }
+        break;
+
+    case Side::East:
+        newX = 0;
+        for (size_t row = 0; row < targetRows; ++row)
+        {
+            if (targetLocation->m_tiles[row][newX]->isTraversable())
+            {
+                newY = row;
+                return std::make_pair(newX, newY);
+            }
+        }
+        break;
+
+    case Side::West:
+        newX = targetCols - 1;
+        for (size_t row = 0; row < targetRows; ++row)
+        {
+            if (targetLocation->m_tiles[row][newX]->isTraversable())
+            {
+                newY = row;
+                return std::make_pair(newX, newY);
+            }
+        }
+        break;
+
+    case Side::Random:
+    default:
+        break;
+    }
+
+    LOG_WARNING("No passable entry point found for map transition.");
+    return std::make_pair(-1, -1);
 }
 
-void Location::setWidth(int width) {
-    m_width = width;
+Side Location::getSideFromPosition(int x, int y) const
+{
+    size_t rows = getLocationHeight(m_tiles);
+    size_t cols = getLocationWidth(m_tiles);
+
+    if (y == 0 && rows > 0)
+    {
+        return Side::North;
+    }
+    else if (y == static_cast<int>(rows) - 1 && rows > 0)
+    {
+        return Side::South;
+    }
+    else if (x == 0 && cols > 0)
+    {
+        return Side::West;
+    }
+    else if (x == static_cast<int>(cols) - 1 && cols > 0)
+    {
+        return Side::East;
+    }
+    else
+    {
+        return Side::Random;
+    }
 }
 
-void Location::setTile(std::vector<std::vector<Tile*>> tiles) {
-    m_tiles = tiles;
+Player *Location::getPlayer() const
+{
+    if (m_player != nullptr)
+    {
+        return m_player;
+    }
+
+    size_t actual_rows = getLocationHeight(m_tiles);
+    size_t actual_cols = getLocationWidth(m_tiles);
+
+    for (size_t row_y = 0; row_y < actual_rows; ++row_y)
+    {
+        for (size_t col_x = 0; col_x < actual_cols; ++col_x)
+        {
+            if (m_tiles[row_y][col_x] && m_tiles[row_y][col_x]->getOccupant())
+            {
+                return m_tiles[row_y][col_x]->getOccupant();
+            }
+        }
+    }
+    LOG_INFO("No player found in the location: " + m_name);
+    return nullptr;
 }
 
-void Location::saveLocation(std::ofstream& file) {
-    //LOG_INFO("Saving location: " + m_name + ".");
-    size_t numRows = m_tiles.size();
-    file.write(reinterpret_cast<const char*>(&numRows), sizeof(size_t));
-    for (const auto& row : m_tiles) {
+void Location::saveLocation(std::ofstream &file) const
+{
+    LOG_INFO("Saving location: " + m_name + ".");
+
+    size_t nameSize = m_name.size();
+    file.write(reinterpret_cast<const char *>(&nameSize), sizeof(nameSize));
+    file.write(m_name.c_str(), nameSize);
+
+    size_t numRows = getLocationHeight(m_tiles);
+    file.write(reinterpret_cast<const char *>(&numRows), sizeof(size_t));
+
+    for (const auto &row : m_tiles)
+    {
         size_t numTiles = row.size();
-        file.write(reinterpret_cast<const char*>(&numTiles), sizeof(size_t));
-        for (const auto& tile : row) {
+        file.write(reinterpret_cast<const char *>(&numTiles), sizeof(size_t));
+        for (const auto &tile : row)
+        {
             tile->saveTile(file);
         }
     }
 
-    // Save destinations
     size_t numDestinations = m_destinations.size();
-    file.write(reinterpret_cast<const char*>(&numDestinations), sizeof(size_t));
-    for (const auto& door : m_destinations) {
+    file.write(reinterpret_cast<const char *>(&numDestinations), sizeof(size_t));
+    for (const auto &door : m_destinations)
+    {
         size_t destinationIdLength = door.first.size();
-        file.write(reinterpret_cast<const char*>(&destinationIdLength), sizeof(size_t));
+        file.write(reinterpret_cast<const char *>(&destinationIdLength), sizeof(size_t));
         file.write(door.first.c_str(), destinationIdLength);
-        file.write(reinterpret_cast<const char*>(&door.second), sizeof(size_t)); // Save index of the destination location
+        file.write(reinterpret_cast<const char *>(&door.second), sizeof(size_t));
     }
-
-    file.write(reinterpret_cast<const char*>(&m_width), sizeof(m_width));
-    file.write(reinterpret_cast<const char*>(&m_height), sizeof(m_height));
-    if (m_previousTile) {
-        m_previousTile->saveTile(file);
-    }
-
-    size_t nameSize = m_name.size();
-    file.write(reinterpret_cast<const char*>(&nameSize), sizeof(nameSize));
-    file.write(m_name.c_str(), nameSize);
-
-    // Save if this is the current location
-    //bool isCurrentLocation = (this == Map::getInstance().getCurrentLocation());
-    //file.write(reinterpret_cast<const char*>(&isCurrentLocation), sizeof(bool));
 }
 
-Location* Location::loadLocation(std::ifstream& file) {
+Location *Location::loadLocation(std::ifstream &file)
+{
+    size_t name_length;
+    file.read(reinterpret_cast<char *>(&name_length), sizeof(name_length));
+    std::string name(name_length, '\0');
+    file.read(&name[0], name_length);
+
     size_t numRows;
-    file.read(reinterpret_cast<char*>(&numRows), sizeof(size_t));
-    std::vector<std::vector<Tile*>> tiles;
-    for (size_t i = 0; i < numRows; ++i) {
+    file.read(reinterpret_cast<char *>(&numRows), sizeof(size_t));
+    std::vector<std::vector<Tile *>> tiles;
+    for (size_t i = 0; i < numRows; ++i)
+    {
         size_t numTiles;
-        file.read(reinterpret_cast<char*>(&numTiles), sizeof(size_t));
-        std::vector<Tile*> row;
-        for (size_t j = 0; j < numTiles; ++j) {
-            Tile* tile = Tile::loadTile(file);
+        file.read(reinterpret_cast<char *>(&numTiles), sizeof(size_t));
+        std::vector<Tile *> row;
+        for (size_t j = 0; j < numTiles; ++j)
+        {
+            Tile *tile = Tile::loadTile(file);
             row.push_back(tile);
         }
         tiles.push_back(row);
     }
 
-    // Load destinations
     size_t numDestinations;
-    file.read(reinterpret_cast<char*>(&numDestinations), sizeof(size_t));
+    file.read(reinterpret_cast<char *>(&numDestinations), sizeof(size_t));
     std::unordered_map<std::string, size_t> destinations;
-    for (size_t i = 0; i < numDestinations; ++i) {
+    for (size_t i = 0; i < numDestinations; ++i)
+    {
         size_t destinationIdLength;
-        file.read(reinterpret_cast<char*>(&destinationIdLength), sizeof(size_t));
+        file.read(reinterpret_cast<char *>(&destinationIdLength), sizeof(size_t));
         std::string destinationId(destinationIdLength, '\0');
         file.read(&destinationId[0], destinationIdLength);
 
         size_t locationIndex;
-        file.read(reinterpret_cast<char*>(&locationIndex), sizeof(size_t)); // Load index of the destination location
+        file.read(reinterpret_cast<char *>(&locationIndex), sizeof(size_t));
         destinations[destinationId] = locationIndex;
     }
 
-    int width, height;
-    file.read(reinterpret_cast<char*>(&width), sizeof(width));
-    file.read(reinterpret_cast<char*>(&height), sizeof(height));
-    Tile* previousTile = Tile::loadTile(file);
-
-    size_t name_length;
-    file.read(reinterpret_cast<char*>(&name_length), sizeof(name_length));
-    std::string name(name_length, '\0');
-    file.read(&name[0], name_length);
-
-    //LOG_INFO("Creating location with name: " + name + " and size: " + std::to_string(width) + "x" + std::to_string(height) + ".");
-    Location* location = new Location(name, tiles, destinations, width, height, previousTile);
-
-    // Load if this is the current location
-    bool isCurrentLocation;
-    file.read(reinterpret_cast<char*>(&isCurrentLocation), sizeof(bool));
-    if (isCurrentLocation) {
-        //Map::getInstance().setCurrentLocation(location);
-        // Add log for post-load player check
-        //LOG_INFO("Location::loadLocation: Checking player after setting current location: " + location->getName());
-        //Player* player = Map::getInstance().getCurrentLocation()->getPlayer();
-        //if (player == nullptr) {
-            //LOG_ERROR("Player is dead or missing after load.");
-            //GameEngine::getInstance().deathScreen();
-        //} else {
-             //LOG_INFO("Location::loadLocation: Player successfully found after load.");
-        //}
-    }
+    LOG_INFO("Successfully loaded location: " + name);
+    Location *location = new Location();
+    location->setName(name);
+    location->setTiles(tiles);
+    location->m_destinations = destinations;
 
     return location;
 }

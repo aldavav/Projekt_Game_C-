@@ -1,25 +1,24 @@
-//
-// Created by Michael Szotkowski on 6/17/2024.
-//
-
-#ifndef NEW_PROJEKT_ZOO_LOCATIONDIRECTOR_H
-#define NEW_PROJEKT_ZOO_LOCATIONDIRECTOR_H
+#ifndef LOCATIONDIRECTOR_H
+#define LOCATIONDIRECTOR_H
 
 #include "LocationBuilder.h"
-#include "DefaultLocationBuilder.h"
+#include <LoggerMacros.h>
 
-class LocationDirector {
+class LocationDirector
+{
 private:
-    LocationBuilder* m_builder;
+    LocationBuilder *m_builder;
 
 public:
-    LocationDirector(LocationBuilder *builder = new DefaultLocationBuilder());
+    LocationDirector();
+
+    LocationDirector(LocationBuilder *builder);
 
     ~LocationDirector();
 
     void setBuilder(LocationBuilder *builder);
 
-    Location *buildLocation(Side doorSide = Random, bool firstLocation = false);
+    Location *buildLocation(Side side, bool isFirst = false);
 };
 
-#endif //NEW_PROJEKT_ZOO_LOCATIONDIRECTOR_H
+#endif

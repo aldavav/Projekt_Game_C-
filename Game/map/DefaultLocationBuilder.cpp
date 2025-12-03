@@ -1,256 +1,160 @@
-//
-// Created by Michael Szotkowski on 6/17/2024.
-//
-
 #include "DefaultLocationBuilder.h"
-#include <ctime>
 
-DefaultLocationBuilder::DefaultLocationBuilder() {
-    //LOG_INFO("Creating DefaultLocationBuilder instance.");
-    m_location = new Location("Default Location");
+DefaultLocationBuilder::DefaultLocationBuilder()
+{
+    LOG_INFO("Creating DefaultLocationBuilder instance.");
+    reset();
 }
 
-DefaultLocationBuilder::~DefaultLocationBuilder() {
-    //LOG_INFO("Destroying DefaultLocationBuilder instance.");
-    delete m_location;
+void DefaultLocationBuilder::reset()
+{
+    m_location = std::make_unique<Location>();
 }
 
-void DefaultLocationBuilder::emptyLayout() {
-    //LOG_INFO("Creating tiles.");
-    std::vector<std::vector<Tile*>> tiles;
-    // Seed the random number generator
+void DefaultLocationBuilder::buildName(Side side)
+{
+    std::string sideName;
+    switch (side)
+    {
+    case Side::North:
+        sideName = "Northern Sector";
+        break;
+    case Side::South:
+        sideName = "Southern Sector";
+        break;
+    case Side::East:
+        sideName = "Eastern Outpost";
+        break;
+    case Side::West:
+        sideName = "Western Foothills";
+        break;
+    case Side::Random:
+    default:
+        sideName = "Unknown Area";
+        break;
+    }
+    m_location->setName("Map " + std::to_string(rand() % 100) + " - " + sideName);
+}
+
+void DefaultLocationBuilder::buildTiles()
+{
+    LOG_INFO("Creating default tiles layout.");
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
-    // Generate random width and height between 5 and 10
-    constexpr int MIN_SIZE = 5;
-    constexpr int MAX_SIZE = 8;
+    constexpr int MIN_SIZE = 10;
+    constexpr int MAX_SIZE = 25;
     int height = std::rand() % (MAX_SIZE - MIN_SIZE + 1) + MIN_SIZE;
-    int width = std::rand() % (height - 4) + height;
+    int width = std::rand() % (MAX_SIZE - MIN_SIZE + 1) + MIN_SIZE;
 
-    // Initialize the location with spaces
-    for (int y = 0; y < height; ++y) {
-        std::vector<Tile*> row;
-        for (int x = 0; x < width; ++x) {
-            if (x == 0 || y == 0 || x == width - 1 || y == height - 1) {
-                // Borders
-                row.push_back(new Tile('#', false,nullptr));
-            } else {
-                // Inner tiles
-                row.push_back(new Tile(' ', true,nullptr));
+    std::vector<std::vector<Tile *>> tiles;
+
+    for (int y = 0; y < height; ++y)
+    {
+        std::vector<Tile *> row;
+        for (int x = 0; x < width; ++x)
+        {
+            if (x == 0 || y == 0 || x == width - 1 || y == height - 1)
+            {
+                row.push_back(new Tile(ROCK, "#", false));
+            }
+            else
+            {
+                row.push_back(new Tile(GRASS, " ", true));
             }
         }
         tiles.push_back(row);
     }
-    m_location->setHeight(height);
-    m_location->setWidth(width);
-    m_location->setTile(tiles);
+    m_location->setTiles(tiles);
 }
 
-void DefaultLocationBuilder::setDoors(Side doorSide) {
-    // FIX: Correctly define dimensions based on tiles[ROW][COLUMN] structure
-    int height = m_location->getTiles().size();       // Number of Rows (Y dimension)
-    int width = m_location->getTiles()[0].size();     // Number of Columns (X dimension)
-    std::vector<std::vector<Tile*>> tiles = m_location->getTiles();
-    std::set<Side> doorSides; // Tracks which sides already have a door
+void DefaultLocationBuilder::buildResources(Side doorSide)
+{
+    int height = m_location->getTiles().size();
+    int width = (height > 0) ? m_location->getTiles()[0].size() : 0;
 
-    // Helper lambda to place a single door on a given side, avoiding corners.
-    auto placeDoor = [&](Side side) {
-        if (doorSides.count(side) > 0) return; // Skip if already placed
+    if (width == 0 || height == 0)
+        return;
 
-        switch (side) {
-            case Side::Left: { // Col 0, needs random Row (Y)
-                int yPos = rand() % (height - 2) + 1;
-                tiles[yPos][0] = new Tile(' ', true);
-                doorSides.insert(Side::Left);
-                break;
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    int numResources = (width * height) / 50;
+
+    std::vector<std::pair<int, int>> availablePositions;
+    for (int y = 1; y < height - 1; ++y)
+    {
+        for (int x = 1; x < width - 1; ++x)
+        {
+            if (m_location->getTiles()[y][x]->isTraversable())
+            {
+                availablePositions.push_back({x, y});
             }
-            case Side::Right: { // Col width-1, needs random Row (Y)
-                int yPos = rand() % (height - 2) + 1;
-                tiles[yPos][width - 1] = new Tile(' ', true);
-                doorSides.insert(Side::Right);
-                break;
-            }
-            case Side::Top: { // Row 0, needs random Col (X)
-                int xPos = rand() % (width - 2) + 1;
-                tiles[0][xPos] = new Tile(' ', true);
-                doorSides.insert(Side::Top);
-                break;
-            }
-            case Side::Bottom: { // Row height-1, needs random Col (X)
-                int xPos = rand() % (width - 2) + 1;
-                tiles[height - 1][xPos] = new Tile(' ', true);
-                doorSides.insert(Side::Bottom);
-                break;
-            }
+        }
+    }
+
+    std::shuffle(availablePositions.begin(), availablePositions.end(), std::mt19937(std::random_device()()));
+
+    for (int i = 0; i < numResources && !availablePositions.empty(); ++i)
+    {
+        auto pos = availablePositions.back();
+        availablePositions.pop_back();
+
+        m_location->setTile(pos.first, pos.second, new Tile(SAND, "T", false));
+    }
+
+    int doorsToCreate = rand() % 3 + 1;
+
+    auto placeDoor = [&](Side side)
+    {
+        if (side == Side::Random)
+            return;
+
+        int xPos = -1, yPos = -1;
+
+        switch (side)
+        {
+        case Side::North:
+            xPos = rand() % (width - 2) + 1;
+            yPos = 0;
+            break;
+        case Side::South:
+            xPos = rand() % (width - 2) + 1;
+            yPos = height - 1;
+            break;
+        case Side::West:
+            xPos = 0;
+            yPos = rand() % (height - 2) + 1;
+            break;
+        case Side::East:
+            xPos = width - 1;
+            yPos = rand() % (height - 2) + 1;
+            break;
+        default:
+            break;
+        }
+
+        if (xPos != -1 && yPos != -1)
+        {
+            m_location->setTile(xPos, yPos, new Tile(GRASS, " ", true));
+            LOG_INFO("Placed door at (" + std::to_string(xPos) + ", " + std::to_string(yPos) + ") on side " + std::to_string((int)side));
         }
     };
 
-    // 1. Place the mandatory door (guaranteeing at least 1 door)
     placeDoor(doorSide);
 
-    // 2. Prepare a list of all possible sides
-    std::vector<Side> allSides = {Side::Left, Side::Right, Side::Top, Side::Bottom};
-    std::vector<Side> availableSides;
+    std::vector<Side> allSides = {Side::North, Side::South, Side::East, Side::West};
+    std::set<Side> placedDoors = {doorSide};
 
-    // 3. Filter out the side that was just placed
-    for (Side side : allSides) {
-        if (side != doorSide) {
-            availableSides.push_back(side);
+    for (int i = 0; i < doorsToCreate; ++i)
+    {
+        Side randomSide = allSides[rand() % allSides.size()];
+        if (placedDoors.find(randomSide) == placedDoors.end())
+        {
+            placeDoor(randomSide);
+            placedDoors.insert(randomSide);
         }
     }
-
-    // 4. Determine how many ADDITIONAL doors to place (0 to 3)
-    // The number of doors will be 1 (mandatory) + random(0-3)
-    int additionalDoorsToCreate = rand() % (availableSides.size() + 1);
-
-    // 5. Shuffle the available sides and select the required number
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(availableSides.begin(), availableSides.end(), g);
-
-    // 6. Place the additional doors
-    for (int i = 0; i < additionalDoorsToCreate; ++i) {
-        placeDoor(availableSides[i]);
-    }
-
-    m_location->setTile(tiles);
 }
 
-void DefaultLocationBuilder::setMonsters(int monsterPercentage) {
-    int width = m_location->getTiles()[0].size();
-    int height = m_location->getTiles().size();
-    int totalTiles = (width - 2) * (height - 2);
-    int numMonsters = totalTiles * monsterPercentage / 100;
-
-    // Create a list of available positions excluding borders
-    std::vector<std::pair<int, int>> availablePositions;
-    for (int y = 1; y < width - 1; ++y) {
-        for (int x = 1; x < height - 1; ++x) {
-            if (m_location->getTiles()[x][y]->isPassable()) {
-                availablePositions.push_back({x, y});
-            }
-        }
-    }
-
-    // Shuffle the available positions
-    std::shuffle(availablePositions.begin(), availablePositions.end(), std::mt19937(std::random_device()()));
-
-    /*for (int i = 0; i < numMonsters && !availablePositions.empty(); ++i) {
-        MonsterType monsterType = static_cast<MonsterType>(rand() % 3 + 1); // Random item type between 1 and 3
-        std::string monsterName = "name" + std::to_string(rand() % 100 + 1); // Random item name
-        int attack = rand() % 10 + 1; // Random attack between 1 and 10
-        int defense = rand() % 10 + 1; // Random defense between 1 and 10
-        int hp = rand() % 11 + 5; // Random HP between 5 and 15
-
-        MonsterLevel monsterLevel = M_EASY;
-        int randomValue = rand() % 100 + 1; // Random number between 1 and 100
-        if (randomValue <= 50) {
-            monsterLevel = M_EASY; // 50% chance
-        } else if (randomValue <= 80) {
-            monsterLevel = M_MEDIUM; // 30% chance
-        } else {
-            monsterLevel = M_HARD; // 5% chance
-        }
-
-        MonsterFactory monsterFactory;
-        Monster* monster = monsterFactory.createMonster(monsterType, monsterName, attack, defense, hp, monsterLevel);
-
-        auto pos = availablePositions.back();
-        availablePositions.pop_back();
-        m_location->setTile(pos.first, pos.second, new Tile(monster->getMonsterSymbol(), false, monster));
-    }*/
-}
-
-void DefaultLocationBuilder::setItems(int itemPercentage) {
-    int width = m_location->getTiles()[0].size();
-    int height = m_location->getTiles().size();
-    int totalTiles = (width - 2) * (height - 2);
-    int numItems = totalTiles * itemPercentage / 100;
-
-    // Create a list of available positions excluding borders
-    std::vector<std::pair<int, int>> availablePositions;
-    for (int y = 1; y < width - 1; ++y) {
-        for (int x = 1; x < height - 1; ++x) {
-            if (m_location->getTiles()[x][y]->isPassable()) {
-                    availablePositions.push_back({x, y});
-            }
-        }
-    }
-
-    // Shuffle the available positions
-    std::shuffle(availablePositions.begin(), availablePositions.end(), std::mt19937(std::random_device()()));
-
-    /*for (int i = 0; i < numItems && !availablePositions.empty(); ++i) {
-        ItemTypes itemType = static_cast<ItemTypes>(rand() % 3 + 1); // Random item type between 1 and 3
-        std::string itemName = "name" + std::to_string(rand() % 100 + 1); // Random item name
-        int itemPower = rand() % 10 + 1; // Random item power between 1 and 10
-
-        ItemRarity itemRarity = COMMON;
-        int randomValue = rand() % 100 + 1; // Random number between 1 and 100
-        if (randomValue <= 50) {
-            itemRarity = COMMON; // 50% chance
-        } else if (randomValue <= 80) {
-            itemRarity = UNCOMMON; // 30% chance
-        } else if (randomValue <= 95) {
-            itemRarity = RARE; // 15% chance
-        } else {
-            itemRarity = LEGENDARY; // 5% chance
-        }
-
-        int itemWeight = rand() % 5 + 1; // Random weight between 1 and 5
-
-        ItemFactory itemFactory;
-        Item* item = itemFactory.createItem(itemType, itemName, itemPower, itemRarity, itemWeight);
-
-        auto pos = availablePositions.back();
-        availablePositions.pop_back();
-        m_location->setTile(pos.first, pos.second, new Tile(item->getItemSymbol(), false, item));
-    }*/
-}
-
-void DefaultLocationBuilder::setGold(int goldPercentage) {
-    int width = m_location->getTiles()[0].size();
-    int height = m_location->getTiles().size();
-    int totalTiles = (width - 2) * (height - 2);
-    int numGoldPiles = totalTiles * goldPercentage / 100;
-
-    // Create a list of available positions excluding borders
-    std::vector<std::pair<int, int>> availablePositions;
-    for (int y = 1; y < width - 1; ++y) {
-        for (int x = 1; x < height - 1; ++x) {
-            if (m_location->getTiles()[x][y]->isPassable()) {
-                availablePositions.push_back({x, y});
-            }
-        }
-    }
-
-    // Shuffle the available positions
-    std::shuffle(availablePositions.begin(), availablePositions.end(), std::mt19937(std::random_device()()));
-
-    /*for (int i = 0; i < numGoldPiles && !availablePositions.empty(); ++i) {
-        int goldAmount = rand() % 101 + 50; // Random gold amount between 50 and 150
-        Gold* gold = new Gold(goldAmount);
-
-        auto pos = availablePositions.back();
-        availablePositions.pop_back();
-        m_location->setTile(pos.first, pos.second, new Tile(gold->getGoldSymbol(), false, gold));
-    }*/
-}
-
-void DefaultLocationBuilder::setPlayer() {
-    int width = m_location->getTiles()[0].size();
-    int height = m_location->getTiles().size();
-    int x = rand() % (height - 2) + 1;
-    int y = rand() % (width - 2) + 1;
-
-    /*Player* player = Player::createPlayer();
-    //LOG_INFO("Player created as: " + player->getPlayerTypeString());
-    std::cout << x << y;
-    std::cout << m_location->getTiles()[x][y]->getSymbol();
-    player->setXY(std::make_pair(x, y));
-    m_location->setTile(x, y, new Tile(player->getPlayerSymbol(), false, player));*/
-}
-
-Location* DefaultLocationBuilder::getLocation() {
-    return m_location;
+Location *DefaultLocationBuilder::getLocation()
+{
+    return m_location.release();
 }

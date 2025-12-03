@@ -1,5 +1,4 @@
 #include "GameEngine.h"
-#include <QDateTime>
 
 GameEngine &GameEngine::getInstance()
 {

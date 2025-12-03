@@ -1,50 +1,58 @@
-//
-// Created by Michael Szotkowski on 6/17/2024.
-//
-
 #include "Tile.h"
 
-Tile::Tile(char symbol, bool passable, Entity *entity) : m_symbol(symbol), m_passable(passable) {
-    if (entity != nullptr) {
-        m_entity = std::unique_ptr<Entity>(entity);
-    }
+Tile::Tile(TerrainType type, const std::string &symbol, bool traversable)
+    : m_type(type), m_symbol(symbol), m_isTraversable(traversable), m_occupant(nullptr)
+{
 }
 
-char Tile::getSymbol() {
+TerrainType Tile::getType() const
+{
+    return m_type;
+}
+
+std::string Tile::getSymbol() const
+{
     return m_symbol;
 }
 
-bool Tile::isPassable() {
-    return m_passable;
+bool Tile::isTraversable() const
+{
+    return m_isTraversable;
 }
 
-Entity* Tile::getEntity() {
-    return m_entity.get();
+Player *Tile::getOccupant() const
+{
+    return m_occupant;
 }
 
-void Tile::saveTile(std::ofstream& file) {
-    file.write(reinterpret_cast<const char*>(&m_symbol), sizeof(m_symbol));
-    file.write(reinterpret_cast<const char*>(&m_passable), sizeof(m_passable));
-
-    bool hasEntity = (m_entity != nullptr);
-    file.write(reinterpret_cast<const char*>(&hasEntity), sizeof(hasEntity));
-    if (hasEntity) {
-        m_entity->saveEntity(file);
-    }
+void Tile::setOccupant(Player *player)
+{
+    m_occupant = player;
 }
 
-Tile* Tile::loadTile(std::ifstream& file) {
-    char symbol;
-    bool passable;
-    file.read(reinterpret_cast<char*>(&symbol), sizeof(symbol));
-    file.read(reinterpret_cast<char*>(&passable), sizeof(passable));
+void Tile::saveTile(std::ofstream &file) const
+{
+    file.write(reinterpret_cast<const char *>(&m_type), sizeof(m_type));
 
-    Entity* entity = nullptr;
-    bool hasEntity;
-    file.read(reinterpret_cast<char*>(&hasEntity), sizeof(hasEntity));
-    if (hasEntity) {
-        entity = Entity::createEntityFromFile(file);
-    }
+    size_t symbolLength = m_symbol.size();
+    file.write(reinterpret_cast<const char *>(&symbolLength), sizeof(size_t));
+    file.write(m_symbol.c_str(), symbolLength);
 
-    return new Tile(symbol, passable, entity);
+    file.write(reinterpret_cast<const char *>(&m_isTraversable), sizeof(m_isTraversable));
+}
+
+Tile *Tile::loadTile(std::ifstream &file)
+{
+    TerrainType type;
+    file.read(reinterpret_cast<char *>(&type), sizeof(type));
+
+    size_t symbolLength;
+    file.read(reinterpret_cast<char *>(&symbolLength), sizeof(size_t));
+    std::string symbol(symbolLength, '\0');
+    file.read(&symbol[0], symbolLength);
+
+    bool traversable;
+    file.read(reinterpret_cast<char *>(&traversable), sizeof(traversable));
+
+    return new Tile(type, symbol, traversable);
 }

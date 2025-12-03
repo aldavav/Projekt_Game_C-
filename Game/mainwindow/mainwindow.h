@@ -1,9 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "../GameEngine/GameEngine.h"
-#include "../MenuManager/MenuManager.h"
 #include "../InputManager/InputManager.h"
+#include "../MenuManager/MenuManager.h"
+#include "../GameEngine/GameEngine.h"
 #include <QApplication>
 #include <QMainWindow>
 #include <QMouseEvent>

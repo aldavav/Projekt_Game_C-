@@ -1,10 +1,11 @@
 #ifndef GAMEENGINE_H
 #define GAMEENGINE_H
 
+#include <QtCore/qobjectdefs.h>
+#include <QDateTime>
+#include <QString>
 #include <QTimer>
 #include <QDebug>
-#include <QtCore/qobjectdefs.h>
-#include <QString>
 
 class GameState;
 class MapManager;

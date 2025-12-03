@@ -1,34 +1,48 @@
-//
-// Created by Michael Szotkowski on 6/17/2024.
-//
+#ifndef TILE_H
+#define TILE_H
 
-#ifndef NEW_PROJEKT_ZOO_TILE_H
-#define NEW_PROJEKT_ZOO_TILE_H
-
-#include <memory>
 #include <fstream>
-#include "../entity/Entity.h"
+#include <string>
 
-class Tile {
-private:
-    char m_symbol;
+class Player;
 
-    bool m_passable;
-
-    std::unique_ptr<Entity> m_entity;
-
-public:
-    Tile(char symbol, bool passable, Entity *entity = nullptr);
-
-    char getSymbol();
-
-    bool isPassable();
-
-    Entity* getEntity();
-
-    void saveTile(std::ofstream &file);
-
-    static Tile *loadTile(std::ifstream &file);
+enum TerrainType
+{
+    GRASS,
+    SAND,
+    WATER,
+    ROCK
 };
 
-#endif //NEW_PROJEKT_ZOO_TILE_H
+class Tile
+{
+private:
+    TerrainType m_type;
+
+    std::string m_symbol;
+
+    bool m_isTraversable;
+
+    Player *m_occupant;
+
+public:
+    Tile(TerrainType type, const std::string &symbol, bool traversable);
+
+    ~Tile() = default;
+
+    TerrainType getType() const;
+
+    std::string getSymbol() const;
+
+    bool isTraversable() const;
+
+    Player *getOccupant() const;
+
+    void setOccupant(Player *player);
+
+    void saveTile(std::ofstream &file) const;
+
+    static Tile* loadTile(std::ifstream &file);
+};
+
+#endif

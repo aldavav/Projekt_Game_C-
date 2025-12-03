@@ -1,38 +1,34 @@
-//
-// Created by Michael Szotkowski on 6/17/2024.
-//
+#ifndef DEFAULTLOCATIONBUILDER_H
+#define DEFAULTLOCATIONBUILDER_H
 
-#ifndef NEW_PROJEKT_ZOO_DEFAULTLOCATIONBUILDER_H
-#define NEW_PROJEKT_ZOO_DEFAULTLOCATIONBUILDER_H
-
-#include <algorithm>
-#include <random>
-#include <set>
 #include "LocationBuilder.h"
+#include <LoggerMacros.h>
 #include "Location.h"
+#include <cstdlib>
+#include <random>
+#include <memory>
+#include <ctime>
+#include <set>
 
-class DefaultLocationBuilder : public LocationBuilder {
+class DefaultLocationBuilder : public LocationBuilder
+{
 private:
-    Location* m_location;
+    std::unique_ptr<Location> m_location;
 
 public:
     DefaultLocationBuilder();
 
-    ~DefaultLocationBuilder() override;
+    ~DefaultLocationBuilder() = default;
 
-    void emptyLayout() override;
+    void buildName(Side side) override;
 
-    void setDoors(Side doorSide) override;
+    void buildTiles() override;
 
-    void setMonsters(int monsterPercentage) override;
+    void buildResources(Side side) override;
 
-    void setItems(int itemPercentage) override;
+    Location *getLocation() override;
 
-    void setGold(int goldPercentage) override;
-
-    void setPlayer() override;
-
-    Location* getLocation() override;
+    void reset() override;
 };
 
-#endif //NEW_PROJEKT_ZOO_DEFAULTLOCATIONBUILDER_H
+#endif

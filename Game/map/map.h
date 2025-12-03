@@ -1,35 +1,32 @@
-//
-// Created by Michael Szotkowski on 6/17/2024.
-//
+#ifndef MAP_H
+#define MAP_H
 
-#ifndef NEW_PROJEKT_ZOO_MAP_H
-#define NEW_PROJEKT_ZOO_MAP_H
-
-#include <conio.h>
-#include <optional>
-#include <limits>
+#include "DefaultLocationBuilder.h"
 #include "LocationDirector.h"
-#include "Location.h"
+#include <LoggerMacros.h>
+#include <fstream>
+#include <string>
+#include <vector>
 
-#include <unordered_map>
-
-enum Difficulty {
+enum Difficulty
+{
     EASY,
     MEDIUM,
     HARD
 };
 
-class Map {
+class Map
+{
 private:
-    std::vector<Location*> m_locations;
+    std::vector<Location *> m_locations;
 
-    Location* m_currentLocation = nullptr;
+    Location *m_currentLocation = nullptr;
 
     Map();
 
     std::string m_mapName;
 
-    static Map* instance;
+    static Map *instance;
 
     LocationDirector m_locationDirector;
 
@@ -38,17 +35,13 @@ private:
 public:
     ~Map();
 
-    void setMapName();
-
-    void setMapDifficulty();
-
-    static Map& getInstance();
+    static Map &getInstance();
 
     static void destroyInstance();
 
     std::string getMapName();
 
-    void initializeNewMap(const std::string& name, Difficulty difficulty);
+    void initializeNewMap(const std::string &name, Difficulty difficulty);
 
     Map(const Map &) = delete;
 
@@ -58,11 +51,11 @@ public:
 
     Map &operator=(Map &&) = delete;
 
-    Location* getCurrentLocation();
+    Location *getCurrentLocation();
 
     void displayCurrentMap();
 
-    void setCurrentLocation(Location* newLocation);
+    void setCurrentLocation(Location *newLocation);
 
     void switchLocation(size_t locationIndex);
 
@@ -73,4 +66,4 @@ public:
     static void loadMap(std::ifstream &file);
 };
 
-#endif //NEW_PROJEKT_ZOO_MAP_H
+#endif
