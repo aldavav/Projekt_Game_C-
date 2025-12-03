@@ -4,6 +4,7 @@
 #include "LocationBuilder.h"
 #include <LoggerMacros.h>
 #include "Location.h"
+#include <algorithm>
 #include <cstdlib>
 #include <random>
 #include <memory>

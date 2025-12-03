@@ -24,6 +24,7 @@ Location::~Location()
         }
     }
     m_tiles.clear();
+    m_player = nullptr;
 }
 
 void Location::setName(const std::string &name)
@@ -181,28 +182,29 @@ Side Location::getSideFromPosition(int x, int y) const
     }
 }
 
+void Location::setPlayer(Player *player)
+{
+    if (m_player && m_player != player)
+    {
+        LOG_WARNING("Overwriting existing player reference in location " + m_name);
+    }
+    m_player = player;
+}
+
+Player *Location::removePlayer()
+{
+    Player *p = m_player;
+    m_player = nullptr;
+    return p;
+}
+
 Player *Location::getPlayer() const
 {
-    if (m_player != nullptr)
+    if (!m_player)
     {
-        return m_player;
+        LOG_INFO("No player/faction explicitly set for this location: " + m_name);
     }
-
-    size_t actual_rows = getLocationHeight(m_tiles);
-    size_t actual_cols = getLocationWidth(m_tiles);
-
-    for (size_t row_y = 0; row_y < actual_rows; ++row_y)
-    {
-        for (size_t col_x = 0; col_x < actual_cols; ++col_x)
-        {
-            if (m_tiles[row_y][col_x] && m_tiles[row_y][col_x]->getOccupant())
-            {
-                return m_tiles[row_y][col_x]->getOccupant();
-            }
-        }
-    }
-    LOG_INFO("No player found in the location: " + m_name);
-    return nullptr;
+    return m_player;
 }
 
 void Location::saveLocation(std::ofstream &file) const
@@ -240,38 +242,48 @@ void Location::saveLocation(std::ofstream &file) const
 Location *Location::loadLocation(std::ifstream &file)
 {
     size_t name_length;
-    file.read(reinterpret_cast<char *>(&name_length), sizeof(name_length));
+    if (!file.read(reinterpret_cast<char *>(&name_length), sizeof(name_length)))
+        return nullptr;
     std::string name(name_length, '\0');
-    file.read(&name[0], name_length);
+    if (!file.read(&name[0], name_length))
+        return nullptr;
 
     size_t numRows;
-    file.read(reinterpret_cast<char *>(&numRows), sizeof(size_t));
+    if (!file.read(reinterpret_cast<char *>(&numRows), sizeof(size_t)))
+        return nullptr;
     std::vector<std::vector<Tile *>> tiles;
     for (size_t i = 0; i < numRows; ++i)
     {
         size_t numTiles;
-        file.read(reinterpret_cast<char *>(&numTiles), sizeof(size_t));
+        if (!file.read(reinterpret_cast<char *>(&numTiles), sizeof(size_t)))
+            return nullptr;
         std::vector<Tile *> row;
         for (size_t j = 0; j < numTiles; ++j)
         {
             Tile *tile = Tile::loadTile(file);
+            if (!tile)
+                return nullptr;
             row.push_back(tile);
         }
         tiles.push_back(row);
     }
 
     size_t numDestinations;
-    file.read(reinterpret_cast<char *>(&numDestinations), sizeof(size_t));
+    if (!file.read(reinterpret_cast<char *>(&numDestinations), sizeof(size_t)))
+        return nullptr;
     std::unordered_map<std::string, size_t> destinations;
     for (size_t i = 0; i < numDestinations; ++i)
     {
         size_t destinationIdLength;
-        file.read(reinterpret_cast<char *>(&destinationIdLength), sizeof(size_t));
+        if (!file.read(reinterpret_cast<char *>(&destinationIdLength), sizeof(size_t)))
+            return nullptr;
         std::string destinationId(destinationIdLength, '\0');
-        file.read(&destinationId[0], destinationIdLength);
+        if (!file.read(&destinationId[0], destinationIdLength))
+            return nullptr;
 
         size_t locationIndex;
-        file.read(reinterpret_cast<char *>(&locationIndex), sizeof(size_t));
+        if (!file.read(reinterpret_cast<char *>(&locationIndex), sizeof(size_t)))
+            return nullptr;
         destinations[destinationId] = locationIndex;
     }
 

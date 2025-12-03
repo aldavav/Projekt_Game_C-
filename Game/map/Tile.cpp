@@ -1,8 +1,27 @@
 #include "Tile.h"
 
-Tile::Tile(TerrainType type, const std::string &symbol, bool traversable)
-    : m_type(type), m_symbol(symbol), m_isTraversable(traversable), m_occupant(nullptr)
+Tile::Tile(TerrainType type, const std::string &symbol, bool traversable, std::unique_ptr<Entity> entity)
+    : m_type(type), m_symbol(symbol), m_isTraversable(traversable), m_entity(std::move(entity))
 {
+}
+
+Tile::Tile(const Tile &other)
+    : m_type(other.m_type), m_symbol(other.m_symbol), m_isTraversable(other.m_isTraversable)
+{
+    m_entity = nullptr;
+    LOG_WARNING("Tile copy constructor called. Entity was deliberately reset to nullptr to prevent complex virtual cloning.");
+}
+
+Tile &Tile::operator=(const Tile &other)
+{
+    if (this != &other)
+    {
+        m_type = other.m_type;
+        m_symbol = other.m_symbol;
+        m_isTraversable = other.m_isTraversable;
+        m_entity = nullptr;
+    }
+    return *this;
 }
 
 TerrainType Tile::getType() const
@@ -20,14 +39,14 @@ bool Tile::isTraversable() const
     return m_isTraversable;
 }
 
-Player *Tile::getOccupant() const
+Entity *Tile::getEntity() const
 {
-    return m_occupant;
+    return m_entity.get();
 }
 
-void Tile::setOccupant(Player *player)
+void Tile::setEntity(std::unique_ptr<Entity> entity)
 {
-    m_occupant = player;
+    m_entity = std::move(entity);
 }
 
 void Tile::saveTile(std::ofstream &file) const
@@ -39,6 +58,14 @@ void Tile::saveTile(std::ofstream &file) const
     file.write(m_symbol.c_str(), symbolLength);
 
     file.write(reinterpret_cast<const char *>(&m_isTraversable), sizeof(m_isTraversable));
+
+    bool hasEntity = m_entity != nullptr;
+    file.write(reinterpret_cast<const char *>(&hasEntity), sizeof(hasEntity));
+
+    if (hasEntity)
+    {
+        m_entity->saveEntity(file);
+    }
 }
 
 Tile *Tile::loadTile(std::ifstream &file)
@@ -54,5 +81,14 @@ Tile *Tile::loadTile(std::ifstream &file)
     bool traversable;
     file.read(reinterpret_cast<char *>(&traversable), sizeof(traversable));
 
-    return new Tile(type, symbol, traversable);
+    bool hasEntity;
+    file.read(reinterpret_cast<char *>(&hasEntity), sizeof(hasEntity));
+
+    std::unique_ptr<Entity> loadedEntity = nullptr;
+    if (hasEntity)
+    {
+        loadedEntity = Entity::createEntityFromFile(file);
+    }
+
+    return new Tile(type, symbol, traversable, std::move(loadedEntity));
 }

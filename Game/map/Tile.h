@@ -1,10 +1,11 @@
 #ifndef TILE_H
 #define TILE_H
 
+#include "../Entity/Entity.h"
+#include <LoggerMacros.h>
 #include <fstream>
 #include <string>
-
-class Player;
+#include <memory>
 
 enum TerrainType
 {
@@ -23,10 +24,14 @@ private:
 
     bool m_isTraversable;
 
-    Player *m_occupant;
+    std::unique_ptr<Entity> m_entity;
 
 public:
-    Tile(TerrainType type, const std::string &symbol, bool traversable);
+    Tile(TerrainType type, const std::string &symbol, bool traversable, std::unique_ptr<Entity> entity = nullptr);
+
+    Tile(const Tile &other);
+
+    Tile &operator=(const Tile &other);
 
     ~Tile() = default;
 
@@ -36,13 +41,13 @@ public:
 
     bool isTraversable() const;
 
-    Player *getOccupant() const;
+    Entity *getEntity() const;
 
-    void setOccupant(Player *player);
+    void setEntity(std::unique_ptr<Entity> entity);
 
     void saveTile(std::ofstream &file) const;
 
-    static Tile* loadTile(std::ifstream &file);
+    static Tile *loadTile(std::ifstream &file);
 };
 
 #endif
