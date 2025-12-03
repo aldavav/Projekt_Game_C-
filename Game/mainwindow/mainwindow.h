@@ -4,13 +4,12 @@
 #include "../InputManager/InputManager.h"
 #include "../MenuManager/MenuManager.h"
 #include "../GameEngine/GameEngine.h"
+#include "Screens/MainMenuScreen.h"
 #include <QApplication>
 #include <QMainWindow>
 #include <QMouseEvent>
-#include <QMouseEvent>
 #include <QPushButton>
 #include <QShowEvent>
-#include <QKeyEvent>
 #include <QKeyEvent>
 #include <QDebug>
 #include <QTimer>

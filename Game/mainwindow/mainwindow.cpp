@@ -4,15 +4,24 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
+
     ui->setupUi(this);
+
     setWindowTitle(tr("Command & Conquer"));
     QIcon icon(":/images/assets/icon0.png");
     setWindowIcon(icon);
+
     MenuManager::getInstance().setMainWindow(ui->centralwidget);
+
+    MenuManager::getInstance().pushScreen(new MainMenuScreen(ui->centralwidget));
+
+    connect(&GameEngine::getInstance(), &GameEngine::gameStateChanged,
+            &MenuManager::getInstance(), &MenuManager::handleGameStateChange);
 }
 
 MainWindow::~MainWindow()
 {
+
     delete ui;
 }
 
@@ -28,12 +37,14 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         QApplication::quit();
         return;
     }
+
     InputManager::getInstance().onKeyPress(event->key());
     QMainWindow::keyPressEvent(event);
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
+
     InputManager::getInstance().onMouseClick(event->button(), event->pos());
     QMainWindow::mousePressEvent(event);
 }

@@ -17,10 +17,6 @@ MenuManager::MenuManager(QObject *parent)
 
 MenuManager::~MenuManager()
 {
-    while (!m_screenStack.isEmpty())
-    {
-        delete m_screenStack.pop();
-    }
     qDebug() << "MenuManager shut down.";
 }
 

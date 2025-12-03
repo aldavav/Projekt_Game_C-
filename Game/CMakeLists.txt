@@ -28,6 +28,8 @@ GameEngine/GameEngine.cpp
 ResourceManager/ResourceManager.cpp
 InputManager/InputManager.cpp
 MenuManager/MenuManager.cpp
+Screens/GameScreen.cpp
+Screens/MainMenuScreen.cpp
 )
 
 add_executable(Game ${PROJECT_SOURCES})
@@ -43,6 +45,7 @@ ${CMAKE_SOURCE_DIR}/GameEngine
 ${CMAKE_SOURCE_DIR}/ResourceManager
 ${CMAKE_SOURCE_DIR}/InputManager
 ${CMAKE_SOURCE_DIR}/MenuManager
+${CMAKE_SOURCE_DIR}/Screens
 )
 
 target_link_libraries(Game PRIVATE
