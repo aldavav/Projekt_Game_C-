@@ -1,10 +1,10 @@
-#include "logger/LoggerMacros.h"
-#include "mainwindow/mainwindow.h"
+#include "MainWindow/MainWindow.h"
+#include "Logger/LoggerMacros.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
-    LOG_INFO("Starting game...");
+    LOG_INFO("Application starting...");
     QApplication a(argc, argv);
     MainWindow w;
     w.show();

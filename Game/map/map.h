@@ -1,10 +1,76 @@
-#ifndef MAP_H
-#define MAP_H
+//
+// Created by Michael Szotkowski on 6/17/2024.
+//
 
-class Map
-{
-public:
-    Map();
+#ifndef NEW_PROJEKT_ZOO_MAP_H
+#define NEW_PROJEKT_ZOO_MAP_H
+
+#include <conio.h>
+#include <optional>
+#include <limits>
+#include "LocationDirector.h"
+#include "Location.h"
+
+#include <unordered_map>
+
+enum Difficulty {
+    EASY,
+    MEDIUM,
+    HARD
 };
 
-#endif // MAP_H
+class Map {
+private:
+    std::vector<Location*> m_locations;
+
+    Location* m_currentLocation = nullptr;
+
+    Map();
+
+    std::string m_mapName;
+
+    static Map* instance;
+
+    LocationDirector m_locationDirector;
+
+    Difficulty m_difficulty = EASY;
+
+public:
+    ~Map();
+
+    void setMapName();
+
+    void setMapDifficulty();
+
+    static Map& getInstance();
+
+    static void destroyInstance();
+
+    std::string getMapName();
+
+    void initializeNewMap(const std::string& name, Difficulty difficulty);
+
+    Map(const Map &) = delete;
+
+    Map &operator=(const Map &) = delete;
+
+    Map(Map &&) = delete;
+
+    Map &operator=(Map &&) = delete;
+
+    Location* getCurrentLocation();
+
+    void displayCurrentMap();
+
+    void setCurrentLocation(Location* newLocation);
+
+    void switchLocation(size_t locationIndex);
+
+    Location *createNewLocation(bool first = false);
+
+    void saveMap(std::ofstream &file);
+
+    static void loadMap(std::ifstream &file);
+};
+
+#endif //NEW_PROJEKT_ZOO_MAP_H

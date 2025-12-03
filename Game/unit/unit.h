@@ -7,4 +7,4 @@ public:
     Unit();
 };
 
-#endif // UNIT_H
+#endif

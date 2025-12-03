@@ -9,45 +9,57 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+# Find necessary Qt components
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Core Multimedia)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Core Multimedia)
 
 # --- 1. DEFINE ALL SOURCE FILES (.cpp and .qrc) ---
 set(PROJECT_SOURCES
     main.cpp
-    mainwindow/mainwindow.cpp
-    logger/Logger.cpp
+    # Standardizing existing components to PascalCase
+    MainWindow/MainWindow.cpp
+    Logger/Logger.cpp
     resource.qrc
-    player/player.cpp
-    unit/unit.cpp
-    map/map.cpp
+    Player/Player.cpp
+    Unit/Unit.cpp
+    Map/Map.cpp
+    
+    # NEW SYSTEM FILES (already in PascalCase)
+    GameEngine/GameEngine.cpp
+    ResourceManager/ResourceManager.cpp
+    InputManager/InputManager.cpp
+    MenuManager/MenuManager.cpp
 )
 
-# --- 2. USE STANDARD ADD_EXECUTABLE FOR COMPATIBILITY ---
-# This avoids the previous 'undefined reference to qMain' linker error.
-# We no longer need the 'if/else' block for Qt versions unless there are specific, non-standard needs.
+# --- 2. USE STANDARD ADD_EXECUTABLE ---
 add_executable(Game ${PROJECT_SOURCES})
 
 # --- 3. SPECIFY INCLUDE DIRECTORIES FOR HEADERS ---
-# This is how CMake finds your header (.h) and UI (.ui) files in subfolders
-# and ensures CMAKE_AUTOUIC/AUTOMOC work correctly.
 target_include_directories(Game PRIVATE
     ${CMAKE_SOURCE_DIR}              # For main.cpp and top-level files
-    ${CMAKE_SOURCE_DIR}/mainwindow
-    ${CMAKE_SOURCE_DIR}/logger
-    ${CMAKE_SOURCE_DIR}/player
-    ${CMAKE_SOURCE_DIR}/unit
-    ${CMAKE_SOURCE_DIR}/map
+    # Standardizing existing include directories to PascalCase
+    ${CMAKE_SOURCE_DIR}/MainWindow
+    ${CMAKE_SOURCE_DIR}/Logger
+    ${CMAKE_SOURCE_DIR}/Player
+    ${CMAKE_SOURCE_DIR}/Unit
+    ${CMAKE_SOURCE_DIR}/Map
+    
+    # NEW SYSTEM DIRECTORIES
+    ${CMAKE_SOURCE_DIR}/GameEngine
+    ${CMAKE_SOURCE_DIR}/ResourceManager
+    ${CMAKE_SOURCE_DIR}/InputManager
+    ${CMAKE_SOURCE_DIR}/MenuManager
 )
 
 # --- 4. LINK LIBRARIES ---
-target_link_libraries(Game PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+# Linked libraries for Core and Multimedia are essential for your new managers
+target_link_libraries(Game PRIVATE 
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Multimedia 
+)
 
 # --- 5. TARGET PROPERTIES (Standard Qt/CMake settings) ---
-
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
 if(${QT_VERSION} VERSION_LESS 6.1.0)
     set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Game)
 endif()
