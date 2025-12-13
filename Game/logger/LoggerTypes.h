@@ -7,4 +7,4 @@ enum LogLevel {
     Error
 };
 
-#endif // LOGGERTYPES_H
+#endif

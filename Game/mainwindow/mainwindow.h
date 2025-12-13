@@ -1,12 +1,19 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "../InputManager/InputManager.h"
+#include "../MenuManager/MenuManager.h"
+#include "../GameEngine/GameEngine.h"
+#include "Screens/MainMenuScreen.h"
+#include <QApplication>
 #include <QMainWindow>
-#include <QStackedWidget>
+#include <QMouseEvent>
 #include <QPushButton>
-#include <QVBoxLayout>
+#include <QShowEvent>
 #include <QKeyEvent>
 #include <QDebug>
+#include <QTimer>
+#include <QIcon>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -20,31 +27,20 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    void setupButton(QPushButton *button, bool disabled);
     MainWindow(QWidget *parent = nullptr);
+
     ~MainWindow();
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
+    void mousePressEvent(QMouseEvent *event) override;
 
 private slots:
     void on_actionQuit_triggered();
-
-    void on_buttonStartGame_clicked();
-
-    void on_buttonLoadGame_clicked();
-
-    void on_buttonSettings_clicked();
-
-    void on_buttonHelp_clicked();
-
-    void on_buttonCredits_clicked();
-
-    void on_actionMenu_triggered();
-
-    void showEvent(QShowEvent *event);
-
-    void keyPressEvent(QKeyEvent *event);
 
 private:
     Ui::MainWindow *ui;
 };
 
-#endif // MAINWINDOW_H
+#endif

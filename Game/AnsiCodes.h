@@ -1,5 +1,5 @@
-#ifndef ELDERGLYPH_ANSICODES_H
-#define ELDERGLYPH_ANSICODES_H
+#ifndef ANSICODES_H
+#define ANSICODES_H
 
 #define RESET_TEXT        "\033[0m"
 #define UNDERLINE_TEXT    "\033[4m"
@@ -20,4 +20,4 @@
 #define YELLOW_BACKGROUND "\033[43m"
 #define BLUE_BACKGROUND   "\033[44m"
 
-#endif // ELDERGLYPH_ANSICODES_H
+#endif
