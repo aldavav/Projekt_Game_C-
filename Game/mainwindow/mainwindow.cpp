@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     MenuManager::getInstance().setMainWindow(ui->centralwidget);
 
+
     MenuManager::getInstance().pushScreen(new MainMenuScreen(ui->centralwidget));
 
     connect(&GameEngine::getInstance(), &GameEngine::gameStateChanged,

@@ -92,3 +92,7 @@ Tile *Tile::loadTile(std::ifstream &file)
 
     return new Tile(type, symbol, traversable, std::move(loadedEntity));
 }
+std::unique_ptr<Entity> Tile::takeEntity()
+{
+    return std::move(m_entity);
+}

@@ -1,7 +1,16 @@
 #include "Entity.h"
+#include "Player.h"
 
-Entity::Entity(EntityType type, const std::string &name, const std::string &symbol, Player *owner)
-    : m_name(name), m_type(type), m_symbol(symbol), m_owner(owner), m_x(0), m_y(0)
+Entity::Entity(EntityType type,
+               const std::string& name,
+               const std::string& symbol,
+               Player* owner)
+    : m_name(name),
+    m_type(type),
+    m_symbol(symbol),
+    m_owner(owner),
+    m_x(0),
+    m_y(0)
 {
 }
 
@@ -10,19 +19,29 @@ EntityType Entity::getType() const
     return m_type;
 }
 
-std::string Entity::getName() const
+const std::string& Entity::getName() const
 {
     return m_name;
 }
 
-std::string Entity::getSymbol() const
+const std::string& Entity::getSymbol() const
 {
     return m_symbol;
 }
 
-Player *Entity::getOwner() const
+Player* Entity::getOwner() const
 {
     return m_owner;
+}
+
+int Entity::getX() const
+{
+    return m_x;
+}
+
+int Entity::getY() const
+{
+    return m_y;
 }
 
 void Entity::setPosition(int x, int y)
@@ -31,11 +50,21 @@ void Entity::setPosition(int x, int y)
     m_y = y;
 }
 
-std::unique_ptr<Entity> Entity::createEntityFromFile(std::ifstream &file)
+void Entity::setSelected(bool selected)
+{
+    m_selected = selected;
+}
+
+bool Entity::isSelected() const
+{
+    return m_selected;
+}
+
+std::unique_ptr<Entity> Entity::createEntityFromFile(std::ifstream& file)
 {
     EntityType type;
 
-    if (!file.read(reinterpret_cast<char *>(&type), sizeof(type)))
+    if (!file.read(reinterpret_cast<char*>(&type), sizeof(type)))
     {
         LOG_ERROR("Failed to read EntityType from file.");
         return nullptr;
@@ -44,17 +73,21 @@ std::unique_ptr<Entity> Entity::createEntityFromFile(std::ifstream &file)
     switch (type)
     {
     case EntityType::UNIT:
-        LOG_ERROR("Entity loading not yet implemented for UNIT type.");
+        LOG_ERROR("Unit loading not implemented yet.");
         return nullptr;
+
     case EntityType::BUILDING:
-        LOG_ERROR("Entity loading not yet implemented for BUILDING type.");
+        LOG_ERROR("Building loading not implemented yet.");
         return nullptr;
+
     case EntityType::RESOURCE:
-        LOG_ERROR("Entity loading not yet implemented for RESOURCE type.");
+        LOG_ERROR("Resource loading not implemented yet.");
         return nullptr;
+
     case EntityType::DEBRIS:
-        LOG_ERROR("Entity loading not yet implemented for DEBRIS type.");
+        LOG_ERROR("Debris loading not implemented yet.");
         return nullptr;
+
     default:
         LOG_ERROR("Unknown EntityType encountered during loading.");
         return nullptr;

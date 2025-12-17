@@ -1,0 +1,12 @@
+#ifndef INFANTRY_H
+#define INFANTRY_H
+
+#include "Unit.h"
+
+class Infantry : public Unit
+{
+public:
+    explicit Infantry(Player* owner);
+};
+
+#endif // INFANTRY_H

@@ -13,26 +13,65 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Core Multimedia)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Core Multimedia)
 
 set(PROJECT_SOURCES
-main.cpp
-MainWindow/MainWindow.cpp
-Logger/Logger.cpp
-resource.qrc
-Player/Player.cpp
-Entity/Entity.cpp
-Map/Map.cpp
-Map/Tile.cpp
-Map/Location.cpp
-Map/LocationDirector.cpp
-Map/DefaultLocationBuilder.cpp
-GameEngine/GameEngine.cpp
-ResourceManager/ResourceManager.cpp
-InputManager/InputManager.cpp
-MenuManager/MenuManager.cpp
-Screens/GameScreen.cpp
-Screens/MainMenuScreen.cpp
+    main.cpp
+
+    MainWindow/MainWindow.cpp
+    MainWindow/MainWindow.h
+    MainWindow/mainwindow.ui
+
+    Logger/Logger.cpp
+    Logger/Logger.h
+
+    Player/Player.cpp
+    Player/Player.h
+
+    Entity/Entity.cpp
+    Entity/Entity.h
+
+    Map/Map.cpp
+    Map/Map.h
+    Map/Tile.cpp
+    Map/Tile.h
+    Map/Location.cpp
+    Map/Location.h
+    Map/LocationDirector.cpp
+    Map/LocationDirector.h
+    Map/DefaultLocationBuilder.cpp
+    Map/DefaultLocationBuilder.h
+
+    GameEngine/GameEngine.cpp
+    GameEngine/GameEngine.h
+
+    ResourceManager/ResourceManager.cpp
+    ResourceManager/ResourceManager.h
+
+    InputManager/InputManager.cpp
+    InputManager/InputManager.h
+
+    MenuManager/MenuManager.cpp
+    MenuManager/MenuManager.h
+
+    Screens/GameScreen.cpp
+    Screens/GameScreen.h
+    Screens/MainMenuScreen.cpp
+    Screens/MainMenuScreen.h
+
+    resource.qrc
 )
 
-add_executable(Game ${PROJECT_SOURCES})
+
+add_executable(Game ${PROJECT_SOURCES}
+    unit.h unit.cpp
+    unitbuilder.h unitbuilder.cpp
+    infantry.h infantry.cpp
+    tank.h tank.cpp
+    plane.h plane.cpp
+    tankbuilder.h tankbuilder.cpp
+    infantrybuilder.h infantrybuilder.cpp
+    plane.h plane.cpp
+    planebuilder.h planebuilder.cpp
+    mapwidget.h mapwidget.cpp
+    unitbuydialog.h unitbuydialog.cpp)
 
 target_include_directories(Game PRIVATE
 ${CMAKE_SOURCE_DIR}

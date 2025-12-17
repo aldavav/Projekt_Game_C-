@@ -17,6 +17,13 @@
 #include <QWidget>
 #include <QPainter>
 #include <QTimer>
+#include "Unit.h"
+
+enum class PlacementState
+{
+    NONE,
+    PLACING_UNIT
+};
 
 class GameScreen : public AbstractScreen
 {
@@ -31,20 +38,31 @@ public:
     
     void onExit() override;
 
+    PlacementState m_placementState = PlacementState::NONE;
+    UnitType m_pendingUnit = UnitType::NONE;
+
+    bool isMoveMode() const { return m_moveMode; }
+    Unit* getSelectedUnit() const { return m_selectedUnit; }
 protected:
     void paintEvent(QPaintEvent *event) override;
     
-    void mousePressEvent(QMouseEvent *event) override;
 
 private slots:
     void updateGameDisplay();
     
     void onPauseClicked();
 
+    void onTileClicked(int x, int y);
+
+    void tryMoveSelectedUnit(int x, int y);
+
 private:
     void drawMap(QPainter &painter);
 
     QTimer *m_updateTimer;
+
+    bool m_moveMode = false;
+    Unit* m_selectedUnit = nullptr;
 };
 
 #endif

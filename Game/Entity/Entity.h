@@ -6,10 +6,9 @@
 #include <string>
 #include <memory>
 
-class Location;
-class Tile;
+class Player;
 
-enum EntityType
+enum class EntityType
 {
     UNIT = 1,
     BUILDING = 2,
@@ -17,43 +16,49 @@ enum EntityType
     DEBRIS = 4
 };
 
-class Player;
 
 class Entity
 {
-private:
+protected:
     std::string m_name;
-
     EntityType m_type;
-
     std::string m_symbol;
+    Player* m_owner;
 
-    Player *m_owner;
+    int m_x;
+    int m_y;
 
-    int m_x, m_y;
+    bool m_selected = false;
 
 public:
-    Entity(EntityType type, const std::string &name, const std::string &symbol, Player *owner = nullptr);
+    Entity(EntityType type,
+           const std::string& name,
+           const std::string& symbol,
+           Player* owner = nullptr);
 
     virtual ~Entity() = default;
 
+    // ---- INFO ----
     EntityType getType() const;
+    const std::string& getName() const;
+    const std::string& getSymbol() const;
+    Player* getOwner() const;
 
-    std::string getName() const;
-
-    std::string getSymbol() const;
-
-    Player *getOwner() const;
-
-    int getX() const { return m_x; }
-
-    int getY() const { return m_y; }
-
+    // ---- POSITION ----
+    int getX() const;
+    int getY() const;
     void setPosition(int x, int y);
 
-    virtual void saveEntity(std::ofstream &file) = 0;
+    // ---- SELECTION ----
+    void setSelected(bool selected);
+    bool isSelected() const;
 
-    static std::unique_ptr<Entity> createEntityFromFile(std::ifstream &file);
+    // ---- UPDATE ----
+    virtual void update(float deltaTime) {}
+
+    // ---- SAVE / LOAD ----
+    virtual void saveEntity(std::ofstream& file) = 0;
+    static std::unique_ptr<Entity> createEntityFromFile(std::ifstream& file);
 };
 
 #endif

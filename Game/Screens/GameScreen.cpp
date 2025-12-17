@@ -1,37 +1,91 @@
 #include "GameScreen.h"
+#include "TankBuilder.h"
+#include "InfantryBuilder.h"
+#include "PlaneBuilder.h"
+#include "MapWidget.h"
+#include <QPushButton>
+#include <QMouseEvent>
+#include "UnitBuyDialog.h"
 
-GameScreen::GameScreen(QWidget *parent)
+GameScreen::GameScreen(QWidget* parent)
     : AbstractScreen(parent), m_updateTimer(new QTimer(this))
 {
+    setStyleSheet("background-color: black;");
 
-    QHBoxLayout *mainLayout = new QHBoxLayout(this);
+    QHBoxLayout* mainLayout = new QHBoxLayout(this);
+    mainLayout->setContentsMargins(0,0,0,0);
+    mainLayout->setSpacing(0);
 
-    this->setMinimumSize(800, 600);
-    this->setStyleSheet("background-color: #000000;");
+    // MAPA
+    MapWidget* mapWidget = new MapWidget(this);
+    mainLayout->addWidget(mapWidget, 1);
 
-    QWidget *commandPanel = new QWidget(this);
-    QVBoxLayout *panelLayout = new QVBoxLayout(commandPanel);
+    // PANEL
+    QWidget* panel = new QWidget(this);
+    panel->setFixedWidth(250);
+    panel->setStyleSheet("background:#222;color:#ccc;");
+
+    QVBoxLayout* panelLayout = new QVBoxLayout(panel);
     panelLayout->setAlignment(Qt::AlignTop);
-    commandPanel->setFixedWidth(250);
-    commandPanel->setStyleSheet("background-color: #222222; color: #CCCCCC; border: 1px solid #444444;");
 
-    QLabel *infoLabel = new QLabel("--- Player Info ---\n\nResources: 0\nUnit Count: 0\n\n--- Commands ---", commandPanel);
-    infoLabel->setStyleSheet("color: #00FF00; padding: 10px;");
-    panelLayout->addWidget(infoLabel);
+    QLabel* info = new QLabel("--- Player Info ---\nResources: 0\nUnits: 0\n\n--- Commands ---");
+    info->setStyleSheet("color:#00ff00;");
+    panelLayout->addWidget(info);
 
-    QPushButton *pauseButton = new QPushButton(tr("Pause / Menu"), commandPanel);
-    pauseButton->setStyleSheet("QPushButton { background-color: #444444; color: white; padding: 10px; border: 1px solid #999999; }"
-                               "QPushButton:hover { background-color: #666666; }");
-    connect(pauseButton, &QPushButton::clicked, this, &GameScreen::onPauseClicked);
-    panelLayout->addWidget(pauseButton);
+    QPushButton* btnInf = new QPushButton("Infantry");
+    QPushButton* btnTank = new QPushButton("Tank");
+    QPushButton* btnPlane = new QPushButton("Plane");
 
-    panelLayout->addStretch(1);
+    panelLayout->addWidget(btnInf);
+    panelLayout->addWidget(btnTank);
+    panelLayout->addWidget(btnPlane);
 
-    mainLayout->addWidget(commandPanel);
-    mainLayout->setStretch(0, 4);
-    mainLayout->setStretch(1, 1);
+    QPushButton* pause = new QPushButton("Pause / Menu");
+    panelLayout->addWidget(pause);
 
-    connect(m_updateTimer, &QTimer::timeout, this, &GameScreen::updateGameDisplay);
+    panelLayout->addStretch();
+    mainLayout->addWidget(panel);
+
+    //connect for mapwidget
+     connect(mapWidget, &MapWidget::tileClicked,this, &GameScreen::onTileClicked);
+
+    //buywindow
+
+    connect(btnTank, &QPushButton::clicked, this, [this]() {
+
+        UnitBuyDialog dialog("Tank", this);
+        if (dialog.exec() == QDialog::Accepted)
+        {
+            m_pendingUnit = UnitType::TANK;
+            m_placementState = PlacementState::PLACING_UNIT;
+
+            LOG_INFO("Tank bought. Waiting for placement.");
+        }
+    });
+    connect(btnPlane, &QPushButton::clicked, this, [this]() {
+
+        UnitBuyDialog dialog("Plane", this);
+        if (dialog.exec() == QDialog::Accepted)
+        {
+            m_pendingUnit = UnitType::PLANE;
+            m_placementState = PlacementState::PLACING_UNIT;
+
+            LOG_INFO("Plane bought. Waiting for placement.");
+        }
+    });
+    connect(btnInf, &QPushButton::clicked, this, [this]() {
+
+        UnitBuyDialog dialog("Infantry", this);
+        if (dialog.exec() == QDialog::Accepted)
+        {
+            m_pendingUnit = UnitType::INFANTRY;
+            m_placementState = PlacementState::PLACING_UNIT;
+
+            LOG_INFO("Infantry bought. Waiting for placement.");
+        }
+    });
+
+
 }
 
 GameScreen::~GameScreen()
@@ -41,9 +95,7 @@ GameScreen::~GameScreen()
 void GameScreen::onEnter()
 {
     LOG_INFO("Entering GameScreen. Starting game loop.");
-
     m_updateTimer->start(33);
-
     update();
 }
 
@@ -57,7 +109,6 @@ void GameScreen::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
-
     drawMap(painter);
 }
 
@@ -77,7 +128,7 @@ void GameScreen::drawMap(QPainter &painter)
         return;
     }
 
-    int mapWidth = width() - 250;
+    int mapWidth = width() - 250;  // Odečita šířku panelu
     int mapHeight = height();
     int tileCols = tiles[0].size();
     int tileRows = tiles.size();
@@ -109,27 +160,139 @@ void GameScreen::drawMap(QPainter &painter)
 
             painter.setPen(QPen(QColor("#1B5E20"), 1));
             painter.drawRect(tileRect);
+
+            // -- vykreslení overlay pro pohyb --
+            if (m_moveMode && m_selectedUnit)
+            {
+                int dist = abs(x - m_selectedUnit->getX()) + abs(y - m_selectedUnit->getY());
+
+                QColor overlay;
+
+                if (tile->getEntity())
+                    overlay = QColor(255, 0, 0, 120); // obsazeno
+                else if (!tile->isTraversable())
+                    overlay = QColor(255, 0, 0, 120); // blok
+                else if (dist <= m_selectedUnit->getMoveRange())
+                    overlay = QColor(255, 255, 0, 120); // OK
+                else
+                    overlay = QColor(255, 0, 0, 120); // mimo range
+
+                painter.fillRect(tileRect, overlay);
+            }
         }
     }
 }
 
 void GameScreen::updateGameDisplay()
 {
-
     update();
 }
 
-void GameScreen::mousePressEvent(QMouseEvent *event)
-{
 
-    InputManager::getInstance().onMouseClick(event->button(), event->pos());
-
-    AbstractScreen::mousePressEvent(event);
-}
 
 void GameScreen::onPauseClicked()
 {
     LOG_INFO("Pause button clicked. Returning to main menu.");
-    
     MenuManager::getInstance().setScreen(new MainMenuScreen());
+}
+void GameScreen::onTileClicked(int x, int y)
+{
+    Location* location = Map::getInstance().getCurrentLocation();
+    if (!location) return;
+
+    Tile* tile = location->getTiles()[y][x];
+
+    // KLIK NA JEDNOTKU MAPA
+    if (!m_moveMode && tile->getEntity())
+    {
+        Unit* unit = dynamic_cast<Unit*>(tile->getEntity());
+        if (!unit) return;
+
+        m_selectedUnit = unit;
+        m_moveMode = true;
+
+        LOG_INFO("Unit selected for move");
+        update();
+        return;
+    }
+
+    // KLIK NA ZVOLENOU POZICI
+    if (m_moveMode && m_selectedUnit)
+    {
+        tryMoveSelectedUnit(x, y);
+        return;
+    }
+
+    if (m_placementState != PlacementState::PLACING_UNIT)
+        return;
+
+    if (!tile->isTraversable() || tile->getEntity())
+        return;
+
+    std::unique_ptr<Unit> unit;
+
+    switch (m_pendingUnit)
+    {
+    case UnitType::TANK:
+    {
+        TankBuilder b;
+        b.setOwner(location->getPlayer());
+        unit = b.build();
+        break;
+    }
+    case UnitType::INFANTRY:
+    {
+        InfantryBuilder b;
+        b.setOwner(location->getPlayer());
+        unit = b.build();
+        break;
+    }
+    case UnitType::PLANE:
+    {
+        PlaneBuilder b;
+        b.setOwner(location->getPlayer());
+        unit = b.build();
+        break;
+    }
+    default:
+        return;
+    }
+
+    unit->setPosition(x, y);
+    tile->setEntity(std::move(unit));
+
+    // RESET
+    m_pendingUnit = UnitType::NONE;
+    m_placementState = PlacementState::NONE;
+
+    update();
+}
+
+void GameScreen::tryMoveSelectedUnit(int x, int y)
+{
+    Location* location = Map::getInstance().getCurrentLocation();
+    if (!location) return;
+
+    Tile* target = location->getTiles()[y][x];
+    Tile* oldTile = location->getTiles()[m_selectedUnit->getY()][m_selectedUnit->getX()];
+
+    // nelze vstoupit
+    if (!target->isTraversable())
+        return;
+
+    if (target->getEntity())
+        return;
+
+    if (!m_selectedUnit->canMoveTo(x, y))
+        return;
+
+    // Přesun entity: uvolnit starý tile a přesunout unique_ptr do nového tile
+    std::unique_ptr<Entity> unitEntity = oldTile->takeEntity();
+    unitEntity->setPosition(x, y);
+    target->setEntity(std::move(unitEntity));
+
+    m_selectedUnit = nullptr;
+    m_moveMode = false;
+
+    update();
 }
