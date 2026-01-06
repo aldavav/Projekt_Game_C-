@@ -1,11 +1,11 @@
 #include "GameScreen.h"
-#include "TankBuilder.h"
-#include "InfantryBuilder.h"
-#include "PlaneBuilder.h"
+#include "unit_builder/TankBuilder.h"
+#include "unit_builder/InfantryBuilder.h"
+#include "unit_builder/PlaneBuilder.h"
 #include "MapWidget.h"
 #include <QPushButton>
 #include <QMouseEvent>
-#include "UnitBuyDialog.h"
+#include "Screens/dialogs/UnitBuyDialog.h"
 
 GameScreen::GameScreen(QWidget* parent)
     : AbstractScreen(parent), m_updateTimer(new QTimer(this))

@@ -1,8 +1,8 @@
 #ifndef INFANTRYBUILDER_H
 #define INFANTRYBUILDER_H
 
-#include "UnitBuilder.h"
-#include "Infantry.h"
+#include "unit_builder/UnitBuilder.h"
+#include "units/Infantry.h"
 
 class InfantryBuilder : public UnitBuilder
 {

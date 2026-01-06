@@ -3,14 +3,12 @@
 #pragma once
 #include <QWidget>
 #include <QPainter>
-#include "Unit.h"
+#include "unit_builder/Unit.h"
 #include "../Map/Location.h"
 #include "MainMenuScreen.h"
 #include "../Map/Tile.h"
 #include "../Map/Map.h"
-#include "TankBuilder.h"
-#include "InfantryBuilder.h"
-#include "PlaneBuilder.h"
+
 class MapWidget : public QWidget
 {
     Q_OBJECT

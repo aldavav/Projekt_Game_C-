@@ -61,17 +61,36 @@ set(PROJECT_SOURCES
 
 
 add_executable(Game ${PROJECT_SOURCES}
-    unit.h unit.cpp
-    unitbuilder.h unitbuilder.cpp
-    infantry.h infantry.cpp
-    tank.h tank.cpp
-    plane.h plane.cpp
-    tankbuilder.h tankbuilder.cpp
-    infantrybuilder.h infantrybuilder.cpp
-    plane.h plane.cpp
-    planebuilder.h planebuilder.cpp
-    mapwidget.h mapwidget.cpp
-    unitbuydialog.h unitbuydialog.cpp)
+    unit_builder/unit.h
+    unit_builder/unit.cpp
+
+    unit_builder/unitbuilder.h
+    unit_builder/unitbuilder.cpp
+
+    unit_builder/planebuilder.h
+    unit_builder/planebuilder.cpp
+
+    unit_builder/infantrybuilder.h
+    unit_builder/infantrybuilder.cpp
+
+    unit_builder/tankbuilder.h
+    unit_builder/tankbuilder.cpp
+
+    unit_builder/units/infantry.h
+    unit_builder/units/infantry.cpp
+
+    unit_builder/units/tank.h
+    unit_builder/units/tank.cpp
+
+    unit_builder/units/plane.h
+    unit_builder/units/plane.cpp
+
+    Screens/mapwidget.h
+    Screens/mapwidget.cpp
+
+   Screens/dialogs/unitbuydialog.h
+    Screens/dialogs/unitbuydialog.cpp
+    )
 
 target_include_directories(Game PRIVATE
 ${CMAKE_SOURCE_DIR}

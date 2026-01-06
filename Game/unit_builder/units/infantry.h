@@ -1,7 +1,7 @@
 #ifndef INFANTRY_H
 #define INFANTRY_H
 
-#include "Unit.h"
+#include "unit_builder/Unit.h"
 
 class Infantry : public Unit
 {

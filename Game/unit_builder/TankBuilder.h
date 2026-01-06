@@ -1,8 +1,8 @@
 #ifndef TANKBUILDER_H
 #define TANKBUILDER_H
 
-#include "UnitBuilder.h"
-#include "Tank.h"
+#include "unit_builder/UnitBuilder.h"
+#include "units/Tank.h"
 
 class TankBuilder : public UnitBuilder
 {

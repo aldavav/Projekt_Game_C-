@@ -1,8 +1,8 @@
 #ifndef PLANEBUILDER_H
 #define PLANEBUILDER_H
 
-#include "UnitBuilder.h"
-#include "Plane.h"
+#include "unit_builder/UnitBuilder.h"
+#include "units/Plane.h"
 
 class PlaneBuilder : public UnitBuilder
 {
