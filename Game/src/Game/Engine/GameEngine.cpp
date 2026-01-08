@@ -1,0 +1,117 @@
+#include "GameEngine.h"
+
+static constexpr float TICK_RATE = 1.0f / 30.0f;
+
+GameEngine &GameEngine::getInstance()
+{
+    static GameEngine instance;
+    return instance;
+}
+
+GameEngine::GameEngine(QObject *parent)
+    : QObject(parent), m_currentState(GAME_MENU)
+{
+    connect(&m_gameTimer, &QTimer::timeout, this, &GameEngine::gameLoopTick);
+    m_gameTimer.setInterval(16);
+    initializeSystems();
+}
+
+void GameEngine::startGame()
+{
+    if (m_isRunning) return;
+
+    LOG_INFO("Engine: Initializing World...");
+    Map::getInstance().initializeNewMap("Default Campaign");
+
+    m_lastTime = std::chrono::steady_clock::now();
+    m_accumulator = 0.0f;
+    m_isRunning = true;
+    m_currentState = GAME_RUNNING;
+
+    emit gameStateChanged(m_currentState);
+    m_gameTimer.start();
+}
+
+void GameEngine::stopGame()
+{
+    if (!m_isRunning)
+        return;
+
+    m_gameTimer.stop();
+    m_isRunning = false;
+    m_currentState = GAME_OVER;
+
+    emit gameStateChanged(m_currentState);
+}
+
+void GameEngine::gameLoopTick()
+{
+    auto currentTime = std::chrono::steady_clock::now();
+    std::chrono::duration<float> elapsed = currentTime - m_lastTime;
+    m_lastTime = currentTime;
+
+    float frameTime = elapsed.count();
+    if (frameTime > 0.25f)
+        frameTime = 0.25f;
+
+    m_accumulator += frameTime;
+
+    while (m_accumulator >= TICK_RATE)
+    {
+        updateSimulation(TICK_RATE);
+        m_accumulator -= TICK_RATE;
+    }
+
+    emit gameLoopUpdate(frameTime);
+}
+
+void GameEngine::updateSimulation(float fixedStep)
+{
+    auto &input = InputManager::getInstance();
+    auto &cam = Camera::getInstance();
+
+    const float scrollSpeed = 800.0f;
+    float distance = scrollSpeed * fixedStep;
+    bool moved = false;
+
+    if (input.isKeyPressed(Qt::Key_W))
+        cam.move(0, -scrollSpeed * fixedStep);
+    if (input.isKeyPressed(Qt::Key_S))
+    {
+        cam.move(0, distance);
+        moved = true;
+    }
+    if (input.isKeyPressed(Qt::Key_A))
+    {
+        cam.move(-distance, 0);
+        moved = true;
+    }
+    if (input.isKeyPressed(Qt::Key_D))
+    {
+        cam.move(distance, 0);
+        moved = true;
+    }
+
+    if (moved)
+    {
+    }
+
+    while (input.hasPendingCommands())
+    {
+        CommandPtr cmd = input.getNextCommand();
+        if (cmd)
+        {
+            LOG_INFO("Processing Command...");
+            cmd->execute();
+        }
+    }
+    cam.update(fixedStep);
+}
+
+void GameEngine::initializeSystems()
+{
+}
+
+void GameEngine::handlePlayerInput(const QString &inputCommand)
+{
+}
