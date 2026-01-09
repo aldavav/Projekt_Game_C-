@@ -3,6 +3,7 @@
 
 #include <Core/Logger/LoggerMacros.h>
 #include <Core/Input/InputManager.h>
+#include <Game/Entities/Entity.h>
 #include <Game/View/Camera.h>
 #include <Game/Map/Map.h>
 #include <QObject>
@@ -53,6 +54,8 @@ private:
     bool m_isRunning = false;
 
     int m_currentState;
+
+    std::vector<std::unique_ptr<Entity>> m_entities;
 
     enum GameStates
     {

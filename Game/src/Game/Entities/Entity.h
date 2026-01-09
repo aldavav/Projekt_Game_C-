@@ -1,27 +1,18 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
+#include <Game/Entities/EntityTypes.h>
 #include <Core/Logger/LoggerMacros.h>
+#include <QPointF>
 #include <fstream>
 #include <string>
 #include <memory>
-
-class Location;
-class Tile;
-
-enum EntityType
-{
-    UNIT = 1,
-    BUILDING = 2,
-    RESOURCE = 3,
-    DEBRIS = 4
-};
 
 class Player;
 
 class Entity
 {
-private:
+protected:
     std::string m_name;
 
     EntityType m_type;
@@ -30,26 +21,36 @@ private:
 
     Player *m_owner;
 
-    int m_x, m_y;
+    QPointF m_position;
+
+    QPointF m_targetPosition;
+
+    float m_speed = 200.0f;
 
 public:
     Entity(EntityType type, const std::string &name, const std::string &symbol, Player *owner = nullptr);
 
     virtual ~Entity() = default;
 
-    EntityType getType() const;
+    virtual void update(float deltaTime);
 
-    std::string getName() const;
+    QPointF getPosition() const { return m_position; }
 
-    std::string getSymbol() const;
+    void setPosition(const QPointF &pos)
+    {
+        m_position = pos;
+        m_targetPosition = pos;
+    }
 
-    Player *getOwner() const;
+    void setTarget(const QPointF &target) { m_targetPosition = target; }
 
-    int getX() const { return m_x; }
+    EntityType getType() const { return m_type; }
 
-    int getY() const { return m_y; }
+    std::string getName() const { return m_name; }
 
-    void setPosition(int x, int y);
+    std::string getSymbol() const { return m_symbol; }
+
+    Player *getOwner() const { return m_owner; }
 
     virtual void saveEntity(std::ofstream &file) = 0;
 

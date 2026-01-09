@@ -5,6 +5,7 @@
 #include <QSoundEffect>
 #include <QObject>
 #include <QString>
+#include <QPixmap>
 #include <QImage>
 #include <QDebug>
 #include <QFile>

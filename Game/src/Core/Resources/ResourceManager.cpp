@@ -19,20 +19,16 @@ ResourceManager::~ResourceManager()
 TexturePtr ResourceManager::getTexture(const QString &resourceId)
 {
     if (m_textureCache.contains(resourceId))
-    {
-        qDebug() << "Texture cache hit for:" << resourceId;
         return m_textureCache.value(resourceId);
-    }
-    qDebug() << "Texture cache miss. Loading:" << resourceId;
+
     TexturePtr newTexture = loadTextureFromFile(resourceId);
-    if (newTexture)
+
+    if (!newTexture)
     {
-        m_textureCache.insert(resourceId, newTexture);
+        return getTexture(":/images/assets/images/missing.png");
     }
-    else
-    {
-        qDebug() << "ERROR: Failed to load texture:" << resourceId;
-    }
+
+    m_textureCache.insert(resourceId, newTexture);
     return newTexture;
 }
 
@@ -58,34 +54,26 @@ AudioPtr ResourceManager::getAudio(const QString &resourceId)
 
 TexturePtr ResourceManager::loadTextureFromFile(const QString &filePath)
 {
-    QImage *image = new QImage();
+    TexturePtr image = TexturePtr::create();
+
     if (image->load(filePath))
     {
         qDebug() << "Successfully loaded texture from:" << filePath;
-        return TexturePtr(image);
+        return image;
     }
     else
     {
-        delete image;
-        return TexturePtr(nullptr);
+        return TexturePtr();
     }
 }
 
 AudioPtr ResourceManager::loadAudioFromFile(const QString &filePath)
 {
-    QSoundEffect *sound = new QSoundEffect();
-    if (QFile::exists(filePath))
-    {
-        sound->setSource(QUrl::fromLocalFile(filePath));
-        if (sound->isLoaded())
-        {
-            qDebug() << "Successfully loaded audio from:" << filePath;
-            return AudioPtr(sound);
-        }
-    }
-    qDebug() << "Failed to load audio or file does not exist:" << filePath;
-    delete sound;
-    return AudioPtr(nullptr);
+
+    AudioPtr sound(new QSoundEffect());
+    sound->setSource(QUrl::fromLocalFile(filePath));
+
+    return sound;
 }
 
 void ResourceManager::clearCache()

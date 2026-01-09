@@ -27,7 +27,6 @@ set(PROJECT_SOURCES
     src/Game/Entities/Entity.cpp
     src/Game/Map/map.cpp
     src/Game/Map/MapManager.cpp
-    src/Game/Player/player.cpp
     
     src/UI/Manager/MenuManager.cpp
     src/UI/Screens/GameScreen.cpp

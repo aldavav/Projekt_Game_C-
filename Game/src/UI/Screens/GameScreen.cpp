@@ -4,6 +4,7 @@ GameScreen::GameScreen(QWidget *parent)
     : AbstractScreen(parent), m_updateTimer(new QTimer(this))
 {
 
+    setMouseTracking(true);
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
 
     /*QScreen *screen = QGuiApplication::primaryScreen();
@@ -153,4 +154,11 @@ void GameScreen::onPauseClicked()
 {
     LOG_INFO("Returning to Menu.");
     MenuManager::getInstance().setScreen(new MainMenuScreen());
+}
+
+void GameScreen::resizeEvent(QResizeEvent *event)
+{
+    Camera::getInstance().setViewportSize(this->width(), this->height());
+    
+    AbstractScreen::resizeEvent(event);
 }

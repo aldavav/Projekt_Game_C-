@@ -42,6 +42,8 @@ private slots:
 
     void onPauseClicked();
 
+    void resizeEvent(QResizeEvent *event) override;
+
 private:
     bool m_isDragging = false;
 

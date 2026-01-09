@@ -18,7 +18,8 @@ GameEngine::GameEngine(QObject *parent)
 
 void GameEngine::startGame()
 {
-    if (m_isRunning) return;
+    if (m_isRunning)
+        return;
 
     LOG_INFO("Engine: Initializing World...");
     Map::getInstance().initializeNewMap("Default Campaign");
@@ -75,7 +76,10 @@ void GameEngine::updateSimulation(float fixedStep)
     bool moved = false;
 
     if (input.isKeyPressed(Qt::Key_W))
+    {
         cam.move(0, -scrollSpeed * fixedStep);
+        moved = true;
+    }
     if (input.isKeyPressed(Qt::Key_S))
     {
         cam.move(0, distance);
@@ -100,16 +104,23 @@ void GameEngine::updateSimulation(float fixedStep)
     {
         CommandPtr cmd = input.getNextCommand();
         if (cmd)
-        {
-            LOG_INFO("Processing Command...");
             cmd->execute(*this);
+    }
+
+    for (const auto& entity : m_entities)
+    {
+        if (entity)
+        {
+            entity->update(fixedStep);
         }
     }
+
     cam.update(fixedStep);
 }
 
 void GameEngine::initializeSystems()
 {
+    LOG_INFO("Systems Initializing...");
 }
 
 void GameEngine::handlePlayerInput(const QString &inputCommand)
