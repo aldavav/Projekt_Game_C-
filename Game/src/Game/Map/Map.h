@@ -1,7 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include <Logger/LoggerMacros.h>
+#include <Core/Logger/LoggerMacros.h>
 #include <unordered_map>
 #include "Chunk.h"
 #include "Tile.h"

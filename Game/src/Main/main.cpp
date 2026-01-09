@@ -1,6 +1,6 @@
-#include <QApplication>
 #include <Core/Logger/LoggerMacros.h>
-#include "MainWindow.h"
+#include <Main/MainWindow.h>
+#include <QApplication>
 
 int main(int argc, char *argv[])
 {

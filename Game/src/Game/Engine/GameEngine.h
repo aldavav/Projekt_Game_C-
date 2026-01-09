@@ -1,9 +1,9 @@
 #ifndef GAMEENGINE_H
 #define GAMEENGINE_H
 
+#include <Core/Logger/LoggerMacros.h>
 #include <Core/Input/InputManager.h>
-#include <Logger/LoggerMacros.h>
-#include <Core/Camera/Camera.h>
+#include <Game/View/Camera.h>
 #include <Game/Map/Map.h>
 #include <QObject>
 #include <QTimer>

@@ -1,7 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include <Logger/LoggerMacros.h>
+#include <Core/Logger/LoggerMacros.h>
 #include <unordered_map>
 #include <algorithm>
 #include <string>

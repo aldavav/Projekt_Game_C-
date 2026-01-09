@@ -1,7 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <Logger/LoggerMacros.h>
+#include <Core/Logger/LoggerMacros.h>
 #include <fstream>
 #include <string>
 #include <memory>
