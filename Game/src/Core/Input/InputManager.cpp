@@ -1,33 +1,21 @@
 #include "InputManager.h"
 
-class PlaceholderCommand : public ICommand
-{
-private:
-    QString m_action;
-
-public:
-    PlaceholderCommand(const QString &action) : m_action(action) {}
-    bool execute() override
-    {
-        qDebug() << "EXECUTING:" << m_action;
-        return true;
-    }
-    bool undo() override
-    {
-        qDebug() << "UNDOING:" << m_action;
-        return true;
-    }
-};
-
 InputManager &InputManager::getInstance()
 {
     static InputManager instance;
     return instance;
 }
 
-InputManager::InputManager(QObject *parent) : QObject(parent) {}
+InputManager::InputManager(QObject *parent) : QObject(parent)
+{
+    setupDefaultBindings();
+}
 
 InputManager::~InputManager() {}
+
+void InputManager::setupDefaultBindings()
+{
+}
 
 void InputManager::onKeyPress(int keyCode)
 {
@@ -78,19 +66,25 @@ CommandPtr InputManager::translateRawInput(const RawInputEvent &event)
 {
     if (event.type == RawInputEvent::Type::Keyboard)
     {
-        if (event.keyCode == Qt::Key_B)
-            return CommandPtr(new PlaceholderCommand("Open Build Menu"));
-
-        if (event.keyCode == Qt::Key_Escape)
-            return CommandPtr(new PlaceholderCommand("Toggle Menu"));
+        switch (event.keyCode)
+        {
+        case Qt::Key_S:
+            return qSharedPointerCast<ICommand>(QSharedPointer<StopAction>::create());
+        case Qt::Key_Plus:
+        case Qt::Key_Equal:
+            return qSharedPointerCast<ICommand>(QSharedPointer<ZoomAction>::create(0.1f));
+        case Qt::Key_Minus:
+            return qSharedPointerCast<ICommand>(QSharedPointer<ZoomAction>::create(-0.1f));
+        default:
+            break;
+        }
     }
 
     if (event.type == RawInputEvent::Type::MouseClick)
     {
         if (event.button == Qt::LeftButton)
         {
-            QString posText = QString("Pos: %1, %2").arg(event.position.x()).arg(event.position.y());
-            return CommandPtr(new PlaceholderCommand("Select at " + posText));
+            return qSharedPointerCast<ICommand>(QSharedPointer<MoveUnitAction>::create(event.position));
         }
     }
 

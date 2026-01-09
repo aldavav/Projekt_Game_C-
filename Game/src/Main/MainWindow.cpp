@@ -7,13 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     if (fontId != -1)
     {
         QString family = QFontDatabase::applicationFontFamilies(fontId).at(0);
-        QFont gameFont(family);
-        QApplication::setFont(gameFont);
-        qApp->setStyleSheet(QString("QWidget { font-family: '%1'; }").arg(family));
-    }
-    else
-    {
-        qCritical() << "Failed to load font from resources! Check your .qrc path.";
+        qApp->setStyleSheet(QString("QWidget { font-family: '%1'; color: #e0e0e0; }").arg(family));
     }
 
     m_centralWidget = new QWidget(this);
@@ -26,35 +20,36 @@ MainWindow::MainWindow(QWidget *parent)
         resize(screen->availableGeometry().size());
         setWindowState(Qt::WindowMaximized);
     }
-    else
-    {
-        resize(1920, 1080);
-    }
 
     MenuManager::getInstance().setMainWindow(m_centralWidget);
     MenuManager::getInstance().pushScreen(new MainMenuScreen(m_centralWidget));
 
     connect(&GameEngine::getInstance(), &GameEngine::gameStateChanged,
             &MenuManager::getInstance(), &MenuManager::handleGameStateChange);
-}
 
-void MainWindow::on_actionQuit_triggered()
-{
-    QApplication::quit();
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     InputManager::getInstance().onKeyPress(event->key());
+    QMainWindow::keyPressEvent(event);
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
     InputManager::getInstance().onKeyRelease(event->key());
+    QMainWindow::keyReleaseEvent(event);
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     InputManager::getInstance().onMouseClick(event->button(), event->pos());
     QMainWindow::mousePressEvent(event);
+}
+
+void MainWindow::on_actionQuit_triggered()
+{
+    // here will be cleanup code later
+    QApplication::quit();
 }

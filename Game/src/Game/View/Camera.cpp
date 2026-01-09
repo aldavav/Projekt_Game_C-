@@ -50,3 +50,16 @@ void Camera::adjustZoom(float delta)
 {
     m_zoom = std::clamp(m_zoom + delta, MIN_ZOOM, MAX_ZOOM);
 }
+
+QPointF Camera::screenToWorld(const QPoint& screenPos) const
+{
+    // 1. Shift relative to the center of the screen
+    float centeredX = screenPos.x() - (m_viewportWidth / 2.0f);
+    float centeredY = screenPos.y() - (m_viewportHeight / 2.0f);
+
+    // 2. Adjust for zoom and camera world position
+    float worldX = (centeredX / m_zoom) + m_currentPos.x();
+    float worldY = (centeredY / m_zoom) + m_currentPos.y();
+
+    return QPointF(worldX, worldY);
+}

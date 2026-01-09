@@ -70,20 +70,28 @@ void Logger::showLog()
 void Logger::log(const LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function)
 {
     std::lock_guard<std::recursive_mutex> lock(logMutex_);
+    std::string formatted = formatLogMessage(type, message, file, line, function);
+
     if (logFile_.is_open())
     {
-        logFile_ << formatLogMessage(type, message, file, line, function) << std::endl;
+        logFile_ << formatted << std::endl;
     }
-    else
-    {
-        std::cerr << RED_NORMAL_TEXT << "Unable to open log file!" << RESET_TEXT << std::endl;
-    }
+
+    std::string color = RESET_TEXT;
+    if (type == LogLevel::Error)
+        color = RED_BOLD_TEXT;
+    else if (type == LogLevel::Warning)
+        color = YELLOW_BOLD_TEXT;
+    else if (type == LogLevel::Info)
+        color = GREEN_NORMAL_TEXT;
+
+    std::cout << color << formatted << RESET_TEXT << std::endl;
 }
 
 std::string Logger::formatLogMessage(const LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function)
 {
     std::ostringstream oss;
-    oss << "[" << logLevelToString(type) << ": " << getCurrentTime() << " | " << file << ":" << line << " | " << function << "] " << message;
+    oss << "[" << logLevelToString(type) << ": " << getCurrentTime() << " | " << stripPath(file) << ":" << line << " | " << function << "] " << message;
     return oss.str();
 }
 
@@ -182,4 +190,9 @@ void Logger::archiveLogFile()
     {
         std::cerr << "Cleanup failed: " << e.what() << "\n";
     }
+}
+
+std::string Logger::stripPath(const std::string& path) {
+    size_t pos = path.find_last_of("\\/");
+    return (pos == std::string::npos) ? path : path.substr(pos + 1);
 }

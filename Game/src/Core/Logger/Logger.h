@@ -1,8 +1,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#include <Core/Logger/LoggerTypes.h>
 #include <Core/Common/AnsiCodes.h>
-#include "LoggerTypes.h"
 #include <filesystem>
 #include <algorithm>
 #include <iostream>
@@ -34,6 +34,8 @@ private:
     std::string getCurrentTime();
 
     void archiveLogFile();
+
+    std::string stripPath(const std::string& path);
 
 public:
     static Logger &getInstance();

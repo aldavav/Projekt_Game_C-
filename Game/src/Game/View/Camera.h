@@ -10,6 +10,8 @@ class Camera
 public:
     static Camera &getInstance();
 
+    QPointF screenToWorld(const QPoint& screenPos) const;
+
     static constexpr float MIN_ZOOM = 0.3f;
 
     static constexpr float MAX_ZOOM = 3.0f;

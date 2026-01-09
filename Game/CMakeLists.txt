@@ -19,6 +19,9 @@ set(PROJECT_SOURCES
     src/Core/Resources/ResourceManager.cpp
     src/Core/Input/InputManager.cpp
     
+    src/Game/Actions/CameraActions.cpp
+    src/Game/Actions/UnitActions.cpp
+    
     src/Game/View/Camera.cpp
     src/Game/Engine/GameEngine.cpp
     src/Game/Entities/Entity.cpp
@@ -41,4 +44,9 @@ target_link_libraries(Game PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Multimedia
+)
+
+set_target_properties(Game PROPERTIES
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
 )

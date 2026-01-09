@@ -1,27 +1,16 @@
 #ifndef INPUTMANAGER_H
 #define INPUTMANAGER_H
 
+#include <Game/Actions/CameraActions.h>
+#include <Game/Actions/GameCommands.h>
+#include <Game/Actions/UnitActions.h>
+#include <Core/Input/RawInputEvent.h>
 #include <Core/Common/KeyCodes.h>
-#include "ICommand.h"
 #include <QObject>
 #include <QQueue>
 #include <QPoint>
 #include <QDebug>
 #include <set>
-
-struct RawInputEvent
-{
-    enum class Type
-    {
-        Keyboard,
-        MouseClick,
-        MouseMove
-    };
-    Type type;
-    int keyCode = 0;
-    QPoint position;
-    Qt::MouseButton button = Qt::NoButton;
-};
 
 class InputManager : public QObject
 {
@@ -62,6 +51,10 @@ private:
     QQueue<CommandPtr> m_commandQueue;
 
     std::set<int> m_activeKeys;
+
+    std::map<int, QString> m_keyBindings;
+
+    void setupDefaultBindings();
 };
 
 #endif

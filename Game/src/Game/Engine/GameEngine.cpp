@@ -102,7 +102,7 @@ void GameEngine::updateSimulation(float fixedStep)
         if (cmd)
         {
             LOG_INFO("Processing Command...");
-            cmd->execute();
+            cmd->execute(*this);
         }
     }
     cam.update(fixedStep);

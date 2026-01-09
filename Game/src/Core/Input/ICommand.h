@@ -3,12 +3,14 @@
 
 #include <QSharedPointer>
 
+class GameEngine;
+
 class ICommand
 {
 public:
     virtual ~ICommand() = default;
 
-    virtual bool execute() = 0;
+    virtual bool execute(GameEngine& engine) = 0;
 
     virtual bool undo() = 0;
 };

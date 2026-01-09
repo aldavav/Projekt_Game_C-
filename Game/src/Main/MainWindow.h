@@ -5,25 +5,15 @@
 #include <Core/Input/InputManager.h>
 #include <UI/Manager/MenuManager.h>
 #include <Game/Engine/GameEngine.h>
-#include <QGuiApplication>
 #include <QFontDatabase>
 #include <QApplication>
 #include <QMainWindow>
-#include <QMouseEvent>
-#include <QPushButton>
-#include <QShowEvent>
-#include <QKeyEvent>
 #include <QScreen>
-#include <QDebug>
-#include <QTimer>
 #include <QIcon>
 
-QT_BEGIN_NAMESPACE
-namespace Ui
-{
-    class MainWindow;
-}
-QT_END_NAMESPACE
+class QKeyEvent;
+class QMouseEvent;
+class QWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -35,7 +25,7 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *event) override;
 
-    void keyReleaseEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event) override;
 
     void mousePressEvent(QMouseEvent *event) override;
 
