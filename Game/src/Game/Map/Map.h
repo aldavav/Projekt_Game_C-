@@ -3,6 +3,7 @@
 
 #include <Core/Logger/LoggerMacros.h>
 #include <Game/Map/Difficulty.h>
+#include <Game/Map/MapStats.h>
 #include <Game/Map/Chunk.h>
 #include <Game/Map/Tile.h>
 #include <unordered_map>
@@ -30,6 +31,8 @@ private:
 
     void generateChunk(Chunk *chunk);
 
+    MapStats m_stats;
+
 public:
     static Map &getInstance();
 
@@ -46,6 +49,8 @@ public:
     Map(const Map &) = delete;
 
     Map &operator=(const Map &) = delete;
+
+    const MapStats &getStats() const { return m_stats; }
 };
 
 #endif

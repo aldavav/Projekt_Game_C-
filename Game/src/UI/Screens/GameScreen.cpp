@@ -153,7 +153,8 @@ void GameScreen::drawMap(QPainter &painter)
                 drawHexagon(painter, screenPos, BASE_TILE * zoom);
             }
 
-            drawHexagon(painter, screenPos, (BASE_TILE * zoom) + 0.5f);
+            float visualRadius = (BASE_TILE * zoom) * 0.96f;
+            drawHexagon(painter, screenPos, visualRadius);
         }
     }
 }
@@ -314,4 +315,31 @@ void GameScreen::drawHUD(QPainter &painter)
         painter.setPen(Qt::gray);
         painter.drawText(startX, startY + (lineSpacing * 3), "No Selection");
     }
+
+    auto &stats = Map::getInstance().getStats();
+    int rightBoxW = 180;
+    int rightBoxH = 100;
+    int padding = 10;
+
+    int rx = width() - rightBoxW - padding;
+    int ry = padding;
+
+    painter.setBrush(QColor(0, 0, 0, 160));
+    painter.setPen(Qt::NoPen);
+    painter.drawRoundedRect(rx, ry, rightBoxW, rightBoxH, 5, 5);
+
+    painter.setPen(Qt::white);
+    painter.setFont(QFont("Consolas", 9, QFont::Bold));
+
+    int textX = rx + 10;
+    int textY = ry + 25;
+    int spacing = 18;
+
+    painter.drawText(textX, textY, "RESOURCES DISCOVERED");
+    painter.setPen(QColor("#FFD600"));
+    painter.drawText(textX, textY + spacing, "Gold Ore:  " + QString::number(stats.oreCount));
+    painter.setPen(QColor("#81C784"));
+    painter.drawText(textX, textY + spacing * 2, "Habitable: " + QString::number(stats.grassCount));
+    painter.setPen(QColor("#64B5F6"));
+    painter.drawText(textX, textY + spacing * 3, "Water:     " + QString::number(stats.waterCount));
 }
