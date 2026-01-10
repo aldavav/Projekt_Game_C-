@@ -32,7 +32,9 @@ Screens/GameScreen.cpp
 Screens/MainMenuScreen.cpp
 )
 
-add_executable(Game ${PROJECT_SOURCES})
+add_executable(Game ${PROJECT_SOURCES}
+    Screens/CreditsScreen.cpp
+    Screens/CreditsScreen.h)
 
 target_include_directories(Game PRIVATE
 ${CMAKE_SOURCE_DIR}
