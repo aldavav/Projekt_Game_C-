@@ -81,7 +81,6 @@ QPointF Camera::screenToWorld(const QPoint &screenPos) const
 
 QPointF Camera::hexRound(float q, float r) const
 {
-
     float x = q;
     float z = r;
     float y = -x - z;

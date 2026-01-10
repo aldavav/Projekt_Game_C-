@@ -14,9 +14,9 @@ public:
 
     QPointF hexRound(float q, float r) const;
 
-    static constexpr float MIN_ZOOM = 0.3f;
+    static constexpr float MIN_ZOOM = 0.75f;
 
-    static constexpr float MAX_ZOOM = 2.0f;
+    static constexpr float MAX_ZOOM = 3.0f;
 
     void update(float deltaTime);
 
@@ -47,7 +47,7 @@ private:
 
     QPointF m_targetPos;
 
-    float m_zoom = 1.0f;
+    float m_zoom = 1.5f;
 
     QRect m_worldBounds;
 

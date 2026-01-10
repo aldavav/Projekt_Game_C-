@@ -78,38 +78,37 @@ void GameScreen::drawMap(QPainter &painter)
     auto &map = Map::getInstance();
     const float BASE_TILE = 32.0f;
     float zoom = cam.getZoom();
-    const int MAP_RADIUS = (width() / (BASE_TILE * cam.getZoom())) - 40;
 
-    for (int q = -MAP_RADIUS; q <= MAP_RADIUS; ++q)
-    {
-        int r_start = std::max(-MAP_RADIUS, -q - MAP_RADIUS);
-        int r_end = std::min(MAP_RADIUS, -q + MAP_RADIUS);
+    const int VIEW_RADIUS = 12;
 
-        for (int r = r_start; r <= r_end; ++r)
-        {
+    QPointF centerCoord = cam.screenToWorld(QPoint(width() / 2, height() / 2));
+    int cq = static_cast<int>(centerCoord.x());
+    int cr = static_cast<int>(centerCoord.y());
 
+    for (int q = cq - VIEW_RADIUS; q <= cq + VIEW_RADIUS; ++q) {
+        
+        int r_start = std::max(cr - VIEW_RADIUS, cr - q + cq - VIEW_RADIUS);
+        int r_end = std::min(cr + VIEW_RADIUS, cr - q + cq + VIEW_RADIUS);
+
+        for (int r = r_start; r <= r_end; ++r) {
+            
             QPoint screenPos = cam.toScreen(q, r, BASE_TILE);
 
-            if (screenPos.x() < -50 || screenPos.x() > width() + 50 ||
-                screenPos.y() < -50 || screenPos.y() > height() + 50)
-            {
+            if (screenPos.x() < -100 || screenPos.x() > width() + 100 ||
+                screenPos.y() < -100 || screenPos.y() > height() + 100) {
                 continue;
             }
 
-            bool isHovered = (q == (int)m_hoveredHex.x() && r == (int)m_hoveredHex.y());
             Tile &tile = map.getTileAt(q, r);
+            bool isHovered = (q == (int)m_hoveredHex.x() && r == (int)m_hoveredHex.y());
 
-            if (isHovered)
-            {
-                painter.setBrush(QColor(255, 255, 255, 150));
-                painter.setPen(QPen(Qt::yellow, 2));
-            }
-            else
-            {
+            if (isHovered) {
+                painter.setBrush(QColor(255, 255, 255, 180));
+            } else {
                 painter.setBrush((tile.type == TileType::GRASS) ? QColor("#2E7D32") : QColor("#4E342E"));
-                painter.setPen(QPen(QColor(0, 0, 0, 40)));
             }
-
+            
+            painter.setPen(QPen(QColor(0, 0, 0, 60), 1));
             drawHexagon(painter, screenPos, BASE_TILE * zoom);
         }
     }
