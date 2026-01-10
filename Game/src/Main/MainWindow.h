@@ -5,6 +5,8 @@
 #include <Core/Input/InputManager.h>
 #include <UI/Manager/MenuManager.h>
 #include <Game/Engine/GameEngine.h>
+#include <qaudiooutput.h>
+#include <qmediaplayer.h>
 #include <QFontDatabase>
 #include <QApplication>
 #include <QMainWindow>
@@ -34,6 +36,12 @@ private slots:
 
 private:
     QWidget *m_centralWidget;
+
+    QMediaPlayer *m_bgmPlayer;
+    
+    QAudioOutput *m_audioOutput;
+    
+    void setupBackgroundMusic();
 };
 
 #endif

@@ -15,6 +15,14 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle(tr("Command & Conquer"));
     setWindowIcon(QIcon(":/images/assets/images/icon0.png"));
 
+    QPixmap pix(":/images/assets/images/cursor.png");
+    QPixmap scaledPix = pix.scaled(32, 32, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    QCursor customCursor(scaledPix, 0, 0);
+    QGuiApplication::setOverrideCursor(customCursor);
+
+    setupBackgroundMusic();
+
     if (QScreen *screen = QGuiApplication::primaryScreen())
     {
         resize(screen->availableGeometry().size());
@@ -50,6 +58,22 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 
 void MainWindow::on_actionQuit_triggered()
 {
-    // here will be cleanup code later
     QApplication::quit();
+}
+
+void MainWindow::setupBackgroundMusic()
+{
+    m_bgmPlayer = new QMediaPlayer(this);
+
+    m_audioOutput = new QAudioOutput(this);
+
+    m_bgmPlayer->setAudioOutput(m_audioOutput);
+
+    m_bgmPlayer->setSource(QUrl("qrc:/audio/assets/audio/music.mp3"));
+
+    m_audioOutput->setVolume(0.4);
+
+    m_bgmPlayer->setLoops(QMediaPlayer::Infinite);
+
+    m_bgmPlayer->play();
 }

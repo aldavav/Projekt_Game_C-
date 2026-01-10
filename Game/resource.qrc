@@ -5,6 +5,7 @@
     <file>assets/images/icon0.png</file>
     <file>assets/images/button.jpg</file>
     <file>assets/images/arrow.png</file>
+    <file>assets/images/cursor.png</file>
   </qresource>
   <qresource prefix="/fonts">
     <file>assets/fonts/Orbitron-Medium.ttf</file>
@@ -13,8 +14,12 @@
     <file>assets/fonts/Orbitron-Regular.ttf</file>
     <file>assets/fonts/Orbitron-Black.ttf</file>
     <file>assets/fonts/Orbitron-SemiBold.ttf</file>
+    <file>assets/images/cursor.png</file>
   </qresource>
   <qresource prefix="/animations">
     <file>assets/animations/menu.gif</file>
+  </qresource>
+  <qresource prefix="/audio">
+    <file>assets/audio/music.mp3</file>
   </qresource>
 </RCC>
