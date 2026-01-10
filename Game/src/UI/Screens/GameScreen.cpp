@@ -52,7 +52,7 @@ void GameScreen::onEnter()
 
     auto &cam = Camera::getInstance();
 
-    cam.setWorldBounds(QRect(0, 0, 10000, 10000));
+    cam.setWorldBounds(QRect(-1000, -1000, 10000, 10000));
 
     cam.setViewportSize(this->width(), this->height());
 
