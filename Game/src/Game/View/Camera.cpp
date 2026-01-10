@@ -136,3 +136,12 @@ void Camera::handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHe
         move(dx, dy);
     }
 }
+
+void Camera::setTargetPos(QPointF worldPos)
+{
+    float size = 32.0f;
+    float x = size * (3.0f / 2.0f * worldPos.x());
+    float y = size * (std::sqrt(3.0f) / 2.0f * worldPos.x() + std::sqrt(3.0f) * worldPos.y());
+
+    m_targetPos = QPointF(x, y);
+}

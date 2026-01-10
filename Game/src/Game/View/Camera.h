@@ -16,6 +16,8 @@ public:
 
     void handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHeight, float deltaTime);
 
+    void setTargetPos(QPointF worldPos);
+
     static constexpr float MIN_ZOOM = 0.75f;
 
     static constexpr float MAX_ZOOM = 3.0f;

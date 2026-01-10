@@ -42,6 +42,8 @@ public:
 
     bool isAreaWalkable(int x, int y, int w, int h);
 
+    void revealRadius(int centerQ, int centerR, int radius);
+
     std::string getMapName() const { return m_mapName; }
 
     void clear();

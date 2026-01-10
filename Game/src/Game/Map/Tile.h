@@ -25,6 +25,7 @@ struct Tile
 {
     TileType type = TileType::GRASS;
     uint8_t variant = 0;
+    bool discovered = false;
 };
 
 #endif

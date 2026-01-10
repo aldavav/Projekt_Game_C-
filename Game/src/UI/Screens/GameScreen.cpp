@@ -56,7 +56,7 @@ void GameScreen::onEnter()
 
     auto &cam = Camera::getInstance();
 
-    cam.setWorldBounds(QRect(-1000, -1000, 2000, 2000));
+    cam.setWorldBounds(QRect(-2000, -1500, 3500, 3000));
 
     cam.setViewportSize(this->width(), this->height());
 
@@ -83,16 +83,16 @@ void GameScreen::drawMap(QPainter &painter)
     auto &map = Map::getInstance();
     const float BASE_TILE = 32.0f;
     float zoom = cam.getZoom();
-
     const int VIEW_RADIUS = 20;
 
     QPointF centerCoord = cam.screenToWorld(QPoint(width() / 2, height() / 2));
     int cq = static_cast<int>(centerCoord.x());
     int cr = static_cast<int>(centerCoord.y());
 
+    float baseVisualRadius = (BASE_TILE * zoom) * 0.96f;
+
     for (int q = cq - VIEW_RADIUS; q <= cq + VIEW_RADIUS; ++q)
     {
-
         int r_start = std::max(cr - VIEW_RADIUS, cr - q + cq - VIEW_RADIUS);
         int r_end = std::min(cr + VIEW_RADIUS, cr - q + cq + VIEW_RADIUS);
 
@@ -107,6 +107,7 @@ void GameScreen::drawMap(QPainter &painter)
             }
 
             Tile &tile = map.getTileAt(q, r);
+            float currentRadius = baseVisualRadius;
 
             QColor tileColor;
             switch (tile.type)
@@ -134,27 +135,29 @@ void GameScreen::drawMap(QPainter &painter)
             bool isHovered = (q == (int)m_hoveredHex.x() && r == (int)m_hoveredHex.y());
             bool isSelected = (m_hasSelection && q == (int)m_selectedHex.x() && r == (int)m_selectedHex.y());
 
-            if (isSelected)
+            if (!tile.discovered)
+            {
+                painter.setBrush(QColor(20, 20, 25));
+                painter.setPen(Qt::NoPen);
+            }
+            else if (isSelected)
             {
                 painter.setPen(QPen(Qt::white, 2));
                 painter.setBrush(tileColor.lighter(160));
-                drawHexagon(painter, screenPos, BASE_TILE * zoom);
+                currentRadius = BASE_TILE * zoom;
             }
             else if (isHovered)
             {
                 painter.setPen(QPen(Qt::yellow, 1));
                 painter.setBrush(tileColor.lighter(120));
-                drawHexagon(painter, screenPos, BASE_TILE * zoom);
             }
             else
             {
                 painter.setPen(Qt::NoPen);
                 painter.setBrush(tileColor);
-                drawHexagon(painter, screenPos, BASE_TILE * zoom);
             }
 
-            float visualRadius = (BASE_TILE * zoom) * 0.96f;
-            drawHexagon(painter, screenPos, visualRadius);
+            drawHexagon(painter, screenPos, currentRadius);
         }
     }
 }
@@ -168,6 +171,36 @@ void GameScreen::wheelEvent(QWheelEvent *event)
 
 void GameScreen::mousePressEvent(QMouseEvent *event)
 {
+    int mmSize = 150;
+    int mmMargin = 15;
+    int mmX = width() - mmSize - mmMargin;
+    int mmY = height() - mmSize - mmMargin;
+    QRect minimapRect(mmX, mmY, mmSize, mmSize);
+
+    if (minimapRect.contains(event->pos()))
+    {
+
+        float localX = event->pos().x() - (mmX + mmSize / 2);
+        float localY = event->pos().y() - (mmY + mmSize / 2);
+
+        const int MM_RANGE = 40;
+        float dotSize = (float)mmSize / (MM_RANGE * 2);
+
+        float size = 1.0f;
+        float q = (2.0f / 3.0f * localX) / dotSize;
+        float r = (-1.0f / 3.0f * localX + std::sqrt(3.0f) / 3.0f * localY) / dotSize;
+
+        auto &cam = Camera::getInstance();
+        QPointF camCenter = cam.screenToWorld(QPoint(width() / 2, height() / 2));
+
+        QPointF targetWorldPos(camCenter.x() + q, camCenter.y() + r);
+
+        cam.setTargetPos(targetWorldPos);
+
+        update();
+        return;
+    }
+
     if (event->button() == Qt::LeftButton)
     {
         m_isDragging = true;
@@ -213,10 +246,13 @@ void GameScreen::mouseReleaseEvent(QMouseEvent *event)
 void GameScreen::updateGameDisplay()
 {
     auto &cam = Camera::getInstance();
-    QPoint localMouse = mapFromGlobal(QCursor::pos());
+    auto &map = Map::getInstance();
 
-    cam.handleEdgePanning(localMouse, width(), height(), 0.016f);
     cam.update(0.016f);
+
+    QPointF worldCenter = cam.screenToWorld(QPoint(width() / 2, height() / 2));
+    map.revealRadius(worldCenter.x(), worldCenter.y(), 10);
+
     update();
 }
 
@@ -342,4 +378,82 @@ void GameScreen::drawHUD(QPainter &painter)
     painter.drawText(textX, textY + spacing * 2, "Habitable: " + QString::number(stats.grassCount));
     painter.setPen(QColor("#64B5F6"));
     painter.drawText(textX, textY + spacing * 3, "Water:     " + QString::number(stats.waterCount));
+
+    auto &map = Map::getInstance();
+    auto &cam = Camera::getInstance();
+
+    int mmSize = 150;
+    int mmMargin = 15;
+    int mmPadding = 5;
+
+    int mmX = width() - mmSize - mmMargin;
+    int mmY = height() - mmSize - mmMargin;
+
+    painter.setBrush(QColor(0, 0, 0, 200));
+    painter.setPen(QPen(QColor("#444444"), 2));
+    painter.drawRect(mmX, mmY, mmSize, mmSize);
+
+    const int MM_RANGE = 40;
+    float dotSize = (float)mmSize / (MM_RANGE * 2);
+
+    QPointF camCenter = cam.screenToWorld(QPoint(width() / 2, height() / 2));
+    int cq = static_cast<int>(camCenter.x());
+    int cr = static_cast<int>(camCenter.y());
+
+    painter.setPen(Qt::NoPen);
+
+    float hexToPixelScale = dotSize * 0.75f;
+
+    for (int q = cq - MM_RANGE; q <= cq + MM_RANGE; ++q)
+    {
+        for (int r = cr - MM_RANGE; r <= cr + MM_RANGE; ++r)
+        {
+            Tile &tile = map.getTileAt(q, r);
+
+            if (tile.discovered)
+            {
+                QColor dotColor;
+                switch (tile.type)
+                {
+                case TileType::WATER:
+                    dotColor = QColor("#1976D2");
+                    break;
+                case TileType::GRASS:
+                    dotColor = QColor("#388E3C");
+                    break;
+                case TileType::MOUNTAIN:
+                    dotColor = QColor("#757575");
+                    break;
+                case TileType::ORE_DEPOSIT:
+                    dotColor = QColor("#FFD600");
+                    break;
+                default:
+                    dotColor = QColor("#555555");
+                    break;
+                }
+
+                float worldX = (3.0f / 2.0f * q);
+                float worldY = (std::sqrt(3.0f) / 2.0f * q + std::sqrt(3.0f) * r);
+
+                float centerX = (3.0f / 2.0f * cq);
+                float centerY = (std::sqrt(3.0f) / 2.0f * cq + std::sqrt(3.0f) * cr);
+
+                float screenX = (worldX - centerX) * dotSize;
+                float screenY = (worldY - centerY) * dotSize;
+
+                painter.setBrush(dotColor);
+
+                painter.drawRect(QRectF(mmX + (mmSize / 2) + screenX,
+                                        mmY + (mmSize / 2) + screenY,
+                                        dotSize + 1.0f, dotSize + 1.0f));
+            }
+        }
+    }
+
+    painter.setBrush(Qt::NoBrush);
+    painter.setPen(QPen(Qt::white, 1));
+    int viewIndicatorSize = 15;
+    painter.drawRect(mmX + (mmSize / 2) - (viewIndicatorSize / 2),
+                     mmY + (mmSize / 2) - (viewIndicatorSize / 2),
+                     viewIndicatorSize, viewIndicatorSize);
 }
