@@ -21,7 +21,9 @@ void Map::initializeNewMap(const std::string &name, Difficulty difficulty)
 
 uint64_t Map::getChunkKey(int cx, int cy) const
 {
-    return (static_cast<uint64_t>(cx) << 32) | (static_cast<uint32_t>(cy));
+    uint32_t low = static_cast<uint32_t>(cx);
+    uint32_t high = static_cast<uint32_t>(cy);
+    return (static_cast<uint64_t>(high) << 32) | low;
 }
 
 Tile &Map::getTileAt(int x, int y)

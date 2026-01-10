@@ -52,7 +52,7 @@ void GameScreen::onEnter()
 
     auto &cam = Camera::getInstance();
 
-    cam.setWorldBounds(QRect(-1000, -1000, 10000, 10000));
+    cam.setWorldBounds(QRect(-1000, -1000, 2000, 2000));
 
     cam.setViewportSize(this->width(), this->height());
 
@@ -206,6 +206,11 @@ void GameScreen::mouseReleaseEvent(QMouseEvent *event)
 
 void GameScreen::updateGameDisplay()
 {
+    auto &cam = Camera::getInstance();
+    QPoint localMouse = mapFromGlobal(QCursor::pos());
+
+    cam.handleEdgePanning(localMouse, width(), height(), 0.016f);
+    cam.update(0.016f);
     update();
 }
 

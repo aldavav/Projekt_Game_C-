@@ -14,6 +14,8 @@ public:
 
     QPointF hexRound(float q, float r) const;
 
+    void handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHeight, float deltaTime);
+
     static constexpr float MIN_ZOOM = 0.75f;
 
     static constexpr float MAX_ZOOM = 3.0f;
@@ -60,6 +62,10 @@ private:
     float m_shakeIntensity = 0.0f;
 
     QPointF m_shakeOffset;
+
+    const int EDGE_MARGIN = 15;
+    
+    const float EDGE_MOVE_SPEED = 10.0f;
 };
 
 #endif

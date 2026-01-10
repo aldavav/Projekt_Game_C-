@@ -14,8 +14,6 @@ void Camera::move(float dx, float dy)
     m_targetPos.setY(m_targetPos.y() + dy);
 }
 
-#include <random>
-
 void Camera::update(float deltaTime)
 {
     float lerpFactor = 1.0f - std::pow(m_smoothing, deltaTime * 60.0f);
@@ -25,11 +23,14 @@ void Camera::update(float deltaTime)
     {
         float minX = static_cast<float>(m_worldBounds.left());
         float maxX = static_cast<float>(m_worldBounds.right());
-        m_currentPos.setX(std::clamp(static_cast<float>(m_currentPos.x()), minX, maxX));
-
         float minY = static_cast<float>(m_worldBounds.top());
         float maxY = static_cast<float>(m_worldBounds.bottom());
+
+        m_currentPos.setX(std::clamp(static_cast<float>(m_currentPos.x()), minX, maxX));
         m_currentPos.setY(std::clamp(static_cast<float>(m_currentPos.y()), minY, maxY));
+
+        m_targetPos.setX(std::clamp(static_cast<float>(m_targetPos.x()), minX, maxX));
+        m_targetPos.setY(std::clamp(static_cast<float>(m_targetPos.y()), minY, maxY));
     }
 
     if (m_shakeIntensity > 0.1f)
@@ -107,4 +108,31 @@ QPointF Camera::hexRound(float q, float r) const
     }
 
     return QPointF(rx, rz);
+}
+
+void Camera::handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHeight, float deltaTime)
+{
+    float dx = 0;
+    float dy = 0;
+
+    float moveAmount = (500.0f / m_zoom) * deltaTime;
+
+    if (mousePos.x() < 0 || mousePos.y() < 0 ||
+        mousePos.x() > viewWidth || mousePos.y() > viewHeight)
+        return;
+
+    if (mousePos.x() < EDGE_MARGIN)
+        dx = -moveAmount;
+    else if (mousePos.x() > viewWidth - EDGE_MARGIN)
+        dx = moveAmount;
+
+    if (mousePos.y() < EDGE_MARGIN)
+        dy = -moveAmount;
+    else if (mousePos.y() > viewHeight - EDGE_MARGIN)
+        dy = moveAmount;
+
+    if (dx != 0 || dy != 0)
+    {
+        move(dx, dy);
+    }
 }

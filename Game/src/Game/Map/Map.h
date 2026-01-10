@@ -20,7 +20,7 @@ private:
 
     std::string m_mapName;
 
-    uint32_t m_seed = 12345;
+    uint32_t m_seed = 12344;
 
     Difficulty m_difficulty = Difficulty::MEDIUM;
 
