@@ -58,6 +58,10 @@ private:
     QTimer *m_updateTimer;
 
     QPointF m_hoveredHex;
+
+    QPointF m_selectedHex = QPointF(9999, 9999);
+    
+    bool m_hasSelection = false;
 };
 
 #endif

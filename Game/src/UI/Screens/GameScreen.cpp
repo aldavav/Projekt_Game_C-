@@ -85,30 +85,46 @@ void GameScreen::drawMap(QPainter &painter)
     int cq = static_cast<int>(centerCoord.x());
     int cr = static_cast<int>(centerCoord.y());
 
-    for (int q = cq - VIEW_RADIUS; q <= cq + VIEW_RADIUS; ++q) {
-        
+    for (int q = cq - VIEW_RADIUS; q <= cq + VIEW_RADIUS; ++q)
+    {
+
         int r_start = std::max(cr - VIEW_RADIUS, cr - q + cq - VIEW_RADIUS);
         int r_end = std::min(cr + VIEW_RADIUS, cr - q + cq + VIEW_RADIUS);
 
-        for (int r = r_start; r <= r_end; ++r) {
-            
+        for (int r = r_start; r <= r_end; ++r)
+        {
             QPoint screenPos = cam.toScreen(q, r, BASE_TILE);
 
             if (screenPos.x() < -100 || screenPos.x() > width() + 100 ||
-                screenPos.y() < -100 || screenPos.y() > height() + 100) {
+                screenPos.y() < -100 || screenPos.y() > height() + 100)
+            {
                 continue;
             }
 
             Tile &tile = map.getTileAt(q, r);
-            bool isHovered = (q == (int)m_hoveredHex.x() && r == (int)m_hoveredHex.y());
 
-            if (isHovered) {
-                painter.setBrush(QColor(255, 255, 255, 180));
-            } else {
-                painter.setBrush((tile.type == TileType::GRASS) ? QColor("#2E7D32") : QColor("#4E342E"));
+            int q_int = static_cast<int>(q);
+            int r_int = static_cast<int>(r);
+
+            bool isHovered = (q_int == (int)m_hoveredHex.x() && r_int == (int)m_hoveredHex.y());
+            bool isSelected = (m_hasSelection && q_int == (int)m_selectedHex.x() && r_int == (int)m_selectedHex.y());
+
+            if (isSelected)
+            {
+                painter.setBrush(QColor("#4FC3F7"));
+                painter.setPen(QPen(Qt::white, 3));
             }
-            
-            painter.setPen(QPen(QColor(0, 0, 0, 60), 1));
+            else if (isHovered)
+            {
+                painter.setBrush(QColor(255, 255, 255, 100));
+                painter.setPen(QPen(Qt::yellow, 2));
+            }
+            else
+            {
+                painter.setBrush((tile.type == TileType::GRASS) ? QColor("#2E7D32") : QColor("#4E342E"));
+                painter.setPen(QPen(QColor(0, 0, 0, 40)));
+            }
+
             drawHexagon(painter, screenPos, BASE_TILE * zoom);
         }
     }
@@ -127,8 +143,18 @@ void GameScreen::mousePressEvent(QMouseEvent *event)
     {
         m_isDragging = true;
         m_lastMousePos = event->pos();
+
+        QPointF clickedHex = Camera::getInstance().screenToWorld(event->pos());
+
+        m_selectedHex = clickedHex;
+        m_hasSelection = true;
+
+        LOG_INFO("Selected Hex: q=" + std::to_string((int)m_selectedHex.x()) +
+                 ", r=" + std::to_string((int)m_selectedHex.y()));
     }
+
     InputManager::getInstance().onMouseClick(event->button(), event->pos());
+    update();
 }
 
 void GameScreen::mouseMoveEvent(QMouseEvent *event)
