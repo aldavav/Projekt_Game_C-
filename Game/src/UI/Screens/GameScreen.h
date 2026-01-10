@@ -62,6 +62,20 @@ private:
     QPointF m_selectedHex = QPointF(9999, 9999);
     
     bool m_hasSelection = false;
+
+    void drawHUD(QPainter &painter);
+    
+    QElapsedTimer m_gameTimer;
+    
+    int m_frameCount = 0;
+    
+    int m_fps = 0;
+    
+    QElapsedTimer m_fpsTimer;
+
+    QPolygonF m_cachedHex;
+    
+    float m_lastRadius = 0.0f;
 };
 
 #endif

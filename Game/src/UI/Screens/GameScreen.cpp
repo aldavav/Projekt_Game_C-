@@ -3,7 +3,9 @@
 GameScreen::GameScreen(QWidget *parent)
     : AbstractScreen(parent), m_updateTimer(new QTimer(this))
 {
-
+    setMouseTracking(true);
+    m_gameTimer.start();
+    m_fpsTimer.start();
     setMouseTracking(true);
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
 
@@ -48,6 +50,8 @@ GameScreen::GameScreen(QWidget *parent)
 
 void GameScreen::onEnter()
 {
+    m_gameTimer.restart();
+
     LOG_INFO("Entering GameScreen. Resetting Camera Bounds.");
 
     auto &cam = Camera::getInstance();
@@ -70,6 +74,7 @@ void GameScreen::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     drawMap(painter);
+    drawHUD(painter);
 }
 
 void GameScreen::drawMap(QPainter &painter)
@@ -79,7 +84,7 @@ void GameScreen::drawMap(QPainter &painter)
     const float BASE_TILE = 32.0f;
     float zoom = cam.getZoom();
 
-    const int VIEW_RADIUS = 12;
+    const int VIEW_RADIUS = 20;
 
     QPointF centerCoord = cam.screenToWorld(QPoint(width() / 2, height() / 2));
     int cq = static_cast<int>(centerCoord.x());
@@ -131,24 +136,24 @@ void GameScreen::drawMap(QPainter &painter)
 
             if (isSelected)
             {
-
+                painter.setPen(QPen(Qt::white, 2));
                 painter.setBrush(tileColor.lighter(160));
-                painter.setPen(QPen(Qt::white, 3));
+                drawHexagon(painter, screenPos, BASE_TILE * zoom);
             }
             else if (isHovered)
             {
-
+                painter.setPen(QPen(Qt::yellow, 1));
                 painter.setBrush(tileColor.lighter(120));
-                painter.setPen(QPen(Qt::yellow, 2));
+                drawHexagon(painter, screenPos, BASE_TILE * zoom);
             }
             else
             {
-
+                painter.setPen(Qt::NoPen);
                 painter.setBrush(tileColor);
-                painter.setPen(QPen(QColor(0, 0, 0, 40)));
+                drawHexagon(painter, screenPos, BASE_TILE * zoom);
             }
 
-            drawHexagon(painter, screenPos, BASE_TILE * zoom);
+            drawHexagon(painter, screenPos, (BASE_TILE * zoom) + 0.5f);
         }
     }
 }
@@ -229,12 +234,84 @@ void GameScreen::resizeEvent(QResizeEvent *event)
 
 void GameScreen::drawHexagon(QPainter &painter, QPoint center, float radius)
 {
-    QPolygonF hex;
-    for (int i = 0; i < 6; ++i)
+    if (std::abs(radius - m_lastRadius) > 0.01f)
     {
-        float angle_rad = (M_PI / 180.0f) * (60.0f * i);
-        hex << QPointF(center.x() + radius * cos(angle_rad),
-                       center.y() + radius * sin(angle_rad));
+        m_cachedHex.clear();
+        for (int i = 0; i < 6; ++i)
+        {
+            float angle_rad = (M_PI / 180.0f) * (60.0f * i);
+            m_cachedHex << QPointF(radius * cos(angle_rad), radius * sin(angle_rad));
+        }
+        m_lastRadius = radius;
     }
-    painter.drawPolygon(hex);
+
+    painter.save();
+    painter.translate(center);
+    painter.drawPolygon(m_cachedHex);
+    painter.restore();
+}
+
+void GameScreen::drawHUD(QPainter &painter)
+{
+    m_frameCount++;
+    if (m_fpsTimer.elapsed() >= 1000)
+    {
+        m_fps = m_frameCount;
+        m_frameCount = 0;
+        m_fpsTimer.restart();
+    }
+
+    int totalSeconds = m_gameTimer.elapsed() / 1000;
+    int mins = totalSeconds / 60;
+    int secs = totalSeconds % 60;
+    QString timeStr = QString("Time: %1:%2")
+                          .arg(mins, 2, 10, QChar('0'))
+                          .arg(secs, 2, 10, QChar('0'));
+
+    int boxW = 220;
+    int boxH = m_hasSelection ? 130 : 100;
+
+    painter.setBrush(QColor(0, 0, 0, 160));
+    painter.setPen(Qt::NoPen);
+    painter.drawRoundedRect(10, 10, boxW, boxH, 5, 5);
+
+    painter.setPen(Qt::white);
+    painter.setFont(QFont("Consolas", 10, QFont::Bold));
+    int startX = 20;
+    int startY = 30;
+    int lineSpacing = 20;
+
+    painter.drawText(startX, startY, "FPS: " + QString::number(m_fps));
+    painter.drawText(startX, startY + lineSpacing, timeStr);
+
+    if (m_hasSelection)
+    {
+        int sq = static_cast<int>(m_selectedHex.x());
+        int sr = static_cast<int>(m_selectedHex.y());
+        Tile &selectedTile = Map::getInstance().getTileAt(sq, sr);
+
+        QString typeStr = "Unknown";
+        if (selectedTile.type == TileType::WATER)
+            typeStr = "Water";
+        else if (selectedTile.type == TileType::DIRT)
+            typeStr = "Dirt";
+        else if (selectedTile.type == TileType::GRASS)
+            typeStr = "Grass";
+        else if (selectedTile.type == TileType::MOUNTAIN)
+            typeStr = "Mountain";
+        else if (selectedTile.type == TileType::ORE_DEPOSIT)
+            typeStr = "Ore Deposit";
+
+        painter.setPen(QColor("#4FC3F7"));
+        painter.drawText(startX, startY + (lineSpacing * 2.5), "--- SELECTION ---");
+
+        painter.setPen(Qt::white);
+        painter.drawText(startX, startY + (lineSpacing * 3.5), QString("Coords: %1, %2").arg(sq).arg(sr));
+        painter.drawText(startX, startY + (lineSpacing * 4.5), "Type: " + typeStr);
+    }
+    else
+    {
+        painter.setPen(Qt::gray);
+        painter.drawText(startX, startY + (lineSpacing * 3), "No Selection");
+    }
 }
