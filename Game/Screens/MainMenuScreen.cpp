@@ -1,5 +1,7 @@
 #include "MainMenuScreen.h"
 #include "CreditsScreen.h"
+#include "HelpScreen.h"
+
 
 MainMenuScreen::MainMenuScreen(QWidget *parent)
     : AbstractScreen(parent)
@@ -156,7 +158,7 @@ void MainMenuScreen::onSettingsClicked()
 
 void MainMenuScreen::onHelpClicked()
 {
-    LOG_INFO("Help clicked. (Functionality pending implementation).");
+    MenuManager::getInstance().pushScreen(new HelpScreen(parentWidget()));
 }
 
 void MainMenuScreen::onCreditsClicked()

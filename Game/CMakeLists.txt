@@ -34,7 +34,9 @@ Screens/MainMenuScreen.cpp
 
 add_executable(Game ${PROJECT_SOURCES}
     Screens/CreditsScreen.cpp
-    Screens/CreditsScreen.h)
+    Screens/CreditsScreen.h
+    Screens/HelpScreen.h
+    Screens/HelpScreen.cpp)
 
 target_include_directories(Game PRIVATE
 ${CMAKE_SOURCE_DIR}
