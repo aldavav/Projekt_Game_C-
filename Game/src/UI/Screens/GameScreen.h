@@ -44,6 +44,8 @@ private slots:
 
     void resizeEvent(QResizeEvent *event) override;
 
+    void drawHexagon(QPainter &painter, QPoint center, float radius);
+
 private:
     bool m_isDragging = false;
 
@@ -54,6 +56,8 @@ private:
     void drawMap(QPainter &painter);
 
     QTimer *m_updateTimer;
+
+    QPointF m_hoveredHex;
 };
 
 #endif

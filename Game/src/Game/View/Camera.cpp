@@ -53,27 +53,59 @@ void Camera::adjustZoom(float delta)
     m_zoom = std::clamp(m_zoom + delta, minZ, maxZ);
 }
 
-QPoint Camera::toScreen(int tileX, int tileY, int tileSize) const
+QPoint Camera::toScreen(int q, int r, int tileSize) const
 {
-    float worldX = tileX * tileSize;
-    float worldY = tileY * tileSize;
+    float size = static_cast<float>(tileSize);
 
-    float screenX = (worldX - (m_currentPos.x() + m_shakeOffset.x())) * m_zoom + (m_viewportWidth / 2.0f);
-    float screenY = (worldY - (m_currentPos.y() + m_shakeOffset.y())) * m_zoom + (m_viewportHeight / 2.0f);
+    float worldX = size * (3.0f / 2.0f * q);
+    float worldY = size * (std::sqrt(3.0f) / 2.0f * q + std::sqrt(3.0f) * r);
+
+    float screenX = (worldX - m_currentPos.x()) * m_zoom + (m_viewportWidth / 2.0f);
+    float screenY = (worldY - m_currentPos.y()) * m_zoom + (m_viewportHeight / 2.0f);
 
     return QPoint(static_cast<int>(screenX), static_cast<int>(screenY));
 }
 
 QPointF Camera::screenToWorld(const QPoint &screenPos) const
 {
-    float centeredX = static_cast<float>(screenPos.x()) - (m_viewportWidth / 2.0f);
-    float centeredY = static_cast<float>(screenPos.y()) - (m_viewportHeight / 2.0f);
+    float worldX = (screenPos.x() - m_viewportWidth / 2.0f) / m_zoom + m_currentPos.x();
+    float worldY = (screenPos.y() - m_viewportHeight / 2.0f) / m_zoom + m_currentPos.y();
 
-    float zoomedX = centeredX / m_zoom;
-    float zoomedY = centeredY / m_zoom;
+    const float size = 32.0f;
 
-    float worldX = zoomedX + (m_currentPos.x() + m_shakeOffset.x());
-    float worldY = zoomedY + (m_currentPos.y() + m_shakeOffset.y());
+    float q = (2.0f / 3.0f * worldX) / size;
+    float r = (-1.0f / 3.0f * worldX + std::sqrt(3.0f) / 3.0f * worldY) / size;
 
-    return QPointF(worldX, worldY);
+    return hexRound(q, r);
+}
+
+QPointF Camera::hexRound(float q, float r) const
+{
+
+    float x = q;
+    float z = r;
+    float y = -x - z;
+
+    int rx = std::round(x);
+    int ry = std::round(y);
+    int rz = std::round(z);
+
+    float x_diff = std::abs(rx - x);
+    float y_diff = std::abs(ry - y);
+    float z_diff = std::abs(rz - z);
+
+    if (x_diff > y_diff && x_diff > z_diff)
+    {
+        rx = -ry - rz;
+    }
+    else if (y_diff > z_diff)
+    {
+        ry = -rx - rz;
+    }
+    else
+    {
+        rz = -rx - ry;
+    }
+
+    return QPointF(rx, rz);
 }

@@ -9,12 +9,12 @@ GameScreen::GameScreen(QWidget *parent)
 
     /*QScreen *screen = QGuiApplication::primaryScreen();
     QRect screenGeometry = screen->availableGeometry();
-    
+
     int width = screenGeometry.width();
     int height = screenGeometry.height();
 
     this->resize(width, height);
-    
+
     this->setMinimumSize(1024, 768);
 
     Camera::getInstance().setViewportSize(width, height);
@@ -69,7 +69,6 @@ void GameScreen::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
-
     drawMap(painter);
 }
 
@@ -77,33 +76,41 @@ void GameScreen::drawMap(QPainter &painter)
 {
     auto &cam = Camera::getInstance();
     auto &map = Map::getInstance();
-
-    const int BASE_TILE = 32;
+    const float BASE_TILE = 32.0f;
     float zoom = cam.getZoom();
-    int zoomTile = static_cast<int>(BASE_TILE * zoom);
+    const int MAP_RADIUS = (width() / (BASE_TILE * cam.getZoom())) - 40;
 
-    if (zoomTile <= 0)
-        return;
-
-    int startX = static_cast<int>(cam.pos().x() / BASE_TILE) - 1;
-    int startY = static_cast<int>(cam.pos().y() / BASE_TILE) - 1;
-
-    int visibleTilesX = (width() / zoomTile) + 2;
-    int visibleTilesY = (height() / zoomTile) + 2;
-
-    for (int y = startY; y <= startY + visibleTilesY; ++y)
+    for (int q = -MAP_RADIUS; q <= MAP_RADIUS; ++q)
     {
-        for (int x = startX; x <= startX + visibleTilesX; ++x)
+        int r_start = std::max(-MAP_RADIUS, -q - MAP_RADIUS);
+        int r_end = std::min(MAP_RADIUS, -q + MAP_RADIUS);
+
+        for (int r = r_start; r <= r_end; ++r)
         {
-            Tile &tile = map.getTileAt(x, y);
 
-            QPoint screenPos = cam.toScreen(x, y, BASE_TILE);
-            QRect tileRect(screenPos.x(), screenPos.y(), zoomTile, zoomTile);
+            QPoint screenPos = cam.toScreen(q, r, BASE_TILE);
 
-            painter.fillRect(tileRect, (tile.type == TileType::GRASS) ? QColor("#2E7D32") : QColor("#4E342E"));
+            if (screenPos.x() < -50 || screenPos.x() > width() + 50 ||
+                screenPos.y() < -50 || screenPos.y() > height() + 50)
+            {
+                continue;
+            }
 
-            painter.setPen(QPen(QColor(0, 0, 0, 30)));
-            painter.drawRect(tileRect);
+            bool isHovered = (q == (int)m_hoveredHex.x() && r == (int)m_hoveredHex.y());
+            Tile &tile = map.getTileAt(q, r);
+
+            if (isHovered)
+            {
+                painter.setBrush(QColor(255, 255, 255, 150));
+                painter.setPen(QPen(Qt::yellow, 2));
+            }
+            else
+            {
+                painter.setBrush((tile.type == TileType::GRASS) ? QColor("#2E7D32") : QColor("#4E342E"));
+                painter.setPen(QPen(QColor(0, 0, 0, 40)));
+            }
+
+            drawHexagon(painter, screenPos, BASE_TILE * zoom);
         }
     }
 }
@@ -127,16 +134,20 @@ void GameScreen::mousePressEvent(QMouseEvent *event)
 
 void GameScreen::mouseMoveEvent(QMouseEvent *event)
 {
+
+    m_hoveredHex = Camera::getInstance().screenToWorld(event->pos());
+
     if (m_isDragging)
     {
         QPoint delta = event->pos() - m_lastMousePos;
-
         float moveX = -static_cast<float>(delta.x()) / Camera::getInstance().getZoom();
         float moveY = -static_cast<float>(delta.y()) / Camera::getInstance().getZoom();
 
         Camera::getInstance().move(moveX, moveY);
         m_lastMousePos = event->pos();
     }
+
+    update();
 }
 
 void GameScreen::mouseReleaseEvent(QMouseEvent *event)
@@ -159,6 +170,18 @@ void GameScreen::onPauseClicked()
 void GameScreen::resizeEvent(QResizeEvent *event)
 {
     Camera::getInstance().setViewportSize(this->width(), this->height());
-    
+
     AbstractScreen::resizeEvent(event);
+}
+
+void GameScreen::drawHexagon(QPainter &painter, QPoint center, float radius)
+{
+    QPolygonF hex;
+    for (int i = 0; i < 6; ++i)
+    {
+        float angle_rad = (M_PI / 180.0f) * (60.0f * i);
+        hex << QPointF(center.x() + radius * cos(angle_rad),
+                       center.y() + radius * sin(angle_rad));
+    }
+    painter.drawPolygon(hex);
 }

@@ -12,9 +12,11 @@ public:
 
     QPointF screenToWorld(const QPoint& screenPos) const;
 
+    QPointF hexRound(float q, float r) const;
+
     static constexpr float MIN_ZOOM = 0.3f;
 
-    static constexpr float MAX_ZOOM = 3.0f;
+    static constexpr float MAX_ZOOM = 2.0f;
 
     void update(float deltaTime);
 
