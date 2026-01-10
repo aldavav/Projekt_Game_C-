@@ -2,6 +2,7 @@
 #define TILE_H
 
 #include <cstdint>
+#include <string>
 
 enum class TileType : uint8_t
 {
@@ -12,14 +13,17 @@ enum class TileType : uint8_t
     ORE_DEPOSIT
 };
 
+struct TileProperties
+{
+    std::string name;
+    bool walkable;
+    bool buildable;
+    float movementCost;
+};
+
 struct Tile
 {
     TileType type = TileType::GRASS;
-
-    bool walkable = true;
-
-    bool buildable = true;
-    
     uint8_t variant = 0;
 };
 

@@ -1,7 +1,7 @@
 #ifndef CHUNK_H
 #define CHUNK_H
 
-#include "Tile.h"
+#include <Game/Map/Tile.h>
 
 struct Chunk
 {

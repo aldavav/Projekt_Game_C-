@@ -8,12 +8,12 @@ ResourceManager &ResourceManager::getInstance()
 
 ResourceManager::ResourceManager()
 {
-    qDebug() << "ResourceManager initialized.";
+    LOG_INFO("ResourceManager initialized.");
 }
 
 ResourceManager::~ResourceManager()
 {
-    qDebug() << "ResourceManager shut down. Caches cleared automatically.";
+    LOG_INFO("ResourceManager shut down. Caches cleared automatically.");
 }
 
 TexturePtr ResourceManager::getTexture(const QString &resourceId)
@@ -36,10 +36,12 @@ AudioPtr ResourceManager::getAudio(const QString &resourceId)
 {
     if (m_audioCache.contains(resourceId))
     {
-        qDebug() << "Audio cache hit for:" << resourceId;
+        LOG_INFO(QString("Audio cache hit for: %1").arg(resourceId));
         return m_audioCache.value(resourceId);
     }
-    qDebug() << "Audio cache miss. Loading:" << resourceId;
+
+    LOG_WARNING(QString("Audio cache miss. Loading: %1").arg(resourceId));
+
     AudioPtr newAudio = loadAudioFromFile(resourceId);
     if (newAudio)
     {
@@ -47,7 +49,7 @@ AudioPtr ResourceManager::getAudio(const QString &resourceId)
     }
     else
     {
-        qDebug() << "ERROR: Failed to load audio:" << resourceId;
+        LOG_ERROR(QString("Failed to load audio: %1").arg(resourceId));
     }
     return newAudio;
 }
@@ -58,7 +60,7 @@ TexturePtr ResourceManager::loadTextureFromFile(const QString &filePath)
 
     if (image->load(filePath))
     {
-        qDebug() << "Successfully loaded texture from:" << filePath;
+        LOG_INFO(QString("Successfully loaded texture from: %1").arg(filePath));
         return image;
     }
     else
@@ -69,7 +71,6 @@ TexturePtr ResourceManager::loadTextureFromFile(const QString &filePath)
 
 AudioPtr ResourceManager::loadAudioFromFile(const QString &filePath)
 {
-
     AudioPtr sound(new QSoundEffect());
     sound->setSource(QUrl::fromLocalFile(filePath));
 
@@ -80,5 +81,5 @@ void ResourceManager::clearCache()
 {
     m_textureCache.clear();
     m_audioCache.clear();
-    qDebug() << "ResourceManager caches cleared.";
+    LOG_INFO("ResourceManager caches cleared.");
 }

@@ -103,25 +103,48 @@ void GameScreen::drawMap(QPainter &painter)
 
             Tile &tile = map.getTileAt(q, r);
 
-            int q_int = static_cast<int>(q);
-            int r_int = static_cast<int>(r);
+            QColor tileColor;
+            switch (tile.type)
+            {
+            case TileType::WATER:
+                tileColor = QColor("#1976D2");
+                break;
+            case TileType::DIRT:
+                tileColor = QColor("#D2B48C");
+                break;
+            case TileType::GRASS:
+                tileColor = QColor("#388E3C");
+                break;
+            case TileType::MOUNTAIN:
+                tileColor = QColor("#757575");
+                break;
+            case TileType::ORE_DEPOSIT:
+                tileColor = QColor("#FFD600");
+                break;
+            default:
+                tileColor = QColor("#2E7D32");
+                break;
+            }
 
-            bool isHovered = (q_int == (int)m_hoveredHex.x() && r_int == (int)m_hoveredHex.y());
-            bool isSelected = (m_hasSelection && q_int == (int)m_selectedHex.x() && r_int == (int)m_selectedHex.y());
+            bool isHovered = (q == (int)m_hoveredHex.x() && r == (int)m_hoveredHex.y());
+            bool isSelected = (m_hasSelection && q == (int)m_selectedHex.x() && r == (int)m_selectedHex.y());
 
             if (isSelected)
             {
-                painter.setBrush(QColor("#4FC3F7"));
+
+                painter.setBrush(tileColor.lighter(160));
                 painter.setPen(QPen(Qt::white, 3));
             }
             else if (isHovered)
             {
-                painter.setBrush(QColor(255, 255, 255, 100));
+
+                painter.setBrush(tileColor.lighter(120));
                 painter.setPen(QPen(Qt::yellow, 2));
             }
             else
             {
-                painter.setBrush((tile.type == TileType::GRASS) ? QColor("#2E7D32") : QColor("#4E342E"));
+
+                painter.setBrush(tileColor);
                 painter.setPen(QPen(QColor(0, 0, 0, 40)));
             }
 

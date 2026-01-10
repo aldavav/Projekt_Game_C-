@@ -2,19 +2,14 @@
 #define MAP_H
 
 #include <Core/Logger/LoggerMacros.h>
+#include <Game/Map/Difficulty.h>
+#include <Game/Map/Chunk.h>
+#include <Game/Map/Tile.h>
 #include <unordered_map>
-#include "Chunk.h"
-#include "Tile.h"
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <cmath>
-
-enum Difficulty
-{
-    EASY,
-    MEDIUM,
-    HARD
-};
 
 class Map
 {
@@ -25,7 +20,9 @@ private:
 
     std::string m_mapName;
 
-    Difficulty m_difficulty = EASY;
+    uint32_t m_seed = 12345;
+
+    Difficulty m_difficulty = Difficulty::MEDIUM;
 
     std::unordered_map<uint64_t, Chunk *> m_chunks;
 
@@ -36,7 +33,7 @@ private:
 public:
     static Map &getInstance();
 
-    void initializeNewMap(const std::string &name, Difficulty difficulty = EASY);
+    void initializeNewMap(const std::string &name, Difficulty difficulty = Difficulty::EASY);
 
     Tile &getTileAt(int x, int y);
 

@@ -1,7 +1,9 @@
 #ifndef MENUMANAGER_H
 #define MENUMANAGER_H
 
+#include <Core/Logger/LoggerMacros.h>
 #include <Game/Engine/GameEngine.h>
+#include <Core/Logger/Logger.h>
 #include <QLayout>
 #include <QObject>
 #include <QString>
