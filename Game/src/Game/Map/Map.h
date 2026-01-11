@@ -8,6 +8,7 @@
 #include <Game/Map/Tile.h>
 #include <unordered_map>
 #include <cstdint>
+#include <random>
 #include <string>
 #include <vector>
 #include <cmath>
@@ -53,6 +54,8 @@ public:
     Map &operator=(const Map &) = delete;
 
     const MapStats &getStats() const { return m_stats; }
+
+    uint32_t getSeed() const { return m_seed; }
 };
 
 #endif

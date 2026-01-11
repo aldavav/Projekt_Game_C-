@@ -192,13 +192,12 @@ void GameScreen::drawMap(QPainter &painter)
     for (int i = 0; i < 50; ++i)
     {
         float speedVar = std::abs(std::sin(i * 1.618f)) * 20.0f;
-        float driftSpeed = 25.0f + speedVar;
 
         float xOffset = i * 937.0f;
 
         float yOffset = std::fmod(i * 563.0f, 4000.0f);
 
-        float worldX = (m_gameTime * driftSpeed) + xOffset;
+        float worldX = (m_gameTime * speedVar) + xOffset;
         float worldY = yOffset - 2000.0f;
 
         worldY += std::sin(m_gameTime * 0.2f + i) * 100.0f;

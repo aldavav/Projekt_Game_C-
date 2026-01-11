@@ -16,7 +16,9 @@ void Map::initializeNewMap(const std::string &name, Difficulty difficulty)
     clear();
     m_mapName = name;
     m_difficulty = difficulty;
-    LOG_INFO("RTS World Initialized: " + name);
+    std::random_device rd;
+    m_seed = rd();
+    LOG_INFO("New Map Initialized: " + std::string(name) + " | Seed: " + std::to_string(m_seed));
 }
 
 uint64_t Map::getChunkKey(int cx, int cy) const
@@ -176,11 +178,15 @@ bool Map::isAreaWalkable(int q, int r, int w, int h)
     return true;
 }
 
-void Map::revealRadius(int centerQ, int centerR, int radius) {
-    for (int q = centerQ - radius; q <= centerQ + radius; ++q) {
-        for (int r = centerR - radius; r <= centerR + radius; ++r) {
+void Map::revealRadius(int centerQ, int centerR, int radius)
+{
+    for (int q = centerQ - radius; q <= centerQ + radius; ++q)
+    {
+        for (int r = centerR - radius; r <= centerR + radius; ++r)
+        {
             int dist = (std::abs(centerQ - q) + std::abs(centerQ + centerR - q - r) + std::abs(centerR - r)) / 2;
-            if (dist <= radius) {
+            if (dist <= radius)
+            {
                 getTileAt(q, r).discovered = true;
             }
         }
