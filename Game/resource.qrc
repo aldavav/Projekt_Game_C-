@@ -1,7 +1,6 @@
 <!DOCTYPE RCC>
 <RCC>
   <qresource prefix="/images">
-    <file>assets/images/menuPicture.jpg</file>
     <file>assets/images/icon0.png</file>
     <file>assets/images/arrow.png</file>
     <file>assets/images/cursor.png</file>

@@ -109,10 +109,10 @@ MainMenuScreen::MainMenuScreen(QWidget *parent)
     : AbstractScreen(parent)
 {
     setObjectName("menu");
-
     m_backgroundLabel = new QLabel(this);
     m_backgroundLabel->setScaledContents(true);
     m_bgMovie = new QMovie(":/animations/assets/animations/menu.gif");
+    m_bgMovie->setSpeed(50);
     m_bgMovie->setCacheMode(QMovie::CacheAll);
     m_backgroundLabel->setMovie(m_bgMovie);
 
