@@ -145,3 +145,8 @@ void Camera::setTargetPos(QPointF worldPos)
 
     m_targetPos = QPointF(x, y);
 }
+
+QPointF Camera::getCurrentPos()
+{
+    return m_currentPos;
+}

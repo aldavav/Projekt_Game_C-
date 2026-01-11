@@ -76,6 +76,8 @@ private:
     QPolygonF m_cachedHex;
     
     float m_lastRadius = 0.0f;
+
+    float m_gameTime = 0.0f;
 };
 
 #endif

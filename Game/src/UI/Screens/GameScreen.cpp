@@ -79,6 +79,7 @@ void GameScreen::paintEvent(QPaintEvent *event)
 
 void GameScreen::drawMap(QPainter &painter)
 {
+    float dayCycle = (std::sin(m_gameTime * (2.0f * M_PI / 60.0f)) * 0.5f) + 0.5f;
     auto &cam = Camera::getInstance();
     auto &map = Map::getInstance();
     const float BASE_TILE = 32.0f;
@@ -113,14 +114,30 @@ void GameScreen::drawMap(QPainter &painter)
             switch (tile.type)
             {
             case TileType::WATER:
-                tileColor = QColor("#1976D2");
+            {
+
+                float wave = std::sin(m_gameTime * 2.0f) * 0.5f + 0.5f;
+
+                QColor deepBlue("#1976D2");
+                QColor lightBlue("#2196F3");
+
+                int r = deepBlue.red() + wave * (lightBlue.red() - deepBlue.red());
+                int g = deepBlue.green() + wave * (lightBlue.green() - deepBlue.green());
+                int b = deepBlue.blue() + wave * (lightBlue.blue() - deepBlue.blue());
+
+                tileColor = QColor(r, g, b);
                 break;
+            }
             case TileType::DIRT:
                 tileColor = QColor("#D2B48C");
                 break;
             case TileType::GRASS:
-                tileColor = QColor("#388E3C");
+            {
+
+                int jitter = (std::abs(q * 13 + r * 7) % 20) - 10;
+                tileColor = QColor("#388E3C").lighter(100 + jitter);
                 break;
+            }
             case TileType::MOUNTAIN:
                 tileColor = QColor("#757575");
                 break;
@@ -142,14 +159,22 @@ void GameScreen::drawMap(QPainter &painter)
             }
             else if (isSelected)
             {
-                painter.setPen(QPen(Qt::white, 2));
                 painter.setBrush(tileColor.lighter(160));
-                currentRadius = BASE_TILE * zoom;
+                painter.setPen(QPen(Qt::white, 2));
+
+                if (dayCycle > 0.5f)
+                {
+                    painter.setBrush(tileColor.lighter(250));
+                }
             }
             else if (isHovered)
             {
-                painter.setPen(QPen(Qt::yellow, 1));
-                painter.setBrush(tileColor.lighter(120));
+
+                int pulse = 170 + static_cast<int>(std::sin(m_gameTime * 3.0f) * 30);
+
+                painter.setPen(QPen(QColor(255, 255, 0, pulse), 2));
+
+                painter.setBrush(tileColor.lighter(115));
             }
             else
             {
@@ -159,6 +184,32 @@ void GameScreen::drawMap(QPainter &painter)
 
             drawHexagon(painter, screenPos, currentRadius);
         }
+    }
+
+    painter.setPen(Qt::NoPen);
+    QPointF camPos = Camera::getInstance().getCurrentPos();
+
+    for (int i = 0; i < 8; ++i)
+    {
+
+        float driftSpeed = 5.0f + (std::abs(std::sin(i * 1.5f)) * 10.0f);
+        float xOffset = i * 600.0f;
+
+        float worldX = (m_gameTime * driftSpeed) + xOffset - (camPos.x() * 0.4f);
+
+        float cloudX = std::fmod(worldX, width() + 1200.0f) - 600.0f;
+
+        float baseHeight = 50.0f + (std::fmod(i * 199.9f, height() * 0.8f));
+        float cloudY = baseHeight - (camPos.y() * 0.4f) + (std::sin(m_gameTime * 0.4f + i) * 20.0f);
+
+        int brightness = 255 - (dayCycle * 160);
+        int alpha = 15 + (i % 4) * 5;
+        painter.setBrush(QColor(brightness, brightness, brightness, alpha));
+
+        float sizeMod = 1.0f + (std::sin(i) * 0.2f);
+        painter.drawEllipse(QPointF(cloudX, cloudY), 140 * sizeMod, 50 * sizeMod);
+        painter.drawEllipse(QPointF(cloudX + (40 * sizeMod), cloudY + (15 * sizeMod)), 90 * sizeMod, 40 * sizeMod);
+        painter.drawEllipse(QPointF(cloudX - (30 * sizeMod), cloudY - (10 * sizeMod)), 110 * sizeMod, 45 * sizeMod);
     }
 }
 
@@ -245,6 +296,7 @@ void GameScreen::mouseReleaseEvent(QMouseEvent *event)
 
 void GameScreen::updateGameDisplay()
 {
+    m_gameTime += 0.016f;
     auto &cam = Camera::getInstance();
     auto &map = Map::getInstance();
 
@@ -456,4 +508,15 @@ void GameScreen::drawHUD(QPainter &painter)
     painter.drawRect(mmX + (mmSize / 2) - (viewIndicatorSize / 2),
                      mmY + (mmSize / 2) - (viewIndicatorSize / 2),
                      viewIndicatorSize, viewIndicatorSize);
+
+    float dayCycle = (std::sin(m_gameTime * (2.0f * M_PI / 60.0f)) * 0.5f) + 0.5f;
+
+    int nightAlpha = static_cast<int>(dayCycle * 130);
+
+    if (nightAlpha > 0)
+    {
+        painter.setBrush(QColor(15, 15, 50, nightAlpha));
+        painter.setPen(Qt::NoPen);
+        painter.drawRect(0, 0, width(), height());
+    }
 }
