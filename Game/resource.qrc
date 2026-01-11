@@ -6,6 +6,7 @@
     <file>assets/images/arrow.png</file>
     <file>assets/images/cursor.png</file>
     <file>assets/images/button.png</file>
+    <file>assets/images/cloud.png</file>
   </qresource>
   <qresource prefix="/fonts">
     <file>assets/fonts/Orbitron-Medium.ttf</file>
