@@ -88,7 +88,7 @@ void GameScreen::drawMap(QPainter &painter)
     int cq = static_cast<int>(centerCoord.x());
     int cr = static_cast<int>(centerCoord.y());
 
-    float baseVisualRadius = (BASE_TILE * zoom) * 0.96f;
+    float baseVisualRadius = (BASE_TILE * zoom) * 0.98f;
 
     for (int q = cq - VIEW_RADIUS; q <= cq + VIEW_RADIUS; ++q)
     {
@@ -463,8 +463,10 @@ void GameScreen::drawSelectionBox(QPainter &painter)
 
 void GameScreen::drawResourceStats(QPainter &painter)
 {
-    auto &stats = Map::getInstance().getStats();
-    int rightBoxW = 180, rightBoxH = 100, padding = 10;
+    auto &map = Map::getInstance();
+    auto &stats = map.getStats();
+
+    int rightBoxW = 180, rightBoxH = 120, padding = 10;
     int rx = width() - rightBoxW - padding;
     int ry = padding;
 
@@ -484,6 +486,10 @@ void GameScreen::drawResourceStats(QPainter &painter)
     painter.drawText(textX, textY + spacing * 2, "Habitable: " + QString::number(stats.grassCount));
     painter.setPen(QColor("#64B5F6"));
     painter.drawText(textX, textY + spacing * 3, "Water:     " + QString::number(stats.waterCount));
+
+    painter.setPen(QColor(200, 200, 200, 150));
+    painter.setFont(QFont("Consolas", 8));
+    painter.drawText(textX, textY + spacing * 4 + 5, "Seed: " + QString::number(map.getSeed()));
 }
 
 void GameScreen::drawMinimap(QPainter &painter)

@@ -3,36 +3,53 @@
 namespace
 {
     constexpr int kTitleHeight = 120;
+
     constexpr int kSocketWidth = 450;
     constexpr int kSocketHeight = 80;
+
     constexpr int kNormalWidth = 250;
-    constexpr int kNormalHeight = 50;
+    constexpr int kNormalHeight = 70;
+
     constexpr int kHoverWidth = 265;
     constexpr int kHoverHeight = 55;
 
     const QString kStandardButtonStyle = R"(
+        QPushButton {
+            font-size: 24px;
+            border-image: url(:/images/assets/images/button.png) 0 0 0 0 stretch stretch;
+            border-width: 0px;
+            padding-bottom: 8px; 
+            color: white;
+        }
+        QPushButton:hover {
+            background-color: rgba(230, 138, 0, 220);
+            border-radius: 20px;
+        }
+    )";
+
+    const QString kQuitButtonStyle = R"(
     QPushButton {
         font-size: 24px;
-        border-image: url(:/images/assets/images/button.png) 0 0 0 0 stretch stretch;
-        border-width: 0px;
+        font-weight: bold;
+        border-radius: 10px;
+        color: #FFFFFF;
+        background-color: #700000; 
+        border: 2px solid #FF3131; 
+        padding-bottom: 5px;
     }
-    QPushButton:hover {
-        background-color: rgba(230, 138, 0, 220);
-        border-radius: 20px;
+    QPushButton:hover { 
+        background-color: #B20000; 
+        border: 2px solid #FF9191; 
+        color: #FFFAFA;
+    }
+    QPushButton:pressed {
+        background-color: #330000;
+        border: 2px solid #990000;
+        color: #888888;
     }
 )";
 
-    const QString kQuitButtonStyle = R"(
-        QPushButton {
-            font-size: 24px;
-            border-radius: 10px;
-            color: white;
-            background-color: #C9302C;
-        }
-        QPushButton:hover { background-color: #A92C28; border: 2px solid white; }
-    )";
-
-    constexpr int kArrowSize = 60;
+    constexpr int kArrowSize = 100;
 
     class HoverScaleFilter : public QObject
     {
@@ -42,10 +59,8 @@ namespace
 
         bool eventFilter(QObject *obj, QEvent *event) override
         {
-
             if (event->type() == QEvent::Enter)
             {
-
                 m_btn->setFixedSize(kHoverWidth, kHoverHeight);
 
                 int newX = (kSocketWidth - kHoverWidth) / 2;
@@ -150,7 +165,7 @@ MainMenuScreen::MainMenuScreen(QWidget *parent)
         socket->setFixedSize(kSocketWidth, kSocketHeight);
 
         QLabel *arrow = new QLabel(socket);
-        arrow->setPixmap(QPixmap(":/images/assets/images/arrow.png").scaled(kArrowSize, kArrowSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        arrow->setPixmap(QPixmap(":/images/assets/images/arrow.png").scaled(kArrowSize - 15, kArrowSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         arrow->setFixedSize(kArrowSize, kArrowSize);
         arrow->hide();
 
