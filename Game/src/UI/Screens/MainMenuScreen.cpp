@@ -3,28 +3,24 @@
 namespace
 {
     constexpr int kTitleHeight = 120;
-    constexpr int kSocketWidth = 380;
-    constexpr int kSocketHeight = 70;
+    constexpr int kSocketWidth = 450;
+    constexpr int kSocketHeight = 80;
     constexpr int kNormalWidth = 250;
     constexpr int kNormalHeight = 50;
     constexpr int kHoverWidth = 265;
     constexpr int kHoverHeight = 55;
 
     const QString kStandardButtonStyle = R"(
-        QPushButton {
-            font-size: 24px;
-            border-radius: 10px;
-            color: white;
-            background-color: rgba(51, 122, 183, 200);
-            background-image: url(:/images/assets/images/button.jpg);
-            background-repeat: no-repeat;
-            background-clip: border-box;
-        }
-        QPushButton:hover {
-            background-color: rgba(230, 138, 0, 220);
-            color: #FFFFCC;
-        }
-    )";
+    QPushButton {
+        font-size: 24px;
+        border-image: url(:/images/assets/images/button.png) 0 0 0 0 stretch stretch;
+        border-width: 0px;
+    }
+    QPushButton:hover {
+        background-color: rgba(230, 138, 0, 220);
+        border-radius: 20px;
+    }
+)";
 
     const QString kQuitButtonStyle = R"(
         QPushButton {
@@ -49,14 +45,26 @@ namespace
 
             if (event->type() == QEvent::Enter)
             {
+
                 m_btn->setFixedSize(kHoverWidth, kHoverHeight);
+
+                int newX = (kSocketWidth - kHoverWidth) / 2;
+                int newY = (kSocketHeight - kHoverHeight) / 2;
+                m_btn->move(newX, newY);
+
                 m_arrow->show();
                 if (auto *glow = m_btn->graphicsEffect())
                     glow->setEnabled(true);
             }
             else if (event->type() == QEvent::Leave)
             {
+
                 m_btn->setFixedSize(kNormalWidth, kNormalHeight);
+
+                int newX = (kSocketWidth - kNormalWidth) / 2;
+                int newY = (kSocketHeight - kNormalHeight) / 2;
+                m_btn->move(newX, newY);
+
                 m_arrow->hide();
                 if (auto *glow = m_btn->graphicsEffect())
                     glow->setEnabled(false);

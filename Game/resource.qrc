@@ -3,9 +3,9 @@
   <qresource prefix="/images">
     <file>assets/images/menuPicture.jpg</file>
     <file>assets/images/icon0.png</file>
-    <file>assets/images/button.jpg</file>
     <file>assets/images/arrow.png</file>
     <file>assets/images/cursor.png</file>
+    <file>assets/images/button.png</file>
   </qresource>
   <qresource prefix="/fonts">
     <file>assets/fonts/Orbitron-Medium.ttf</file>
