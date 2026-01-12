@@ -34,8 +34,7 @@ namespace
         border-radius: 10px;
         color: #FFFFFF;
         background-color: #700000; 
-        border: 2px solid #FF3131; 
-        padding-bottom: 5px;
+        border: 2px solid #FF3131;
     }
     QPushButton:hover { 
         background-color: #B20000; 
@@ -109,6 +108,7 @@ MainMenuScreen::MainMenuScreen(QWidget *parent)
     : AbstractScreen(parent)
 {
     setObjectName("menu");
+
     m_backgroundLabel = new QLabel(this);
     m_backgroundLabel->setScaledContents(true);
     m_bgMovie = new QMovie(":/animations/assets/animations/menu.gif");
@@ -116,12 +116,11 @@ MainMenuScreen::MainMenuScreen(QWidget *parent)
     m_bgMovie->setCacheMode(QMovie::CacheAll);
     m_backgroundLabel->setMovie(m_bgMovie);
 
-    m_bgMovie->setPaused(false);
     connect(m_bgMovie, &QMovie::frameChanged, this, [this](int frameNumber)
             {
-    if (frameNumber == m_bgMovie->frameCount() - 1) {
-        m_bgMovie->stop();
-    } });
+        if (frameNumber == m_bgMovie->frameCount() - 1) {
+            m_bgMovie->stop();
+        } });
 
     m_backgroundLabel->lower();
     m_bgMovie->start();
@@ -130,7 +129,7 @@ MainMenuScreen::MainMenuScreen(QWidget *parent)
     mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     mainLayout->addSpacing(20);
 
-    auto *titleLabel = new QLabel(tr("Command & Conquer"), this);
+    auto *titleLabel = new QLabel(tr("COMMAND & CONQUER"), this);
     titleLabel->setMinimumHeight(kTitleHeight);
     titleLabel->setAlignment(Qt::AlignCenter);
     titleLabel->setFont(QFont("Yu Gothic UI", 48, QFont::Bold));
@@ -157,7 +156,7 @@ MainMenuScreen::MainMenuScreen(QWidget *parent)
         {tr("CREDITS"), kStandardButtonStyle, &MainMenuScreen::onCreditsClicked},
         {tr("QUIT"), kQuitButtonStyle, &MainMenuScreen::onQuitClicked}};
 
-    for (int row = 0; row < std::size(entries); ++row)
+    for (int row = 0; row < (int)std::size(entries); ++row)
     {
         const auto &e = entries[row];
 
@@ -182,15 +181,66 @@ MainMenuScreen::MainMenuScreen(QWidget *parent)
         arrow->move(arrowX, arrowY);
 
         connect(btn, &QPushButton::clicked, this, e.slot);
-        applyEffects(btn, arrow);
+
+        if (e.text == tr("QUIT"))
+        {
+            auto *neonGlow = new QGraphicsDropShadowEffect(btn);
+            neonGlow->setBlurRadius(20);
+            neonGlow->setOffset(0, 0);
+            neonGlow->setColor(QColor(255, 49, 49, 200));
+            btn->setGraphicsEffect(neonGlow);
+        }
+        else
+        {
+            applyEffects(btn, arrow);
+        }
 
         gridLayout->addWidget(socket, row, 0, Qt::AlignCenter);
     }
 
+    m_sidePanel = new QWidget(this);
+    m_sidePanel->setFixedWidth(380);
+    m_sidePanel->setFixedHeight(300);
+    m_sidePanel->setStyleSheet("background-color: rgba(0, 20, 0, 230); border: 2px solid #FFD700; border-radius: 5px;");
+    m_sidePanel->hide();
+
+    auto *panelLayout = new QVBoxLayout(m_sidePanel);
+    panelLayout->setContentsMargins(15, 10, 15, 15);
+
+    auto *headerLayout = new QHBoxLayout();
+
+    m_panelTitle = new QLabel("INFORMATION", m_sidePanel);
+    m_panelTitle->setFont(QFont("Yu Gothic UI", 14, QFont::Bold));
+    m_panelTitle->setStyleSheet("color: #FFD700; border: none;");
+
+    QPushButton *closeBtn = new QPushButton("X", m_sidePanel);
+    closeBtn->setFixedSize(24, 24);
+    closeBtn->setStyleSheet("QPushButton { background: #440000; color: white; border: 1px solid #FFD700; font-weight: bold; } QPushButton:hover { background: #aa0000; }");
+    connect(closeBtn, &QPushButton::clicked, m_sidePanel, &QWidget::hide);
+
+    headerLayout->addWidget(m_panelTitle);
+    headerLayout->addStretch();
+    headerLayout->addWidget(closeBtn);
+    panelLayout->addLayout(headerLayout);
+
+    QFrame *line = new QFrame(m_sidePanel);
+    line->setFrameShape(QFrame::HLine);
+    line->setStyleSheet("background-color: rgba(255, 215, 0, 100);");
+    panelLayout->addWidget(line);
+
+    m_panelText = new QLabel("", m_sidePanel);
+    m_panelText->setStyleSheet("color: #00FF00; border: none; font-family: 'Consolas'; font-size: 13px;");
+    m_panelText->setWordWrap(true);
+    m_panelText->setAlignment(Qt::AlignTop);
+    panelLayout->addWidget(m_panelText);
+    panelLayout->addStretch();
+
     auto *hLayout = new QHBoxLayout();
     hLayout->addStretch(1);
     hLayout->addLayout(gridLayout);
-    hLayout->addStretch(4);
+    hLayout->addSpacing(50);
+    hLayout->addWidget(m_sidePanel, 0, Qt::AlignVCenter);
+    hLayout->addStretch(3);
 
     mainLayout->addLayout(hLayout);
     mainLayout->addStretch();
@@ -206,6 +256,7 @@ void MainMenuScreen::resizeEvent(QResizeEvent *event)
 }
 
 void MainMenuScreen::onEnter() { LOG_INFO("Entering MainMenuScreen."); }
+
 void MainMenuScreen::onExit()
 {
     LOG_INFO("Exiting MainMenuScreen.");
@@ -234,6 +285,38 @@ void MainMenuScreen::onNewGameClicked()
 
 void MainMenuScreen::onLoadGameClicked() { LOG_INFO("Load Game clicked."); }
 void MainMenuScreen::onSettingsClicked() { LOG_INFO("Settings clicked."); }
-void MainMenuScreen::onHelpClicked() { LOG_INFO("Help clicked."); }
-void MainMenuScreen::onCreditsClicked() { LOG_INFO("Credits clicked."); }
+
+void MainMenuScreen::onHelpClicked()
+{
+    m_panelTitle->setText("SYSTEM MANUAL");
+    m_panelText->setText(
+        "CONTROLS:\n"
+        " - Left Click: Select unit/hex\n"
+        " - Right Click Drag: Pan Camera\n"
+        " - Scroll: Zoom In/Out\n\n"
+        "TIME CONTROLS:\n"
+        " - [1][2][3] or HUD: Change Speed\n"
+        " - [Space]: Pause Simulation\n\n"
+        "GOAL: Reveal the map and discover resources.");
+
+    if (!m_sidePanel->isVisible())
+        m_sidePanel->show();
+    LOG_INFO("Help Manual Accessed.");
+}
+
+void MainMenuScreen::onCreditsClicked()
+{
+    m_panelTitle->setText("PERSONNEL DOSSIER");
+    m_panelText->setText(
+        "CHIEF ARCHITECT: [Your Name]\n"
+        "ENGINE: Gemini 3 Flash\n"
+        "GRAPHICS: Nano Banana\n\n"
+        "STATUS: ONLINE\n"
+        "STRIKE TEAM: C++ / Qt Framework");
+
+    if (!m_sidePanel->isVisible())
+        m_sidePanel->show();
+    LOG_INFO("Credits Dossier Accessed.");
+}
+
 void MainMenuScreen::onQuitClicked() { QCoreApplication::quit(); }

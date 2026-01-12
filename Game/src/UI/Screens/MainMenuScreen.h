@@ -45,6 +45,12 @@ private:
     QLabel *m_backgroundLabel;
 
     QMovie *m_bgMovie;
+
+    QWidget* m_sidePanel = nullptr;
+
+    QLabel* m_panelTitle = nullptr;
+    
+    QLabel* m_panelText = nullptr;
 };
 
 #endif
