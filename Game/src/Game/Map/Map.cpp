@@ -119,15 +119,9 @@ void Map::generateChunk(Chunk *chunk)
             else
             {
 
-                float oreChance = (float)rand() / (float)RAND_MAX;
-                if (height > 0.85f || (height > 0.7f && oreChance > 0.85f))
-                {
-                    chunk->tiles[tx][ty].type = TileType::ORE_DEPOSIT;
-                }
-                else
-                {
+                
                     chunk->tiles[tx][ty].type = TileType::MOUNTAIN;
-                }
+                
             }
 
             switch (chunk->tiles[tx][ty].type)
@@ -140,9 +134,6 @@ void Map::generateChunk(Chunk *chunk)
                 break;
             case TileType::MOUNTAIN:
                 m_stats.mountainCount++;
-                break;
-            case TileType::ORE_DEPOSIT:
-                m_stats.oreCount++;
                 break;
             case TileType::DIRT:
                 m_stats.dirtCount++;

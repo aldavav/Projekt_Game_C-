@@ -2,7 +2,6 @@
 #define GAMESCREEN_H
 
 #include <UI/Screens/MainMenuScreen.h>
-#include <Core/Logger/LoggerMacros.h>
 #include <Core/Input/InputManager.h>
 #include <UI/Manager/MenuManager.h>
 #include <Game/Engine/GameEngine.h>

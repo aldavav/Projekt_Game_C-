@@ -9,8 +9,7 @@ enum class TileType : uint8_t
     GRASS,
     DIRT,
     WATER,
-    MOUNTAIN,
-    ORE_DEPOSIT
+    MOUNTAIN
 };
 
 struct TileProperties

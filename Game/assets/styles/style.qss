@@ -1,0 +1,188 @@
+/* --- Global Reset --- */
+QWidget {
+    font-family: 'Orbitron'; 
+    color: #e0e0e0;
+}
+
+#versionLabel {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 20px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+}
+
+/* --- Main Menu Title --- */
+QLabel#mainMenuTitle {
+    min-height: 120px;
+    font-size: 72px;
+    font-weight: 900;
+    color: #FFD700;
+    background: transparent;
+    qproperty-alignment: 'AlignCenter';
+    margin-top: 20px;
+}
+
+/* --- Standard Menu Buttons --- */
+QPushButton#menuButton {
+    min-width: 250px;
+    min-height: 70px;
+    font-size: 24px;
+    border-image: url(:/images/assets/images/button.png) 0 0 0 0 stretch stretch;
+    border-width: 0px;
+    padding-bottom: 8px; 
+    color: white;
+    background-color: transparent;
+}
+
+QPushButton#menuButton:hover {
+    background-color: rgba(230, 138, 0, 220);
+    border-radius: 20px;
+}
+
+/* --- Quit Button --- */
+QPushButton#quitButton {
+    min-width: 250px;
+    min-height: 70px;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 10px;
+    color: #FFFFFF;
+    background-color: #700000; 
+    border: 2px solid #FF3131;
+}
+
+QPushButton#quitButton:hover { 
+    background-color: #B20000; 
+    border: 2px solid #FF9191; 
+    color: #FFFAFA;
+}
+
+QPushButton#quitButton:pressed {
+    background-color: #330000;
+    border: 2px solid #990000;
+    color: #888888;
+}
+
+/* --- Side Information Panel --- */
+QWidget#sidePanel {
+    min-width: 380px;
+    max-width: 380px;
+    min-height: 350px;
+    background-color: rgba(0, 20, 0, 230); 
+    border: 2px solid #FFD700; 
+    border-radius: 5px;
+}
+
+QLabel#panelTitle {
+    font-size: 18px;
+    font-weight: bold;
+    color: #FFD700;
+    border: none;
+}
+
+QPushButton#panelCloseBtn {
+    background: #440000; 
+    color: white; 
+    border: 1px solid #FFD700; 
+    font-weight: bold;
+}
+
+QPushButton#panelCloseBtn:hover { 
+    background: #aa0000; 
+}
+
+QFrame#panelLine {
+    background-color: rgba(255, 215, 0, 100);
+    max-height: 2px;
+}
+
+QLabel#panelDescription {
+    color: #00FF00;
+    font-family: 'Consolas';
+    font-size: 13px;
+    border: none;
+    padding-top: 10px;
+}
+
+/* --- Menu Button Wrapper ('Socket') --- */
+MenuButton {
+    min-width: 500px; 
+    min-height: 80px;
+    background: transparent;
+}
+
+/* --- Arrow Icon --- */
+QLabel#buttonArrow {
+    qproperty-pixmap: url(":/images/assets/images/arrow.png");
+    min-width: 102px;
+    max-width: 102px;
+    min-height: 22px;
+    max-height: 22px;
+    qproperty-scaledContents: true; 
+    background: transparent;
+}
+
+/* Settings Container */
+#settingsScreen {
+    background-color: rgba(10, 10, 10, 240);
+    border: 3px solid #FFD700;
+}
+
+QLabel#settingsTitle {
+    font-size: 36px;
+    color: #FFD700;
+    margin-bottom: 20px;
+}
+
+/* Styling Tabs */
+QTabWidget::pane {
+    border: 1px solid #FFD700;
+    background: rgba(0, 40, 0, 100);
+}
+
+QTabBar::tab {
+    background: #222;
+    color: #FFD700;
+    padding: 10px 30px;
+    border: 1px solid #FFD700;
+    margin-right: 2px;
+}
+
+QTabBar::tab:selected {
+    background: #FFD700;
+    color: black;
+}
+
+/* Form Styling */
+QFormLayout QLabel {
+    color: #00FF00;
+    font-weight: bold;
+}
+
+QPushButton#applyButton {
+    background-color: #006600;
+    color: white;
+    padding: 10px 20px;
+}
+
+QWidget#tacticalDialog {
+    background-color: rgba(20, 0, 0, 245); /* Dark Red Tint */
+    border: 2px solid #FF3131; /* Bright Red Border */
+}
+
+QLabel#dialogTitle {
+    color: #FF3131;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+QLabel#dialogBody {
+    color: #e0e0e0;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+QPushButton#confirmBtn {
+    background-color: #700000;
+    border: 1px solid #FF3131;
+}

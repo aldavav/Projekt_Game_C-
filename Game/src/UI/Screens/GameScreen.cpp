@@ -50,8 +50,6 @@ GameScreen::GameScreen(QWidget *parent)
 
 void GameScreen::onEnter()
 {
-    LOG_INFO("Entering GameScreen. Resetting Camera Bounds.");
-
     auto &cam = Camera::getInstance();
 
     cam.setWorldBounds(QRect(-2000, -1500, 3500, 3000));
@@ -63,7 +61,6 @@ void GameScreen::onEnter()
 
 void GameScreen::onExit()
 {
-    LOG_INFO("Exiting GameScreen. Stopping game loop.");
     m_updateTimer->stop();
 }
 
@@ -136,9 +133,6 @@ void GameScreen::drawMap(QPainter &painter)
             }
             case TileType::MOUNTAIN:
                 tileColor = QColor("#757575");
-                break;
-            case TileType::ORE_DEPOSIT:
-                tileColor = QColor("#FFD600");
                 break;
             default:
                 tileColor = QColor("#2E7D32");
@@ -308,9 +302,6 @@ void GameScreen::mousePressEvent(QMouseEvent *event)
 
         m_selectedHex = clickedHex;
         m_hasSelection = true;
-
-        LOG_INFO("Selected Hex: q=" + std::to_string((int)m_selectedHex.x()) +
-                 ", r=" + std::to_string((int)m_selectedHex.y()));
     }
 
     InputManager::getInstance().onMouseClick(event->button(), event->pos());
@@ -371,7 +362,6 @@ void GameScreen::updateGameDisplay()
 
 void GameScreen::onPauseClicked()
 {
-    LOG_INFO("Returning to Menu.");
     MenuManager::getInstance().setScreen(new MainMenuScreen());
 }
 
@@ -535,9 +525,6 @@ void GameScreen::drawMinimap(QPainter &painter)
             case TileType::MOUNTAIN:
                 dotColor = QColor("#757575");
                 break;
-            case TileType::ORE_DEPOSIT:
-                dotColor = QColor("#FFD600");
-                break;
             default:
                 dotColor = QColor("#555555");
                 break;
@@ -670,8 +657,6 @@ QString GameScreen::getTileTypeName(TileType type)
         return "Grass";
     case TileType::MOUNTAIN:
         return "Mountain";
-    case TileType::ORE_DEPOSIT:
-        return "Ore Deposit";
     default:
         return "Unknown";
     }

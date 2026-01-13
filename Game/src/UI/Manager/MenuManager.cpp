@@ -10,22 +10,18 @@ MenuManager::MenuManager(QObject *parent)
     : QObject(parent),
       m_mainWindow(nullptr)
 {
-    LOG_INFO("MenuManager initialized.");
-
     connect(&GameEngine::getInstance(), &GameEngine::gameStateChanged,
             this, &MenuManager::handleGameStateChange);
 }
 
 MenuManager::~MenuManager()
 {
-    LOG_INFO("MenuManager shut down.");
 }
 
 void MenuManager::setMainWindow(QWidget *window)
 {
     if (m_mainWindow)
     {
-        LOG_WARNING("MainWindow already set. Overwriting.");
     }
 
     m_mainWindow = window;
@@ -35,14 +31,12 @@ void MenuManager::setMainWindow(QWidget *window)
         m_mainWindow->setLayout(new QVBoxLayout(m_mainWindow));
     }
 
-    LOG_INFO("MenuManager now controls MainWindow.");
 }
 
 void MenuManager::pushScreen(AbstractScreen *screen)
 {
     if (!m_mainWindow)
     {
-        LOG_WARNING("Cannot push screen: MainWindow is not set.");
         delete screen;
         return;
     }
@@ -58,15 +52,12 @@ void MenuManager::pushScreen(AbstractScreen *screen)
     updateScreenVisibility();
     screen->onEnter();
 
-    LOG_INFO(QString("Pushed screen onto stack. Current depth: %1")
-                 .arg(m_screenStack.size()));
 }
 
 void MenuManager::popScreen()
 {
     if (m_screenStack.isEmpty())
     {
-        LOG_WARNING("Cannot pop screen: Stack is empty.");
         return;
     }
 
@@ -83,8 +74,6 @@ void MenuManager::popScreen()
         m_screenStack.top()->onEnter();
     }
 
-    LOG_INFO(QString("Popped screen from stack. Current depth: %1")
-                 .arg(m_screenStack.size()));
 }
 
 void MenuManager::setScreen(AbstractScreen *screen)
@@ -120,7 +109,6 @@ void MenuManager::handleGameStateChange(int newState)
     const int GAME_PAUSED = 3;
     const int GAME_OVER = 4;
 
-    LOG_INFO(QString("MenuManager received state change: %1").arg(newState));
 
     switch (newState)
     {

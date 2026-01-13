@@ -2,19 +2,24 @@
 #define MAINWINDOW_H
 
 #include <UI/Screens/MainMenuScreen.h>
-#include <Core/Input/InputManager.h>
-#include <UI/Manager/MenuManager.h>
-#include <Game/Engine/GameEngine.h>
-#include <qaudiooutput.h>
-#include <qmediaplayer.h>
+#include <UI/Widgets/TacticalDialog.h>
+#include <Core/Logger/LoggerMacros.h>
+#include <Core/Assets/AssetManager.h>
+#include <Core/Config/GameConfig.h>
+#include <qguiapplication.h>
+#include <qfontdatabase.h>
 #include <QFontDatabase>
 #include <QApplication>
+#include <QMediaPlayer>
+#include <QAudioOutput>
+#include <QVBoxLayout>
 #include <QMainWindow>
-#include <QScreen>
-#include <QIcon>
+#include <QFile>
 
 class QKeyEvent;
 class QMouseEvent;
+class QResizeEvent;
+class QCloseEvent;
 class QWidget;
 
 class MainWindow : public QMainWindow
@@ -24,6 +29,12 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
 
+    virtual ~MainWindow() = default;
+
+    void toggleFullscreen();
+
+    void applyCustomCursor(const QString &path);
+
 protected:
     void keyPressEvent(QKeyEvent *event) override;
 
@@ -31,17 +42,29 @@ protected:
 
     void mousePressEvent(QMouseEvent *event) override;
 
+    void resizeEvent(QResizeEvent *event) override;
+
+    void closeEvent(QCloseEvent *event) override;
+
 private slots:
     void on_actionQuit_triggered();
+
+    void updateWindowMetadata();
 
 private:
     QWidget *m_centralWidget;
 
+    bool m_isFullscreen = false;
+
     QMediaPlayer *m_bgmPlayer;
-    
+
     QAudioOutput *m_audioOutput;
-    
+
     void setupBackgroundMusic();
+
+    void applyGlobalStyles();
+
+    void centerOnScreen();
 };
 
 #endif
