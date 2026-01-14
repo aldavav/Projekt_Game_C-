@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="cs_CZ" sourcelanguage="en_US">
+<context>
+    <name>SettingsScreen</name> <message>
+        <source>SYSTEM CONFIGURATION</source>
+        <translation>KONFIGURACE SYSTÉMU</translation>
+    </message>
+</context>
+</TS>

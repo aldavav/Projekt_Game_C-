@@ -1,8 +1,32 @@
 <!DOCTYPE RCC>
 <RCC>
   <qresource prefix="/images">
-    <file>assets/menuPicture.jpg</file>
-    <file>assets/icon0.png</file>
-    <file>assets/button.jpg</file>
+    <file>assets/images/arrow.png</file>
+    <file>assets/images/cursor.png</file>
+    <file>assets/images/button.png</file>
+    <file>assets/images/cloud.png</file>
+    <file>assets/images/icon.png</file>
+  </qresource>
+  <qresource prefix="/fonts">
+    <file>assets/fonts/Orbitron-Medium.ttf</file>
+    <file>assets/fonts/Orbitron-ExtraBold.ttf</file>
+    <file>assets/fonts/Orbitron-Bold.ttf</file>
+    <file>assets/fonts/Orbitron-Regular.ttf</file>
+    <file>assets/fonts/Orbitron-Black.ttf</file>
+    <file>assets/fonts/Orbitron-SemiBold.ttf</file>
+    <file>assets/images/cursor.png</file>
+  </qresource>
+  <qresource prefix="/animations">
+    <file>assets/animations/menu.gif</file>
+  </qresource>
+  <qresource prefix="/audio">
+    <file>assets/audio/music.mp3</file>
+  </qresource>
+  <qresource prefix="/styles">
+    <file>assets/styles/style.qss</file>
+  </qresource>
+  <qresource prefix="/i18n">
+    <file>assets/i18n/game_en.qm</file>
+    <file>assets/i18n/game_cz.qm</file>
   </qresource>
 </RCC>

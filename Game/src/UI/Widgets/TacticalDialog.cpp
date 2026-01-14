@@ -1,0 +1,46 @@
+#include "TacticalDialog.h"
+
+TacticalDialog::TacticalDialog(const QString &title, const QString &message, QWidget *parent)
+    : QDialog(parent)
+{
+    setModal(true);
+    setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+    setObjectName("tacticalDialog");
+    setFixedSize(400, 200);
+
+    setupUI(title, message);
+}
+
+void TacticalDialog::setupUI(const QString &title, const QString &message)
+{
+    auto *layout = new QVBoxLayout(this);
+    layout->setContentsMargins(20, 15, 20, 15);
+
+    auto *titleLabel = new QLabel(title.toUpper());
+    titleLabel->setObjectName("dialogTitle");
+    layout->addWidget(titleLabel);
+
+    auto *line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setObjectName("panelLine");
+    layout->addWidget(line);
+
+    auto *bodyLabel = new QLabel(message);
+    bodyLabel->setObjectName("dialogBody");
+    bodyLabel->setWordWrap(true);
+    layout->addWidget(bodyLabel);
+
+    layout->addStretch();
+
+    auto *btnLayout = new QHBoxLayout();
+    auto *cancelBtn = new QPushButton("ABORT");
+    auto *confirmBtn = new QPushButton("PROCEED");
+    confirmBtn->setObjectName("confirmBtn");
+
+    connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
+    connect(confirmBtn, &QPushButton::clicked, this, &QDialog::accept);
+
+    btnLayout->addWidget(cancelBtn);
+    btnLayout->addWidget(confirmBtn);
+    layout->addLayout(btnLayout);
+}

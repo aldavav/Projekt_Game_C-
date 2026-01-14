@@ -1,11 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
-
 project(Game VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -13,61 +11,54 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Core Multimedia)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Core Multimedia)
 
 set(PROJECT_SOURCES
-main.cpp
-MainWindow/MainWindow.cpp
-Logger/Logger.cpp
-resource.qrc
-Player/Player.cpp
-Entity/Entity.cpp
-Map/Map.cpp
-Map/Tile.cpp
-Map/Location.cpp
-Map/LocationDirector.cpp
-Map/DefaultLocationBuilder.cpp
-GameEngine/GameEngine.cpp
-ResourceManager/ResourceManager.cpp
-InputManager/InputManager.cpp
-MenuManager/MenuManager.cpp
-Screens/GameScreen.cpp
-Screens/MainMenuScreen.cpp
+    src/Main/main.cpp
+    src/Main/MainWindow.cpp
+    resource.qrc
+    
+    src/Core/Logger/Logger.cpp
+    src/Core/Resources/ResourceManager.cpp
+    src/Core/Input/InputManager.cpp
+    
+    src/Game/Actions/CameraActions.cpp
+    src/Game/Actions/UnitActions.cpp
+    
+    src/Game/View/Camera.cpp
+    src/Game/Engine/GameEngine.cpp
+    src/Game/Entities/Entity.cpp
+    src/Game/Map/Map.cpp
+    
+    src/UI/Manager/MenuManager.cpp
+    src/UI/Manager/ControlsSettingsManager.cpp
+    src/UI/Manager/ConfigManager.cpp
+    src/UI/Screens/SettingsScreen.cpp
+    src/UI/Screens/GameScreen.cpp
+    src/UI/Screens/GameOverScreen.cpp
+    src/UI/Screens/MenuScreen.cpp
+    src/UI/Components/MenuButton.cpp
+    src/UI/Widgets/KeyCaptureDialog.cpp
+    src/UI/Widgets/TacticalDialog.cpp
+    src/UI/Manager/GameSettingsManager.cpp
+    src/UI/Manager/AudioSettingsManager.cpp
+    src/UI/Manager/DisplaySettingsManager.cpp
+    src/UI/Manager/GraphicsSettingsManager.cpp
+    src/UI/Screens/NewGameScreen.cpp
+    src/UI/Screens/LoadingScreen.cpp
+    src/UI/Screens/LoadGameScreen.cpp
 )
 
 add_executable(Game ${PROJECT_SOURCES})
 
 target_include_directories(Game PRIVATE
-${CMAKE_SOURCE_DIR}
-${CMAKE_SOURCE_DIR}/MainWindow
-${CMAKE_SOURCE_DIR}/Entity
-${CMAKE_SOURCE_DIR}/Logger
-${CMAKE_SOURCE_DIR}/Player
-${CMAKE_SOURCE_DIR}/Map
-${CMAKE_SOURCE_DIR}/GameEngine
-${CMAKE_SOURCE_DIR}/ResourceManager
-${CMAKE_SOURCE_DIR}/InputManager
-${CMAKE_SOURCE_DIR}/MenuManager
-${CMAKE_SOURCE_DIR}/Screens
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_link_libraries(Game PRIVATE
-Qt${QT_VERSION_MAJOR}::Widgets
-Qt${QT_VERSION_MAJOR}::Core
-Qt${QT_VERSION_MAJOR}::Multimedia
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Multimedia
 )
 
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Game)
-endif()
 set_target_properties(Game PROPERTIES
-${BUNDLE_ID_OPTION}
-MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-MACOSX_BUNDLE TRUE
-WIN32_EXECUTABLE TRUE
-)
-
-include(GNUInstallDirs)
-install(TARGETS Game
-BUNDLE DESTINATION .
-LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
 )

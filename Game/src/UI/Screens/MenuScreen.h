@@ -1,0 +1,74 @@
+#ifndef MENUSCREEN_H
+#define MENUSCREEN_H
+
+#include <UI/Screens/SettingsScreen.h>
+#include <UI/Components/MenuButton.h>
+#include <UI/Screens/NewGameScreen.h>
+#include <Core/Config/GameConfig.h>
+#include <UI/Manager/MenuManager.h>
+#include <QCoreApplication>
+#include <QResizeEvent>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QGridLayout>
+#include <QWidget>
+#include <QLabel>
+#include <QMovie>
+
+class QLabel;
+class QMovie;
+class QPushButton;
+class QVBoxLayout;
+class QResizeEvent;
+
+class MenuScreen : public AbstractScreen
+{
+    Q_OBJECT
+
+public:
+    explicit MenuScreen(QWidget *parent = nullptr);
+
+    virtual ~MenuScreen() = default;
+
+    void onEnter() override;
+
+    void onExit() override;
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
+private slots:
+    void onNewGameClicked();
+
+    void onLoadGameClicked();
+
+    void onSettingsClicked();
+
+    void onHelpClicked();
+
+    void onCreditsClicked();
+
+    void onQuitClicked();
+
+private:
+    QLabel *m_backgroundLabel = nullptr;
+
+    QMovie *m_bgMovie = nullptr;
+
+    QWidget *m_sidePanel = nullptr;
+
+    QLabel *m_panelTitle = nullptr;
+
+    QLabel *m_panelText = nullptr;
+
+    QVBoxLayout *m_buttonLayout = nullptr;
+
+    void setupUI();
+
+    void setupBackground();
+
+    void updatePanelContent(const QString &title, const QString &description);
+};
+
+#endif
