@@ -35,7 +35,10 @@ void MenuScreen::onNewGameClicked()
     MenuManager::getInstance().pushScreen(new NewGameScreen(this->parentWidget()));
 }
 
-void MenuScreen::onLoadGameClicked() { /* Logic for loading */ }
+void MenuScreen::onLoadGameClicked()
+{
+    MenuManager::getInstance().pushScreen(new LoadGameScreen(this->parentWidget()));
+}
 
 void MenuScreen::onSettingsClicked()
 {

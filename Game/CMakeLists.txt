@@ -43,6 +43,7 @@ set(PROJECT_SOURCES
     src/UI/Manager/GraphicsSettingsManager.cpp
     src/UI/Screens/NewGameScreen.cpp
     src/UI/Screens/LoadingScreen.cpp
+    src/UI/Screens/LoadGameScreen.cpp
 )
 
 add_executable(Game ${PROJECT_SOURCES})

@@ -59,6 +59,10 @@ void GameEngine::saveCurrentMatch()
     LOG_INFO("Game auto-saved at: " + savePath);
 }
 
+void GameEngine::loadMatch(QString selectedMap)
+{
+}
+
 void GameEngine::stopGame()
 {
     if (!m_isRunning)

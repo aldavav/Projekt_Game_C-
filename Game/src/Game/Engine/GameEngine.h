@@ -45,6 +45,8 @@ public:
 
     void triggerEndGame(bool victory);
 
+    void loadMatch(QString selectedMap);
+
 signals:
     void gameLoopUpdate(float deltaTime);
 
