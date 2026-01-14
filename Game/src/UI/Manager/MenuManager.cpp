@@ -1,3 +1,5 @@
+#include <UI/Screens/GameOverScreen.h>
+#include <UI/Screens/MenuScreen.h>
 #include "MenuManager.h"
 
 MenuManager &MenuManager::getInstance()
@@ -92,4 +94,24 @@ void MenuManager::updateScreenVisibility()
 
 void MenuManager::handleGameStateChange(int newState)
 {
+    switch (newState)
+    {
+    case STATE_MENU:
+        setScreen(new MenuScreen(m_mainWindow));
+        break;
+
+    case STATE_RUNNING:
+        while (!m_screenStack.isEmpty())
+        {
+            popScreen();
+        }
+        break;
+
+    case STATE_GAMEOVER:
+    {
+        bool winStatus = GameEngine::getInstance().didPlayerWin();
+        setScreen(new GameOverScreen(winStatus, m_mainWindow));
+        break;
+    }
+    }
 }

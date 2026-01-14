@@ -32,6 +32,7 @@ set(PROJECT_SOURCES
     src/UI/Manager/ConfigManager.cpp
     src/UI/Screens/SettingsScreen.cpp
     src/UI/Screens/GameScreen.cpp
+    src/UI/Screens/GameOverScreen.cpp
     src/UI/Screens/MenuScreen.cpp
     src/UI/Components/MenuButton.cpp
     src/UI/Widgets/KeyCaptureDialog.cpp
@@ -40,6 +41,8 @@ set(PROJECT_SOURCES
     src/UI/Manager/AudioSettingsManager.cpp
     src/UI/Manager/DisplaySettingsManager.cpp
     src/UI/Manager/GraphicsSettingsManager.cpp
+    src/UI/Screens/NewGameScreen.cpp
+    src/UI/Screens/LoadingScreen.cpp
 )
 
 add_executable(Game ${PROJECT_SOURCES})

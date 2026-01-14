@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(m_centralWidget);
 
     setCursor(AssetManager::getCursor(AssetManager::CursorType::Standard));
-    
+
     setupBackgroundMusic();
 
     setupDisplayConnections();
@@ -195,27 +195,40 @@ void MainWindow::applyDisplaySettings()
 {
     auto &cfg = ConfigManager::getInstance().getSettings();
 
-    Qt::WindowFlags flags = this->windowFlags();
+    this->hide();
 
     if (cfg.windowModeIndex == 0)
     {
-        showFullScreen();
+        setWindowFlags(Qt::Window);
+        this->show();
+        this->showFullScreen();
     }
     else if (cfg.windowModeIndex == 1)
     {
         setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-        showMaximized();
+
+        this->show();
+        this->showMaximized();
+
+        QScreen *screen = QGuiApplication::primaryScreen();
+        if (screen)
+        {
+            this->setGeometry(screen->geometry());
+        }
     }
     else
     {
-        setWindowFlags(Qt::Window);
+        setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint);
+
         QStringList res = DisplaySettingsManager::getInstance().getAvailableResolutions();
         if (cfg.resolutionIndex < res.size())
         {
             QStringList parts = res[cfg.resolutionIndex].split('x');
-            resize(parts[0].toInt(), parts[1].toInt());
-            centerOnScreen();
+            this->resize(parts[0].toInt(), parts[1].toInt());
         }
-        showNormal();
+
+        this->show();
+        this->showNormal();
+        centerOnScreen();
     }
 }

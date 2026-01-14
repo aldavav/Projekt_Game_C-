@@ -32,9 +32,7 @@ void MenuScreen::resizeEvent(QResizeEvent *event)
 
 void MenuScreen::onNewGameClicked()
 {
-    this->setEnabled(false);
-    GameEngine::getInstance().startGame();
-    MenuManager::getInstance().setScreen(new GameScreen());
+    MenuManager::getInstance().pushScreen(new NewGameScreen(this->parentWidget()));
 }
 
 void MenuScreen::onLoadGameClicked() { /* Logic for loading */ }

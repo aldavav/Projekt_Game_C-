@@ -1,4 +1,7 @@
 #include "GameEngine.h"
+#include <qcoreapplication.h>
+#include <qdir.h>
+#include <qsettings.h>
 
 static constexpr float TICK_RATE = 1.0f / 30.0f;
 
@@ -9,7 +12,7 @@ GameEngine &GameEngine::getInstance()
 }
 
 GameEngine::GameEngine(QObject *parent)
-    : QObject(parent), m_currentState(GAME_MENU)
+    : QObject(parent), m_currentState(STATE_MENU)
 {
     connect(&m_gameTimer, &QTimer::timeout, this, &GameEngine::gameLoopTick);
     m_gameTimer.setInterval(16);
@@ -27,10 +30,33 @@ void GameEngine::startGame()
     m_lastTime = std::chrono::steady_clock::now();
     m_accumulator = 0.0f;
     m_isRunning = true;
-    m_currentState = GAME_RUNNING;
+    m_currentState = STATE_RUNNING;
 
     emit gameStateChanged(m_currentState);
     m_gameTimer.start();
+    saveCurrentMatch();
+}
+
+void GameEngine::saveCurrentMatch()
+{
+    QString saveRoot = QCoreApplication::applicationDirPath() + "/saves";
+    QString mapFolder = saveRoot + "/" + m_currentMapName;
+
+    QDir dir;
+    if (!dir.exists(mapFolder))
+    {
+        dir.mkpath(mapFolder); // Creates /saves/MapName/
+    }
+
+    QString savePath = mapFolder + "/initial_state.sav";
+
+    // Perform binary or INI save here
+    QSettings saveFile(savePath, QSettings::IniFormat);
+    saveFile.setValue("Seed", m_currentSeed);
+    saveFile.setValue("Timestamp", QDateTime::currentDateTime().toString());
+    saveFile.sync();
+
+    LOG_INFO("Game auto-saved at: " + savePath);
 }
 
 void GameEngine::stopGame()
@@ -40,9 +66,13 @@ void GameEngine::stopGame()
 
     m_gameTimer.stop();
     m_isRunning = false;
-    m_currentState = GAME_OVER;
+    m_currentState = STATE_GAMEOVER;
 
     emit gameStateChanged(m_currentState);
+}
+
+void GameEngine::setupMatch(QString mapName, uint32_t seed)
+{
 }
 
 void GameEngine::gameLoopTick()
@@ -107,7 +137,7 @@ void GameEngine::updateSimulation(float fixedStep)
             cmd->execute(*this);
     }
 
-    for (const auto& entity : m_entities)
+    for (const auto &entity : m_entities)
     {
         if (entity)
         {
@@ -125,4 +155,27 @@ void GameEngine::initializeSystems()
 
 void GameEngine::handlePlayerInput(const QString &inputCommand)
 {
+}
+
+void GameEngine::setState(State newState)
+{
+    if (m_currentState == newState)
+        return;
+
+    m_currentState = newState;
+
+    // Log the state change for debugging
+    LOG_INFO("Engine State Transition: " + QString::number(static_cast<int>(newState)));
+
+    // Notify MenuManager and MainWindow
+    emit gameStateChanged(static_cast<int>(m_currentState));
+}
+
+void GameEngine::triggerEndGame(bool victory)
+{
+    m_playerWon = victory;
+    setState(STATE_GAMEOVER);
+
+    // Stop internal game systems here (timers, pathfinding, etc.)
+    // StopGameLoop();
 }

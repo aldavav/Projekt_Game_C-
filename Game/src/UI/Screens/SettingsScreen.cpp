@@ -119,19 +119,39 @@ QWidget *SettingsScreen::createDisplayTab()
     auto *vsyncCheck = new QCheckBox(tr("Limit Frame Rate (VSync)"));
     vsyncCheck->setChecked(cfg.vsync);
 
+    auto *infoLabel = new QLabel(tr("Resolution is locked to native in Borderless mode."), w);
+    infoLabel->setStyleSheet("font-size: 10px; color: #888; font-style: italic;");
+    infoLabel->setVisible(cfg.windowModeIndex == 1);
+
     layout->addRow(tr("RESOLUTION"), resCombo);
+    layout->addRow("", infoLabel);
     layout->addRow(tr("DISPLAY MODE"), winCombo);
     layout->addRow(tr("VERTICAL SYNC"), vsyncCheck);
 
+    auto updateAvailability = [resCombo, infoLabel](int modeIndex)
+    {
+        bool isBorderless = (modeIndex == 1);
+        resCombo->setEnabled(!isBorderless);
+        infoLabel->setVisible(isBorderless);
+    };
+
     connect(resCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg](int idx)
             {
-        m_isDirty = true; cfg.resolutionIndex = idx; });
-    connect(winCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg](int idx)
+        m_isDirty = true; 
+        cfg.resolutionIndex = idx; });
+
+    connect(winCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg, updateAvailability](int idx)
             {
-        m_isDirty = true; cfg.windowModeIndex = idx; });
+        m_isDirty = true; 
+        cfg.windowModeIndex = idx;
+        updateAvailability(idx); });
+
     connect(vsyncCheck, &QCheckBox::toggled, this, [this, &cfg](bool chk)
             {
-        m_isDirty = true; cfg.vsync = chk; });
+        m_isDirty = true; 
+        cfg.vsync = chk; });
+
+    updateAvailability(cfg.windowModeIndex);
 
     return w;
 }

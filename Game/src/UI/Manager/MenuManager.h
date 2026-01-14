@@ -10,7 +10,9 @@
 #include <QStack>
 #include <QDebug>
 
+class AbstractScreen;
 class GameEngine;
+class QWidget;
 
 class AbstractScreen : public QWidget
 {

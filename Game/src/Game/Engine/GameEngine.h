@@ -10,6 +10,14 @@
 #include <QTimer>
 #include <chrono>
 
+enum State
+{
+    STATE_MENU = 0,
+    STATE_LOADING = 1,
+    STATE_RUNNING = 2,
+    STATE_GAMEOVER = 3
+};
+
 class GameEngine : public QObject
 {
     Q_OBJECT
@@ -19,11 +27,23 @@ public:
 
     void startGame();
 
+    void saveCurrentMatch();
+
     void stopGame();
+
+    void setupMatch(QString mapName, uint32_t seed);
 
     GameEngine(const GameEngine &) = delete;
 
     void operator=(const GameEngine &) = delete;
+
+    void setState(State newState);
+
+    State getState() const { return m_currentState; }
+
+    bool didPlayerWin() const { return m_playerWon; }
+
+    void triggerEndGame(bool victory);
 
 signals:
     void gameLoopUpdate(float deltaTime);
@@ -53,7 +73,13 @@ private:
 
     bool m_isRunning = false;
 
-    int m_currentState;
+    State m_currentState;
+
+    bool m_playerWon;
+
+    QString m_currentMapName;
+
+    uint32_t m_currentSeed;
 
     std::vector<std::unique_ptr<Entity>> m_entities;
 

@@ -194,17 +194,24 @@ QPushButton#confirmBtn {
 }
 
 #victoryTitle {
-    font-family: 'Orbitron';
-    font-size: 48px;
-    color: #00ffff; /* Cyber Blue */
-    text-shadow: 0 0 10px #00ffff;
+    font-size: 60px;
+    color: #00f2ff; /* Cyan glow */
+    font-weight: bold;
 }
 
 #defeatTitle {
+    font-size: 60px;
+    color: #ff3333; /* Red alert */
+    font-weight: bold;
+}
+
+#statsBox {
+    background-color: rgba(0, 0, 0, 180);
+    border: 1px solid #444;
+    padding: 40px;
+    color: #00ff00; /* Matrix green stats */
     font-family: 'Orbitron';
-    font-size: 48px;
-    color: #ff0000; /* Alert Red */
-    text-shadow: 0 0 10px #ff0000;
+    line-height: 1.5;
 }
 
 #statsLabel {
@@ -213,4 +220,28 @@ QPushButton#confirmBtn {
     background: rgba(0, 0, 0, 0.5);
     padding: 20px;
     border: 1px solid #444;
+}
+
+QProgressBar {
+    border: 2px solid #00ffff;
+    background-color: #111;
+    border-radius: 0px;
+}
+
+QProgressBar::chunk {
+    background-color: #00ffff;
+    width: 10px;
+    margin: 1px;
+}
+
+#loadingTitle {
+    font-size: 24px;
+    color: #00ffff;
+    margin-bottom: 20px;
+}
+
+#statusLabel {
+    color: #888;
+    margin-top: 10px;
+    font-family: 'Orbitron';
 }
