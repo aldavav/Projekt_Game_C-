@@ -45,6 +45,8 @@ public:
     QPoint toScreen(int tileX, int tileY, int tileSize) const;
 
     void shake(float intensity) { m_shakeIntensity = intensity; }
+    
+    QPoint screenToHex(const QPoint& screenPos) const;
 
 private:
     Camera();

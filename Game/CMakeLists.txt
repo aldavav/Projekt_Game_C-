@@ -22,7 +22,7 @@ set(PROJECT_SOURCES
     src/Game/Actions/CameraActions.cpp
     src/Game/Actions/UnitActions.cpp
     
-    src/Game/View/Camera.cpp
+    src/Game/Camera/Camera.cpp
     src/Game/Engine/GameEngine.cpp
     src/Game/Entities/Entity.cpp
     src/Game/Map/Map.cpp
@@ -44,6 +44,8 @@ set(PROJECT_SOURCES
     src/UI/Screens/NewGameScreen.cpp
     src/UI/Screens/LoadingScreen.cpp
     src/UI/Screens/LoadGameScreen.cpp
+    src/UI/HUD/TacticalHUD.cpp
+    src/UI/Manager/GameManager.cpp
 )
 
 add_executable(Game ${PROJECT_SOURCES})

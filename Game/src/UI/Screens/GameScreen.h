@@ -1,27 +1,19 @@
 #ifndef GAMESCREEN_H
 #define GAMESCREEN_H
 
-#include <Core/Input/InputManager.h>
 #include <UI/Manager/MenuManager.h>
-#include <Game/Engine/GameEngine.h>
-#include <UI/Screens/MenuScreen.h>
-#include <Game/Map/Tile.h>
-#include <Game/Map/Map.h>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QMouseEvent>
-#include <QMessageBox>
-#include <QPainter>
-#include <QWidget>
+#include <UI/Manager/GameManager.h>
+#include <qpainter.h>
+#include <QPolygonF>
+#include <QPointF>
+#include <QPixmap>
 #include <QTimer>
 
-enum class GameSpeed
-{
-    SLOW,
-    NORMAL,
-    FAST
-};
+class QPainter;
+class QMouseEvent;
+class QWheelEvent;
+class QResizeEvent;
+class Tile;
 
 class GameScreen : public AbstractScreen
 {
@@ -47,43 +39,29 @@ protected:
 
     void resizeEvent(QResizeEvent *event) override;
 
+    void keyPressEvent(QKeyEvent *event) override;
+
+    void keyReleaseEvent(QKeyEvent *event) override;
+
 private slots:
     void updateGameDisplay();
-
-    void onPauseClicked();
 
 private:
     void drawMap(QPainter &painter);
 
     void drawHexagon(QPainter &painter, QPoint center, float radius);
 
-    void drawSelectionBox(QPainter &painter);
+    void drawClouds(QPainter &painter, Camera &cam, float gameTime, float zoom, float dayCycle);
 
-    void drawHUD(QPainter &painter);
-
-    void drawResourceStats(QPainter &painter);
-
-    void drawMinimap(QPainter &painter);
-
-    void drawDayNightCycle(QPainter &painter);
-
-    QString getTileTypeName(TileType type);
+    QColor getTileVisualColor(const Tile &tile, float gameTime);
 
     QTimer *m_updateTimer;
 
-    QElapsedTimer m_fpsTimer;
+    QPixmap m_cloudTexture;
 
-    int m_frameCount = 0;
+    QPolygonF m_cachedHex;
 
-    int m_fps = 0;
-
-    void updateFPS();
-
-    float m_gameTime = 0.0f;
-
-    float m_timeScale = 1.0f;
-
-    GameSpeed m_currentSpeed = GameSpeed::NORMAL;
+    float m_lastRadius = 0.0f;
 
     bool m_isDragging = false;
 
@@ -91,19 +69,7 @@ private:
 
     QPointF m_hoveredHex;
 
-    QPointF m_selectedHex = QPointF(9999, 9999);
-
-    bool m_hasSelection = false;
-
-    QPolygonF m_cachedHex;
-
-    float m_lastRadius = 0.0f;
-
-    QPixmap m_cloudTexture;
-
-    bool m_isPaused = false;
-
-    const int HUD_BOX_H = 75;
+    QSet<int> m_pressedKeys;
 };
 
 #endif

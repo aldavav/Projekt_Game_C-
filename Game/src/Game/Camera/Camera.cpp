@@ -150,3 +150,19 @@ QPointF Camera::getCurrentPos()
 {
     return m_currentPos;
 }
+
+QPoint Camera::screenToHex(const QPoint& screenPos) const {
+    QPointF worldPos = screenToWorld(screenPos);
+    
+    // For Pointy-Top Hexagons:
+    // Size is the distance from center to a corner (radius)
+    const float size = 32.0f; 
+
+    // Matrix to convert Cartesian (x, y) to Fractional Hex (q, r)
+    float q = (sqrt(3.0f)/3.0f * worldPos.x() - 1.0f/3.0f * worldPos.y()) / size;
+    float r = (2.0f/3.0f * worldPos.y()) / size;
+
+    // Use hexRound to snap the fractional values to the nearest integer grid
+    QPointF rounded = hexRound(q, r);
+    return QPoint(static_cast<int>(rounded.x()), static_cast<int>(rounded.y()));
+}

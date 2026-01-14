@@ -245,3 +245,42 @@ QProgressBar::chunk {
     margin-top: 10px;
     font-family: 'Orbitron';
 }
+
+#saveListWidget {
+    background-color: rgba(10, 20, 20, 200);
+    border: 1px solid #00ffff;
+    color: #00ffff;
+    font-family: 'Orbitron';
+    font-size: 16px;
+    outline: none;
+}
+
+#saveListWidget::item {
+    padding: 15px;
+    border-bottom: 1px solid #222;
+}
+
+#saveListWidget::item:selected {
+    background-color: #00ffff;
+    color: #000;
+}
+
+/* TacticalHUD specific identifiers */
+#tacticalHUD {
+    background: transparent;
+}
+
+/* We can style a helper info widget if you decide to use actual labels later */
+QLabel#hudHeader {
+    font-family: 'Orbitron';
+    color: #00ffff;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.7);
+    border-left: 3px solid #00ffff;
+}
+
+/* Minimap border styling via the HUD Frame */
+#minimapFrame {
+    border: 2px solid #444;
+    background-color: rgba(0, 0, 0, 0.8);
+}

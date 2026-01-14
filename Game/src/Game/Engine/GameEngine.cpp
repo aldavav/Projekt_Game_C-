@@ -59,8 +59,18 @@ void GameEngine::saveCurrentMatch()
     LOG_INFO("Game auto-saved at: " + savePath);
 }
 
-void GameEngine::loadMatch(QString selectedMap)
-{
+void GameEngine::loadMatch(const QString &mapName) {
+    m_currentMapName = mapName;
+    QString path = QCoreApplication::applicationDirPath() + "/saves/" + mapName + "/initial_state.sav";
+
+    QSettings saveFile(path, QSettings::IniFormat);
+    uint32_t seed = saveFile.value("Seed").toUInt();
+    
+    // Restore engine state
+    setupMatch(mapName, seed);
+    setState(STATE_RUNNING);
+    
+    LOG_INFO("Match successfully reconstructed from " + path);
 }
 
 void GameEngine::stopGame()

@@ -55,7 +55,9 @@ void NewGameScreen::setupUI()
 
 void NewGameScreen::onLaunchClicked()
 {
-    auto *loading = new LoadingScreen();
+    MenuManager::getInstance().setScreen(new GameScreen());
+
+    /*auto *loading = new LoadingScreen();
     MenuManager::getInstance().setScreen(loading);
 
     QTimer::singleShot(100, this, [this, loading]()
@@ -75,7 +77,7 @@ void NewGameScreen::onLaunchClicked()
         
         QTimer::singleShot(500, this, []() {
             MenuManager::getInstance().setScreen(new GameScreen());
-        }); });
+        }); });*/
 }
 
 void NewGameScreen::onBackClicked()

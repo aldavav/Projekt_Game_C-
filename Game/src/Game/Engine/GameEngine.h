@@ -4,7 +4,7 @@
 #include <Core/Logger/LoggerMacros.h>
 #include <Core/Input/InputManager.h>
 #include <Game/Entities/Entity.h>
-#include <Game/View/Camera.h>
+#include <Game/Camera/Camera.h>
 #include <Game/Map/Map.h>
 #include <QObject>
 #include <QTimer>
@@ -29,6 +29,8 @@ public:
 
     void saveCurrentMatch();
 
+    void loadMatch(const QString &mapName);
+
     void stopGame();
 
     void setupMatch(QString mapName, uint32_t seed);
@@ -44,8 +46,6 @@ public:
     bool didPlayerWin() const { return m_playerWon; }
 
     void triggerEndGame(bool victory);
-
-    void loadMatch(QString selectedMap);
 
 signals:
     void gameLoopUpdate(float deltaTime);
