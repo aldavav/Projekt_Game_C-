@@ -14,66 +14,54 @@ MenuManager::MenuManager(QObject *parent)
             this, &MenuManager::handleGameStateChange);
 }
 
-MenuManager::~MenuManager()
-{
-}
-
 void MenuManager::setMainWindow(QWidget *window)
 {
-    if (m_mainWindow)
-    {
-    }
-
     m_mainWindow = window;
 
     if (!m_mainWindow->layout())
     {
-        m_mainWindow->setLayout(new QVBoxLayout(m_mainWindow));
+        auto *stacked = new QStackedLayout(m_mainWindow);
+        stacked->setStackingMode(QStackedLayout::StackOne);
+        m_mainWindow->setLayout(stacked);
     }
-
 }
 
 void MenuManager::pushScreen(AbstractScreen *screen)
 {
-    if (!m_mainWindow)
-    {
-        delete screen;
+    if (!m_mainWindow || !screen)
         return;
-    }
 
     if (!m_screenStack.isEmpty())
     {
         m_screenStack.top()->onExit();
     }
 
-    m_mainWindow->layout()->addWidget(screen);
+    auto *layout = qobject_cast<QStackedLayout *>(m_mainWindow->layout());
+    layout->addWidget(screen);
+    layout->setCurrentWidget(screen);
+
     m_screenStack.push(screen);
-
-    updateScreenVisibility();
     screen->onEnter();
-
 }
 
 void MenuManager::popScreen()
 {
     if (m_screenStack.isEmpty())
-    {
         return;
-    }
 
     AbstractScreen *oldScreen = m_screenStack.pop();
     oldScreen->onExit();
 
-    m_mainWindow->layout()->removeWidget(oldScreen);
-    delete oldScreen;
-
-    updateScreenVisibility();
+    auto *layout = qobject_cast<QStackedLayout *>(m_mainWindow->layout());
+    layout->removeWidget(oldScreen);
+    oldScreen->deleteLater();
 
     if (!m_screenStack.isEmpty())
     {
-        m_screenStack.top()->onEnter();
+        AbstractScreen *nextScreen = m_screenStack.top();
+        layout->setCurrentWidget(nextScreen);
+        nextScreen->onEnter();
     }
-
 }
 
 void MenuManager::setScreen(AbstractScreen *screen)
@@ -104,27 +92,4 @@ void MenuManager::updateScreenVisibility()
 
 void MenuManager::handleGameStateChange(int newState)
 {
-    const int GAME_MENU = 0;
-    const int GAME_RUNNING = 2;
-    const int GAME_PAUSED = 3;
-    const int GAME_OVER = 4;
-
-
-    switch (newState)
-    {
-    case GAME_MENU:
-        break;
-    case GAME_RUNNING:
-        if (!m_screenStack.isEmpty())
-        {
-            popScreen();
-        }
-        break;
-    case GAME_PAUSED:
-        break;
-    case GAME_OVER:
-        break;
-    default:
-        break;
-    }
 }

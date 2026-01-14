@@ -67,7 +67,7 @@ QPushButton#quitButton:pressed {
 QWidget#sidePanel {
     min-width: 380px;
     max-width: 380px;
-    min-height: 350px;
+    min-height: 300px;
     background-color: rgba(0, 20, 0, 230); 
     border: 2px solid #FFD700; 
     border-radius: 5px;
@@ -185,4 +185,32 @@ QLabel#dialogBody {
 QPushButton#confirmBtn {
     background-color: #700000;
     border: 1px solid #FF3131;
+}
+
+#captureDialog {
+    background-color: rgba(20, 20, 20, 230);
+    border: 2px solid #00ff00;
+    border-radius: 5px;
+}
+
+#victoryTitle {
+    font-family: 'Orbitron';
+    font-size: 48px;
+    color: #00ffff; /* Cyber Blue */
+    text-shadow: 0 0 10px #00ffff;
+}
+
+#defeatTitle {
+    font-family: 'Orbitron';
+    font-size: 48px;
+    color: #ff0000; /* Alert Red */
+    text-shadow: 0 0 10px #ff0000;
+}
+
+#statsLabel {
+    color: #aaaaaa;
+    font-size: 18px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border: 1px solid #444;
 }

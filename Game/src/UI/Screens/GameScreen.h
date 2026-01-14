@@ -1,10 +1,10 @@
 #ifndef GAMESCREEN_H
 #define GAMESCREEN_H
 
-#include <UI/Screens/MainMenuScreen.h>
 #include <Core/Input/InputManager.h>
 #include <UI/Manager/MenuManager.h>
 #include <Game/Engine/GameEngine.h>
+#include <UI/Screens/MenuScreen.h>
 #include <Game/Map/Tile.h>
 #include <Game/Map/Map.h>
 #include <QHBoxLayout>

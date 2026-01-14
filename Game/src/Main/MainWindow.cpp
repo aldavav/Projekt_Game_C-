@@ -3,8 +3,10 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), m_isFullscreen(false)
 {
-    applyGlobalStyles();
 
+    ConfigManager::getInstance().loadConfiguration();
+
+    applyGlobalStyles();
     setWindowTitle(Config::GAME_TITLE);
     setWindowIcon(QIcon(":/images/assets/images/icon.png"));
 
@@ -12,21 +14,20 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(m_centralWidget);
 
     setCursor(AssetManager::getCursor(AssetManager::CursorType::Standard));
-
+    
     setupBackgroundMusic();
 
-    resize(Config::DEFAULT_WIDTH, Config::DEFAULT_HEIGHT);
-    centerOnScreen();
-    setWindowState(Qt::WindowMaximized);
+    setupDisplayConnections();
+
+    QTimer::singleShot(0, this, [this]()
+                       { applyDisplaySettings(); });
 
     MenuManager::getInstance().setMainWindow(m_centralWidget);
-    MenuManager::getInstance().pushScreen(new MainMenuScreen(m_centralWidget));
+    MenuManager::getInstance().pushScreen(new MenuScreen(m_centralWidget));
 
-    connect(&GameEngine::getInstance(), &GameEngine::gameStateChanged,
-            this, &MainWindow::updateWindowMetadata);
-
-    connect(&GameEngine::getInstance(), &GameEngine::gameStateChanged,
-            &MenuManager::getInstance(), &MenuManager::handleGameStateChange);
+    auto &cfg = ConfigManager::getInstance().getSettings();
+    QString langCode = (cfg.languageIndex == 1) ? "cz" : "en";
+    GameSettingsManager::getInstance().setLanguage(langCode);
 
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -129,9 +130,14 @@ void MainWindow::setupBackgroundMusic()
     m_audioOutput = new QAudioOutput(this);
     m_bgmPlayer->setAudioOutput(m_audioOutput);
     m_bgmPlayer->setSource(QUrl("qrc:/audio/assets/audio/music.mp3"));
-    m_audioOutput->setVolume(0.4);
+
+    updateMusicVolume();
+
     m_bgmPlayer->setLoops(QMediaPlayer::Infinite);
     m_bgmPlayer->play();
+
+    connect(&AudioSettingsManager::getInstance(), &AudioSettingsManager::volumesChanged,
+            this, &MainWindow::updateMusicVolume);
 }
 
 void MainWindow::applyGlobalStyles()
@@ -164,5 +170,52 @@ void MainWindow::centerOnScreen()
         int x = (screenGeometry.width() - width()) / 2;
         int y = (screenGeometry.height() - height()) / 2;
         move(x, y);
+    }
+}
+
+void MainWindow::updateMusicVolume()
+{
+    auto &cfg = ConfigManager::getInstance().getSettings();
+
+    float masterScale = cfg.masterVol / 100.0f;
+    float musicBase = cfg.musicVol / 100.0f;
+
+    float finalVol = masterScale * musicBase;
+
+    m_audioOutput->setVolume(finalVol);
+}
+
+void MainWindow::setupDisplayConnections()
+{
+    connect(&DisplaySettingsManager::getInstance(), &DisplaySettingsManager::displayChanged,
+            this, &MainWindow::applyDisplaySettings);
+}
+
+void MainWindow::applyDisplaySettings()
+{
+    auto &cfg = ConfigManager::getInstance().getSettings();
+
+    Qt::WindowFlags flags = this->windowFlags();
+
+    if (cfg.windowModeIndex == 0)
+    {
+        showFullScreen();
+    }
+    else if (cfg.windowModeIndex == 1)
+    {
+        setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+        showMaximized();
+    }
+    else
+    {
+        setWindowFlags(Qt::Window);
+        QStringList res = DisplaySettingsManager::getInstance().getAvailableResolutions();
+        if (cfg.resolutionIndex < res.size())
+        {
+            QStringList parts = res[cfg.resolutionIndex].split('x');
+            resize(parts[0].toInt(), parts[1].toInt());
+            centerOnScreen();
+        }
+        showNormal();
     }
 }

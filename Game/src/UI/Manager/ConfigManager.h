@@ -1,21 +1,27 @@
 #ifndef CONFIGMANAGER_H
 #define CONFIGMANAGER_H
 
-#include <UI/Manager/KeyBindingManager.h>
+#include <UI/Manager/GraphicsSettingsManager.h>
+#include <UI/Manager/ControlsSettingsManager.h>
+#include <UI/Manager/DisplaySettingsManager.h>
+#include <UI/Manager/AudioSettingsManager.h>
+#include <UI/Manager/GameSettingsManager.h>
 #include <QCoreApplication>
 #include <QSettings>
 #include <QString>
-#include <QDir>
 
 struct GameSettings
 {
-    int languageIndex = 0;
+    int languageIndex = 1;
     bool showTooltips = true;
-    int resolutionIndex = 0;
+
+    int resolutionIndex = 3;
     int windowModeIndex = 0;
     bool vsync = true;
+
     int textureQualityIndex = 2;
     int gamma = 50;
+
     int masterVol = 75;
     int musicVol = 75;
     int sfxVol = 75;
@@ -30,6 +36,8 @@ public:
     void saveConfiguration();
 
     void loadConfiguration();
+
+    void resetToDefaults();
 
     GameSettings &getSettings() { return m_cachedSettings; }
 

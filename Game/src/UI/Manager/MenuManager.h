@@ -2,6 +2,7 @@
 #define MENUMANAGER_H
 
 #include <Game/Engine/GameEngine.h>
+#include <qstackedlayout.h>
 #include <QLayout>
 #include <QObject>
 #include <QString>
@@ -30,8 +31,6 @@ class MenuManager : public QObject
 
 private:
     explicit MenuManager(QObject *parent = nullptr);
-
-    ~MenuManager() override;
 
     QStack<AbstractScreen *> m_screenStack;
 

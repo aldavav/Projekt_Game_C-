@@ -14,24 +14,29 @@ void SettingsScreen::setupUI()
     auto *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(50, 50, 50, 50);
 
-    QLabel *header = new QLabel("SYSTEM CONFIGURATION", this);
-    header->setObjectName("settingsTitle");
-    mainLayout->addWidget(header);
+    m_headerLabel = new QLabel(this);
+    m_headerLabel->setObjectName("settingsTitle");
+    mainLayout->addWidget(m_headerLabel);
 
     m_tabs = new QTabWidget(this);
-    m_tabs->addTab(createGameTab(), "GAME");
-    m_tabs->addTab(createInputTab(), "CONTROLS");
-    m_tabs->addTab(createDisplayTab(), "DISPLAY");
-    m_tabs->addTab(createGraphicsTab(), "GRAPHICS");
-    m_tabs->addTab(createAudioTab(), "AUDIO");
+    m_tabs->addTab(createGameTab(), "");
+    m_tabs->addTab(createInputTab(), "");
+    m_tabs->addTab(createDisplayTab(), "");
+    m_tabs->addTab(createGraphicsTab(), "");
+    m_tabs->addTab(createAudioTab(), "");
 
     mainLayout->addWidget(m_tabs);
 
     QHBoxLayout *btnLayout = new QHBoxLayout();
+
+    QPushButton *resetBtn = new QPushButton(tr("RESET TO DEFAULTS"));
+    connect(resetBtn, &QPushButton::clicked, this, &SettingsScreen::onResetClicked);
+    btnLayout->addWidget(resetBtn);
+
     btnLayout->addStretch();
 
-    QPushButton *cancelBtn = new QPushButton("BACK");
-    QPushButton *applyBtn = new QPushButton("APPLY CHANGES");
+    QPushButton *cancelBtn = new QPushButton(tr("BACK"));
+    QPushButton *applyBtn = new QPushButton(tr("APPLY CHANGES"));
     applyBtn->setObjectName("applyButton");
 
     connect(cancelBtn, &QPushButton::clicked, this, &SettingsScreen::onBackClicked);
@@ -40,6 +45,27 @@ void SettingsScreen::setupUI()
     btnLayout->addWidget(cancelBtn);
     btnLayout->addWidget(applyBtn);
     mainLayout->addLayout(btnLayout);
+
+    retranslateUi();
+}
+
+void SettingsScreen::retranslateUi()
+{
+    m_headerLabel->setText(tr("SYSTEM CONFIGURATION"));
+    m_tabs->setTabText(0, tr("GAME"));
+    m_tabs->setTabText(1, tr("CONTROLS"));
+    m_tabs->setTabText(2, tr("DISPLAY"));
+    m_tabs->setTabText(3, tr("GRAPHICS"));
+    m_tabs->setTabText(4, tr("AUDIO"));
+}
+
+void SettingsScreen::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+    {
+        retranslateUi();
+    }
+    AbstractScreen::changeEvent(event);
 }
 
 QWidget *SettingsScreen::createGameTab()
@@ -49,23 +75,28 @@ QWidget *SettingsScreen::createGameTab()
     auto &cfg = ConfigManager::getInstance().getSettings();
 
     auto *langCombo = new QComboBox();
-    langCombo->addItem("English");
+    langCombo->addItem("English", "en");
+    langCombo->addItem("Čeština", "cz");
     langCombo->setCurrentIndex(cfg.languageIndex);
 
-    auto *tooltipsCheck = new QCheckBox("Show Context Tooltips");
+    auto *tooltipsCheck = new QCheckBox(tr("Enable Context Tooltips"));
     tooltipsCheck->setChecked(cfg.showTooltips);
 
-    layout->addRow("LANGUAGE", langCombo);
-    layout->addRow("INTERFACE", tooltipsCheck);
+    layout->addRow(tr("SYSTEM LANGUAGE"), langCombo);
+    layout->addRow(tr("USER INTERFACE"), tooltipsCheck);
 
-    connect(langCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg](int index)
+    connect(langCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg, langCombo](int index)
             {
         m_isDirty = true;
-        cfg.languageIndex = index; });
+        cfg.languageIndex = index;
+        QString langCode = langCombo->itemData(index).toString();
+        GameSettingsManager::getInstance().setLanguage(langCode); });
+
     connect(tooltipsCheck, &QCheckBox::toggled, this, [this, &cfg](bool checked)
             {
         m_isDirty = true;
-        cfg.showTooltips = checked; });
+        cfg.showTooltips = checked;
+        GameSettingsManager::getInstance().setTooltipsEnabled(checked); });
 
     return w;
 }
@@ -75,34 +106,32 @@ QWidget *SettingsScreen::createDisplayTab()
     auto *w = new QWidget();
     auto *layout = new QFormLayout(w);
     auto &cfg = ConfigManager::getInstance().getSettings();
+    auto &dm = DisplaySettingsManager::getInstance();
 
     auto *resCombo = new QComboBox();
-    resCombo->addItems({"1920x1080", "2560x1440", "3840x2160"});
+    resCombo->addItems(dm.getAvailableResolutions());
     resCombo->setCurrentIndex(cfg.resolutionIndex);
 
     auto *winCombo = new QComboBox();
-    winCombo->addItems({"Fullscreen", "Borderless Window", "Windowed"});
+    winCombo->addItems({tr("Fullscreen"), tr("Borderless"), tr("Windowed")});
     winCombo->setCurrentIndex(cfg.windowModeIndex);
 
-    auto *vsyncCheck = new QCheckBox();
+    auto *vsyncCheck = new QCheckBox(tr("Limit Frame Rate (VSync)"));
     vsyncCheck->setChecked(cfg.vsync);
 
-    layout->addRow("RESOLUTION", resCombo);
-    layout->addRow("DISPLAY MODE", winCombo);
-    layout->addRow("VERTICAL SYNC", vsyncCheck);
+    layout->addRow(tr("RESOLUTION"), resCombo);
+    layout->addRow(tr("DISPLAY MODE"), winCombo);
+    layout->addRow(tr("VERTICAL SYNC"), vsyncCheck);
 
-    connect(resCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg](int index)
+    connect(resCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg](int idx)
             {
-        m_isDirty = true;
-        cfg.resolutionIndex = index; });
-    connect(winCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg](int index)
+        m_isDirty = true; cfg.resolutionIndex = idx; });
+    connect(winCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg](int idx)
             {
-        m_isDirty = true;
-        cfg.windowModeIndex = index; });
-    connect(vsyncCheck, &QCheckBox::toggled, this, [this, &cfg](bool checked)
+        m_isDirty = true; cfg.windowModeIndex = idx; });
+    connect(vsyncCheck, &QCheckBox::toggled, this, [this, &cfg](bool chk)
             {
-        m_isDirty = true;
-        cfg.vsync = checked; });
+        m_isDirty = true; cfg.vsync = chk; });
 
     return w;
 }
@@ -114,24 +143,26 @@ QWidget *SettingsScreen::createGraphicsTab()
     auto &cfg = ConfigManager::getInstance().getSettings();
 
     auto *texCombo = new QComboBox();
-    texCombo->addItems({"Low", "Medium", "High", "Ultra"});
+    texCombo->addItems({tr("LOW"), tr("MEDIUM"), tr("HIGH"), tr("ULTRA")});
     texCombo->setCurrentIndex(cfg.textureQualityIndex);
 
     auto *gammaSlider = new QSlider(Qt::Horizontal);
-    gammaSlider->setRange(0, 100);
+    gammaSlider->setRange(10, 90);
     gammaSlider->setValue(cfg.gamma);
 
-    layout->addRow("TEXTURE QUALITY", texCombo);
-    layout->addRow("GAMMA CALIBRATION", gammaSlider);
+    layout->addRow(tr("TEXTURE QUALITY"), texCombo);
+    layout->addRow(tr("GAMMA CORRECTION"), gammaSlider);
 
     connect(texCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg](int index)
             {
         m_isDirty = true;
         cfg.textureQualityIndex = index; });
+
     connect(gammaSlider, &QSlider::valueChanged, this, [this, &cfg](int val)
             {
         m_isDirty = true;
-        cfg.gamma = val; });
+        cfg.gamma = val;
+        GraphicsSettingsManager::getInstance().applyGraphicsSettings(); });
 
     return w;
 }
@@ -147,28 +178,24 @@ QWidget *SettingsScreen::createAudioTab()
     auto *sfxSlider = new QSlider(Qt::Horizontal);
     auto *voiceSlider = new QSlider(Qt::Horizontal);
 
-    masterSlider->setValue(cfg.masterVol);
-    musicSlider->setValue(cfg.musicVol);
-    sfxSlider->setValue(cfg.sfxVol);
-    voiceSlider->setValue(cfg.voiceVol);
-
-    QMap<QSlider *, int *> sliderMap = {
+    QList<QPair<QSlider *, int *>> sliderPairs = {
         {masterSlider, &cfg.masterVol}, {musicSlider, &cfg.musicVol}, {sfxSlider, &cfg.sfxVol}, {voiceSlider, &cfg.voiceVol}};
 
-    for (auto it = sliderMap.begin(); it != sliderMap.end(); ++it)
+    for (auto &pair : sliderPairs)
     {
-        it.key()->setRange(0, 100);
-        int *targetValue = it.value();
-        connect(it.key(), &QSlider::valueChanged, this, [this, targetValue](int val)
+        pair.first->setRange(0, 100);
+        pair.first->setValue(*pair.second);
+        connect(pair.first, &QSlider::valueChanged, this, [this, pair](int val)
                 {
             m_isDirty = true;
-            *targetValue = val; });
+            *pair.second = val;
+            emit AudioSettingsManager::getInstance().volumesChanged(); });
     }
 
-    layout->addRow("MASTER VOLUME", masterSlider);
-    layout->addRow("MUSIC VOLUME", musicSlider);
-    layout->addRow("SFX VOLUME", sfxSlider);
-    layout->addRow("VOICE VOLUME", voiceSlider);
+    layout->addRow(tr("MASTER VOLUME"), masterSlider);
+    layout->addRow(tr("MUSIC VOLUME"), musicSlider);
+    layout->addRow(tr("SFX VOLUME"), sfxSlider);
+    layout->addRow(tr("VOICE VOLUME"), voiceSlider);
 
     return w;
 }
@@ -178,22 +205,11 @@ QWidget *SettingsScreen::createInputTab()
     auto *w = new QWidget();
     auto *layout = new QFormLayout(w);
 
-    auto *sensSlider = new QSlider(Qt::Horizontal);
-    auto *invertCheck = new QCheckBox();
+    layout->addRow(new QLabel(tr("KEY BINDINGS")));
 
-    layout->addRow("MOUSE SENSITIVITY", sensSlider);
-    layout->addRow("INVERT Y-AXIS", invertCheck);
-
-    connect(sensSlider, &QSlider::valueChanged, this, [this]
-            { m_isDirty = true; });
-    connect(invertCheck, &QCheckBox::toggled, this, [this]
-            { m_isDirty = true; });
-
-    layout->addRow(new QLabel("KEY BINDINGS"));
-
-    auto createBindRow = [this, layout](const QString &label, KeyBindingManager::Action action)
+    auto createBindRow = [this, layout](const QString &label, ControlsSettingsManager::Action action)
     {
-        auto *btn = new QPushButton(KeyBindingManager::getInstance().getKeyName(action));
+        auto *btn = new QPushButton(ControlsSettingsManager::getInstance().getKeyName(action));
         btn->setObjectName("bindButton");
 
         connect(btn, &QPushButton::clicked, this, [this, btn, action]()
@@ -201,18 +217,17 @@ QWidget *SettingsScreen::createInputTab()
             KeyCaptureDialog diag(this);
             if (diag.exec() == QDialog::Accepted) {
                 m_isDirty = true; 
-                KeyBindingManager::getInstance().setKey(action, static_cast<Input::KeyCode>(diag.capturedKey));
-                btn->setText(KeyBindingManager::getInstance().getKeyName(action));
+                ControlsSettingsManager::getInstance().setKey(action, static_cast<Input::KeyCode>(diag.capturedKey));
+                btn->setText(ControlsSettingsManager::getInstance().getKeyName(action));
             } });
-
         layout->addRow(label, btn);
     };
 
-    createBindRow("MOVE UP", KeyBindingManager::Action::MOVE_UP);
-    createBindRow("MOVE DOWN", KeyBindingManager::Action::MOVE_DOWN);
-    createBindRow("UNIT: STOP", KeyBindingManager::Action::STOP);
-    createBindRow("UNIT: GUARD", KeyBindingManager::Action::GUARD);
-    createBindRow("UNIT: SCATTER", KeyBindingManager::Action::SCATTER);
+    createBindRow(tr("MOVE UP"), ControlsSettingsManager::Action::MOVE_UP);
+    createBindRow(tr("MOVE DOWN"), ControlsSettingsManager::Action::MOVE_DOWN);
+    createBindRow(tr("UNIT: STOP"), ControlsSettingsManager::Action::STOP);
+    createBindRow(tr("UNIT: GUARD"), ControlsSettingsManager::Action::GUARD);
+    createBindRow(tr("UNIT: SCATTER"), ControlsSettingsManager::Action::SCATTER);
 
     return w;
 }
@@ -220,22 +235,45 @@ QWidget *SettingsScreen::createInputTab()
 void SettingsScreen::onApplyClicked()
 {
     ConfigManager::getInstance().saveConfiguration();
+
+    DisplaySettingsManager::getInstance().applySettings();
+    GraphicsSettingsManager::getInstance().applyGraphicsSettings();
+
     m_isDirty = false;
     MenuManager::getInstance().popScreen();
+}
+
+void SettingsScreen::onResetClicked()
+{
+    TacticalDialog confirm(tr("FACTORY RESET"),
+                           tr("Restore all settings to default?"),
+                           this);
+
+    if (confirm.exec() == QDialog::Accepted)
+    {
+
+        ConfigManager::getInstance().resetToDefaults();
+
+        m_isDirty = true;
+
+        QTimer::singleShot(0, this, [this]()
+                           {
+            
+            if (layout()) {
+                qDeleteAll(this->children());
+            }
+            
+            setupUI(); });
+    }
 }
 
 void SettingsScreen::onBackClicked()
 {
     if (m_isDirty)
     {
-        TacticalDialog confirm(
-            "Unsaved Changes",
-            "Configuration modified. Discard changes and exit to terminal?",
-            this);
-
+        TacticalDialog confirm(tr("Unsaved Changes"), tr("Discard changes and exit?"), this);
         if (confirm.exec() == QDialog::Rejected)
             return;
-
         ConfigManager::getInstance().loadConfiguration();
     }
     MenuManager::getInstance().popScreen();

@@ -1,7 +1,11 @@
 #ifndef SETTINGSSCREEN_H
 #define SETTINGSSCREEN_H
 
-#include <UI/Manager/KeyBindingManager.h>
+#include <UI/Manager/GraphicsSettingsManager.h>
+#include <UI/Manager/ControlsSettingsManager.h>
+#include <UI/Manager/DisplaySettingsManager.h>
+#include <UI/Manager/AudioSettingsManager.h>
+#include <UI/Manager/GameSettingsManager.h>
 #include <UI/Widgets/KeyCaptureDialog.h>
 #include <UI/Widgets/TacticalDialog.h>
 #include <UI/Manager/ConfigManager.h>
@@ -38,7 +42,13 @@ private:
 
     QTabWidget *m_tabs = nullptr;
 
+    QLabel *m_headerLabel = nullptr;
+
     void setupUI();
+
+    void retranslateUi();
+
+    void changeEvent(QEvent *event);
 
     QWidget *createGameTab();
 
@@ -52,6 +62,8 @@ private:
 
 private slots:
     void onApplyClicked();
+
+    void onResetClicked();
 
     void onBackClicked();
 };

@@ -14,19 +14,24 @@ ConfigManager::ConfigManager()
 void ConfigManager::saveConfiguration()
 {
     QSettings settings(m_configPath, QSettings::IniFormat);
-    auto &kbm = KeyBindingManager::getInstance();
+    auto &csm = ControlsSettingsManager::getInstance();
 
-    settings.beginGroup("Controls");
-    settings.setValue("MOVE_UP", static_cast<int>(kbm.getKey(KeyBindingManager::Action::MOVE_UP)));
-    settings.setValue("MOVE_DOWN", static_cast<int>(kbm.getKey(KeyBindingManager::Action::MOVE_DOWN)));
-    settings.setValue("STOP", static_cast<int>(kbm.getKey(KeyBindingManager::Action::STOP)));
-    settings.setValue("GUARD", static_cast<int>(kbm.getKey(KeyBindingManager::Action::GUARD)));
-    settings.setValue("SCATTER", static_cast<int>(kbm.getKey(KeyBindingManager::Action::SCATTER)));
-    settings.endGroup();
-
-    settings.beginGroup("General");
+    settings.beginGroup("Game");
     settings.setValue("Language", m_cachedSettings.languageIndex);
     settings.setValue("Tooltips", m_cachedSettings.showTooltips);
+    settings.endGroup();
+
+    settings.beginGroup("Controls");
+    settings.setValue("MOVE_UP", static_cast<int>(csm.getKey(ControlsSettingsManager::Action::MOVE_UP)));
+    settings.setValue("MOVE_DOWN", static_cast<int>(csm.getKey(ControlsSettingsManager::Action::MOVE_DOWN)));
+    settings.setValue("MOVE_LEFT", static_cast<int>(csm.getKey(ControlsSettingsManager::Action::MOVE_LEFT)));
+    settings.setValue("MOVE_RIGHT", static_cast<int>(csm.getKey(ControlsSettingsManager::Action::MOVE_RIGHT)));
+    settings.setValue("STOP", static_cast<int>(csm.getKey(ControlsSettingsManager::Action::STOP)));
+    settings.setValue("GUARD", static_cast<int>(csm.getKey(ControlsSettingsManager::Action::GUARD)));
+    settings.setValue("SCATTER", static_cast<int>(csm.getKey(ControlsSettingsManager::Action::SCATTER)));
+    settings.endGroup();
+
+    settings.beginGroup("Display");
     settings.setValue("Resolution", m_cachedSettings.resolutionIndex);
     settings.setValue("WindowMode", m_cachedSettings.windowModeIndex);
     settings.setValue("VSync", m_cachedSettings.vsync);
@@ -49,26 +54,30 @@ void ConfigManager::saveConfiguration()
 
 void ConfigManager::loadConfiguration()
 {
-
     QSettings settings(m_configPath, QSettings::IniFormat);
-    auto &kbm = KeyBindingManager::getInstance();
+    auto &csm = ControlsSettingsManager::getInstance();
 
-    settings.beginGroup("Controls");
-    auto loadKey = [&](const QString &key, KeyBindingManager::Action action, Input::KeyCode def)
-    {
-        int val = settings.value(key, static_cast<int>(def)).toInt();
-        kbm.setKey(action, static_cast<Input::KeyCode>(val));
-    };
-    loadKey("MOVE_UP", KeyBindingManager::Action::MOVE_UP, Input::KeyCode::UP_ARROW);
-    loadKey("MOVE_DOWN", KeyBindingManager::Action::MOVE_DOWN, Input::KeyCode::DOWN_ARROW);
-    loadKey("STOP", KeyBindingManager::Action::STOP, Input::KeyCode::STOP);
-    loadKey("GUARD", KeyBindingManager::Action::GUARD, Input::KeyCode::GUARD);
-    loadKey("SCATTER", KeyBindingManager::Action::SCATTER, Input::KeyCode::SCATTER);
-    settings.endGroup();
-
-    settings.beginGroup("General");
+    settings.beginGroup("Game");
     m_cachedSettings.languageIndex = settings.value("Language", 0).toInt();
     m_cachedSettings.showTooltips = settings.value("Tooltips", true).toBool();
+    settings.endGroup();
+
+    settings.beginGroup("Controls");
+    auto loadKey = [&](const QString &key, ControlsSettingsManager::Action action, Input::KeyCode def)
+    {
+        int val = settings.value(key, static_cast<int>(def)).toInt();
+        csm.setKey(action, static_cast<Input::KeyCode>(val));
+    };
+    loadKey("MOVE_UP", ControlsSettingsManager::Action::MOVE_UP, Input::KeyCode::UP_ARROW);
+    loadKey("MOVE_DOWN", ControlsSettingsManager::Action::MOVE_DOWN, Input::KeyCode::DOWN_ARROW);
+    loadKey("MOVE_LEFT", ControlsSettingsManager::Action::MOVE_LEFT, Input::KeyCode::LEFT_ARROW);
+    loadKey("MOVE_RIGHT", ControlsSettingsManager::Action::MOVE_RIGHT, Input::KeyCode::RIGHT_ARROW);
+    loadKey("STOP", ControlsSettingsManager::Action::STOP, Input::KeyCode::STOP);
+    loadKey("GUARD", ControlsSettingsManager::Action::GUARD, Input::KeyCode::GUARD);
+    loadKey("SCATTER", ControlsSettingsManager::Action::SCATTER, Input::KeyCode::SCATTER);
+    settings.endGroup();
+
+    settings.beginGroup("Display");
     m_cachedSettings.resolutionIndex = settings.value("Resolution", 0).toInt();
     m_cachedSettings.windowModeIndex = settings.value("WindowMode", 0).toInt();
     m_cachedSettings.vsync = settings.value("VSync", true).toBool();
@@ -85,4 +94,24 @@ void ConfigManager::loadConfiguration()
     m_cachedSettings.sfxVol = settings.value("SFX", 75).toInt();
     m_cachedSettings.voiceVol = settings.value("Voice", 75).toInt();
     settings.endGroup();
+}
+
+void ConfigManager::resetToDefaults()
+{
+    m_cachedSettings = GameSettings();
+
+    auto &csm = ControlsSettingsManager::getInstance();
+    csm.setKey(ControlsSettingsManager::Action::MOVE_UP, Input::KeyCode::UP_ARROW);
+    csm.setKey(ControlsSettingsManager::Action::MOVE_DOWN, Input::KeyCode::DOWN_ARROW);
+    csm.setKey(ControlsSettingsManager::Action::MOVE_LEFT, Input::KeyCode::LEFT_ARROW);
+    csm.setKey(ControlsSettingsManager::Action::MOVE_RIGHT, Input::KeyCode::RIGHT_ARROW);
+    csm.setKey(ControlsSettingsManager::Action::STOP, Input::KeyCode::STOP);
+    csm.setKey(ControlsSettingsManager::Action::GUARD, Input::KeyCode::GUARD);
+    csm.setKey(ControlsSettingsManager::Action::SCATTER, Input::KeyCode::SCATTER);
+
+    GameSettingsManager::getInstance().setLanguage(m_cachedSettings.languageIndex == 0 ? "en" : "cz");
+    GameSettingsManager::getInstance().setTooltipsEnabled(m_cachedSettings.showTooltips);
+    AudioSettingsManager::getInstance().volumesChanged();
+    DisplaySettingsManager::getInstance().applySettings();
+    GraphicsSettingsManager::getInstance().applyGraphicsSettings();
 }

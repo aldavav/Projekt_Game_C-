@@ -3,22 +3,29 @@
 KeyCaptureDialog::KeyCaptureDialog(QWidget *parent) : QDialog(parent)
 {
     setModal(true);
-
     setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
-    setFixedSize(300, 150);
+    setFixedSize(400, 200);
     setObjectName("captureDialog");
 
     auto *layout = new QVBoxLayout(this);
-    auto *msg = new QLabel("AWAITING INPUT...\nPRESS ANY KEY TO BIND", this);
+
+    auto *msg = new QLabel(tr("AWAITING INPUT...\nPRESS ANY KEY TO BIND"), this);
     msg->setAlignment(Qt::AlignCenter);
 
-    msg->setStyleSheet("font-weight: bold; color: white;");
-
     layout->addWidget(msg);
+
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 void KeyCaptureDialog::keyPressEvent(QKeyEvent *event)
 {
+    if (event->key() == Qt::Key_Control ||
+        event->key() == Qt::Key_Shift ||
+        event->key() == Qt::Key_Alt)
+    {
+        return;
+    }
+
     if (event->key() == Qt::Key_Escape)
     {
         reject();

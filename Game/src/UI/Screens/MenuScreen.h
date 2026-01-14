@@ -1,5 +1,5 @@
-#ifndef MAINMENUSCREEN_H
-#define MAINMENUSCREEN_H
+#ifndef MENUSCREEN_H
+#define MENUSCREEN_H
 
 #include <UI/Screens/SettingsScreen.h>
 #include <UI/Components/MenuButton.h>
@@ -22,14 +22,14 @@ class QPushButton;
 class QVBoxLayout;
 class QResizeEvent;
 
-class MainMenuScreen : public AbstractScreen
+class MenuScreen : public AbstractScreen
 {
     Q_OBJECT
 
 public:
-    explicit MainMenuScreen(QWidget *parent = nullptr);
+    explicit MenuScreen(QWidget *parent = nullptr);
 
-    virtual ~MainMenuScreen() = default;
+    virtual ~MenuScreen() = default;
 
     void onEnter() override;
 

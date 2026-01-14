@@ -1,15 +1,15 @@
-#ifndef KEYBINDINGMANAGER_H
-#define KEYBINDINGMANAGER_H
+#ifndef CONTROLSSETTINGSMANAGER_H
+#define CONTROLSSETTINGSMANAGER_H
 
 #include <Core/Common/KeyCodes.h>
 #include <QKeySequence>
 #include <QString>
 #include <QMap>
 
-class KeyBindingManager
+class ControlsSettingsManager
 {
 public:
-    static KeyBindingManager &getInstance();
+    static ControlsSettingsManager &getInstance();
 
     using Key = Input::KeyCode;
 
@@ -31,13 +31,13 @@ public:
     QString getKeyName(Action action) const;
 
 private:
-    KeyBindingManager();
+    ControlsSettingsManager();
     
-    ~KeyBindingManager() = default;
+    ~ControlsSettingsManager() = default;
 
-    KeyBindingManager(const KeyBindingManager &) = delete;
+    ControlsSettingsManager(const ControlsSettingsManager &) = delete;
     
-    KeyBindingManager &operator=(const KeyBindingManager &) = delete;
+    ControlsSettingsManager &operator=(const ControlsSettingsManager &) = delete;
 
     QMap<Action, Key> m_bindings;
 };

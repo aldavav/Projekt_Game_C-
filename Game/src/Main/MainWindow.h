@@ -1,11 +1,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <UI/Screens/MainMenuScreen.h>
+#include <UI/Manager/DisplaySettingsManager.h>
 #include <UI/Widgets/TacticalDialog.h>
 #include <Core/Logger/LoggerMacros.h>
 #include <Core/Assets/AssetManager.h>
 #include <Core/Config/GameConfig.h>
+#include <UI/Screens/MenuScreen.h>
 #include <qguiapplication.h>
 #include <qfontdatabase.h>
 #include <QFontDatabase>
@@ -34,6 +35,12 @@ public:
     void toggleFullscreen();
 
     void applyCustomCursor(const QString &path);
+
+    void updateMusicVolume();
+
+    void setupDisplayConnections();
+
+    void applyDisplaySettings();
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

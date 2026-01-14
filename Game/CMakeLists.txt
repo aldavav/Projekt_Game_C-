@@ -28,14 +28,18 @@ set(PROJECT_SOURCES
     src/Game/Map/Map.cpp
     
     src/UI/Manager/MenuManager.cpp
-    src/UI/Manager/KeyBindingManager.cpp
+    src/UI/Manager/ControlsSettingsManager.cpp
     src/UI/Manager/ConfigManager.cpp
     src/UI/Screens/SettingsScreen.cpp
     src/UI/Screens/GameScreen.cpp
-    src/UI/Screens/MainMenuScreen.cpp
+    src/UI/Screens/MenuScreen.cpp
     src/UI/Components/MenuButton.cpp
     src/UI/Widgets/KeyCaptureDialog.cpp
     src/UI/Widgets/TacticalDialog.cpp
+    src/UI/Manager/GameSettingsManager.cpp
+    src/UI/Manager/AudioSettingsManager.cpp
+    src/UI/Manager/DisplaySettingsManager.cpp
+    src/UI/Manager/GraphicsSettingsManager.cpp
 )
 
 add_executable(Game ${PROJECT_SOURCES})

@@ -1,27 +1,27 @@
-#include "MainMenuScreen.h"
+#include "MenuScreen.h"
 
-MainMenuScreen::MainMenuScreen(QWidget *parent)
+MenuScreen::MenuScreen(QWidget *parent)
     : AbstractScreen(parent)
 {
     setupBackground();
     setupUI();
 }
 
-void MainMenuScreen::onEnter()
+void MenuScreen::onEnter()
 {
     if (m_bgMovie)
         m_bgMovie->start();
     this->show();
 }
 
-void MainMenuScreen::onExit()
+void MenuScreen::onExit()
 {
     if (m_bgMovie)
         m_bgMovie->stop();
     this->hide();
 }
 
-void MainMenuScreen::resizeEvent(QResizeEvent *event)
+void MenuScreen::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
     if (m_backgroundLabel)
@@ -30,21 +30,21 @@ void MainMenuScreen::resizeEvent(QResizeEvent *event)
     }
 }
 
-void MainMenuScreen::onNewGameClicked()
+void MenuScreen::onNewGameClicked()
 {
     this->setEnabled(false);
     GameEngine::getInstance().startGame();
     MenuManager::getInstance().setScreen(new GameScreen());
 }
 
-void MainMenuScreen::onLoadGameClicked() { /* Logic for loading */ }
+void MenuScreen::onLoadGameClicked() { /* Logic for loading */ }
 
-void MainMenuScreen::onSettingsClicked()
+void MenuScreen::onSettingsClicked()
 {
     MenuManager::getInstance().pushScreen(new SettingsScreen());
 }
 
-void MainMenuScreen::onHelpClicked()
+void MenuScreen::onHelpClicked()
 {
     const QString helpContent = R"(CONTROLS:
  - Left Click: Select unit / structure / hex
@@ -70,7 +70,7 @@ STRATEGIC OBJECTIVE:
     updatePanelContent("SYSTEM MANUAL", helpContent);
 }
 
-void MainMenuScreen::onCreditsClicked()
+void MenuScreen::onCreditsClicked()
 {
     QString content = "LEAD PROGRAMMER\nLEAD GAME DESIGNER\nTECHNICAL ARCHITECT\n"
                       "CORE SYSTEMS & GAMEPLAY\n- " +
@@ -87,12 +87,12 @@ void MainMenuScreen::onCreditsClicked()
     updatePanelContent("PERSONNEL DOSSIER", content);
 }
 
-void MainMenuScreen::onQuitClicked()
+void MenuScreen::onQuitClicked()
 {
     QCoreApplication::quit();
 }
 
-void MainMenuScreen::setupUI()
+void MenuScreen::setupUI()
 {
     auto *mainLayout = new QVBoxLayout(this);
     mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
@@ -113,17 +113,17 @@ void MainMenuScreen::setupUI()
     struct MenuEntry
     {
         QString text;
-        void (MainMenuScreen::*slot)();
+        void (MenuScreen::*slot)();
         bool isQuit;
     };
 
     const MenuEntry entries[] = {
-        {tr("NEW GAME"), &MainMenuScreen::onNewGameClicked, false},
-        {tr("LOAD GAME"), &MainMenuScreen::onLoadGameClicked, false},
-        {tr("SETTINGS"), &MainMenuScreen::onSettingsClicked, false},
-        {tr("HELP"), &MainMenuScreen::onHelpClicked, false},
-        {tr("CREDITS"), &MainMenuScreen::onCreditsClicked, false},
-        {tr("QUIT"), &MainMenuScreen::onQuitClicked, true}};
+        {tr("NEW GAME"), &MenuScreen::onNewGameClicked, false},
+        {tr("LOAD GAME"), &MenuScreen::onLoadGameClicked, false},
+        {tr("SETTINGS"), &MenuScreen::onSettingsClicked, false},
+        {tr("HELP"), &MenuScreen::onHelpClicked, false},
+        {tr("CREDITS"), &MenuScreen::onCreditsClicked, false},
+        {tr("QUIT"), &MenuScreen::onQuitClicked, true}};
 
     for (const auto &e : entries)
     {
@@ -183,7 +183,7 @@ void MainMenuScreen::setupUI()
     mainLayout->addLayout(footerLayout);
 }
 
-void MainMenuScreen::setupBackground()
+void MenuScreen::setupBackground()
 {
     m_backgroundLabel = new QLabel(this);
     m_backgroundLabel->setScaledContents(true);
@@ -203,7 +203,7 @@ void MainMenuScreen::setupBackground()
     m_bgMovie->start();
 }
 
-void MainMenuScreen::updatePanelContent(const QString &title, const QString &description)
+void MenuScreen::updatePanelContent(const QString &title, const QString &description)
 {
     m_panelTitle->setText(title);
     m_panelText->setText(description);

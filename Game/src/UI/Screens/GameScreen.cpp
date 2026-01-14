@@ -362,7 +362,7 @@ void GameScreen::updateGameDisplay()
 
 void GameScreen::onPauseClicked()
 {
-    MenuManager::getInstance().setScreen(new MainMenuScreen());
+    MenuManager::getInstance().setScreen(new MenuScreen());
 }
 
 void GameScreen::resizeEvent(QResizeEvent *event)

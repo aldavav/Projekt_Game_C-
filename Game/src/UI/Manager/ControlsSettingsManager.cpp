@@ -1,28 +1,28 @@
-#include "KeyBindingManager.h"
+#include "ControlsSettingsManager.h"
 
-KeyBindingManager &KeyBindingManager::getInstance()
+ControlsSettingsManager &ControlsSettingsManager::getInstance()
 {
-    static KeyBindingManager instance;
+    static ControlsSettingsManager instance;
     return instance;
 }
 
-void KeyBindingManager::setKey(Action action, Key key)
+void ControlsSettingsManager::setKey(Action action, Key key)
 {
     m_bindings[action] = key;
 }
 
-KeyBindingManager::Key KeyBindingManager::getKey(Action action) const
+ControlsSettingsManager::Key ControlsSettingsManager::getKey(Action action) const
 {
     return m_bindings.value(action);
 }
 
-QString KeyBindingManager::getKeyName(Action action) const
+QString ControlsSettingsManager::getKeyName(Action action) const
 {
     int qtKey = static_cast<int>(m_bindings.value(action));
     return QKeySequence(qtKey).toString();
 }
 
-KeyBindingManager::KeyBindingManager()
+ControlsSettingsManager::ControlsSettingsManager()
 {
     m_bindings[Action::MOVE_UP] = Key::UP_ARROW;
     m_bindings[Action::MOVE_DOWN] = Key::DOWN_ARROW;
