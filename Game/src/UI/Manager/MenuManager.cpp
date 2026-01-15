@@ -101,10 +101,6 @@ void MenuManager::handleGameStateChange(int newState)
         break;
 
     case STATE_RUNNING:
-        while (!m_screenStack.isEmpty())
-        {
-            popScreen();
-        }
         break;
 
     case STATE_GAMEOVER:

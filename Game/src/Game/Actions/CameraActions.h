@@ -2,7 +2,7 @@
 #define CAMERAACTIONS_H
 
 #include <Game/Actions/GameActions.h>
-#include <Game/View/Camera.h>
+#include <Game/Camera/Camera.h>
 #include <QPointF>
 
 class ZoomAction : public GameAction

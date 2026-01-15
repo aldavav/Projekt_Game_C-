@@ -2,7 +2,7 @@
 #define UNITACTIONS_H
 
 #include <Game/Actions/GameActions.h>
-#include <Game/View/Camera.h>
+#include <Game/Camera/Camera.h>
 #include <QPoint>
 
 class MoveUnitAction : public GameAction

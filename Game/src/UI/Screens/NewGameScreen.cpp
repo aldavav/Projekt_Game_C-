@@ -55,26 +55,36 @@ void NewGameScreen::setupUI()
 
 void NewGameScreen::onLaunchClicked()
 {
+    QString mapName = m_mapNameEdit->text();
+    uint seed = m_seedEdit->text().toUInt();
+
     auto *loading = new LoadingScreen();
     MenuManager::getInstance().setScreen(loading);
 
-    QTimer::singleShot(100, this, [this, loading]()
+    QTimer::singleShot(500, loading, [loading, mapName, seed]()
                        {
         loading->setStatus(tr("GENERATING TERRAIN..."));
         loading->setProgress(30);
         
-        GameEngine::getInstance().setupMatch(m_mapNameEdit->text(), m_seedEdit->text().toUInt());
-
-        loading->setStatus(tr("CREATING SECURE ARCHIVE..."));
-        loading->setProgress(60);
         
-        GameEngine::getInstance().startGame();
+        GameEngine::getInstance().setupMatch(mapName, seed);
 
-        loading->setStatus(tr("SYNCHRONIZING BATTLEFIELD..."));
-        loading->setProgress(100);
-        
-        QTimer::singleShot(500, this, []() {
-            MenuManager::getInstance().setScreen(new GameScreen());
+        QTimer::singleShot(100, loading, [loading]() {
+            loading->setStatus(tr("CREATING SECURE ARCHIVE..."));
+            loading->setProgress(60);
+            
+            GameEngine::getInstance().startGame();
+
+            QTimer::singleShot(500, loading, []() {
+    auto* game = new GameScreen();
+    MenuManager::getInstance().setScreen(game);
+    
+    
+    QTimer::singleShot(0, game, [game]() {
+        game->setFocus();
+        game->update(); 
+    });
+});
         }); });
 }
 
