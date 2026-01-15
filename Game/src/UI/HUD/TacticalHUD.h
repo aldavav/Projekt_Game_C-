@@ -51,6 +51,10 @@ private:
 
     QString getTileTypeName(TileType type);
 
+    void drawScanlines(QPainter &painter, QRect rect);
+
+    void updateMinimapCache(int size, int width, int height);
+
     float m_gameTime = 0.0f;
 
     bool m_isPaused = false;
@@ -68,6 +72,12 @@ private:
     int m_fps = 0;
 
     const int HUD_BOX_H = 75;
+
+    QPixmap m_minimapCache;
+
+    bool m_minimapNeedsUpdate = true;
+
+    QRect m_minimapBox;
 };
 
 #endif

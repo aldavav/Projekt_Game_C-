@@ -110,16 +110,22 @@ void GameScreen::updateGameDisplay()
     auto &cam = Camera::getInstance();
     float zoom = cam.getZoom();
 
-    float speed = 8.0f / zoom;
+    float baseSpeed = 10.0f / zoom;
+    QPointF velocity(0, 0);
 
     if (m_pressedKeys.contains(Qt::Key_W))
-        cam.move(0, -speed);
+        velocity.setY(-baseSpeed);
     if (m_pressedKeys.contains(Qt::Key_S))
-        cam.move(0, speed);
+        velocity.setY(baseSpeed);
     if (m_pressedKeys.contains(Qt::Key_A))
-        cam.move(-speed, 0);
+        velocity.setX(-baseSpeed);
     if (m_pressedKeys.contains(Qt::Key_D))
-        cam.move(speed, 0);
+        velocity.setX(baseSpeed);
+
+    if (!velocity.isNull())
+    {
+        cam.move(velocity.x(), velocity.y());
+    }
 
     GameManager::getInstance().update(0.016f);
     update();

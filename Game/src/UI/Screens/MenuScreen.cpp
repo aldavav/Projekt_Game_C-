@@ -82,7 +82,7 @@ void MenuScreen::onCreditsClicked()
     content += "ADDITIONAL CONTRIBUTIONS\n- " + Config::Strings::CONTRIBUTIONS.join("\n- ") + "\n\n";
 
     content += "ENGINE & FRAMEWORK:\nQt / C++\n\n"
-               "ASSETS:\nAudio and textures from free/open sources\n\n"
+               "ASSETS:\nAssets by Pixelrepo (https://pixelrepo.com)\n\n"
                "TESTING:\nDeveloped and tested by the team";
 
     updatePanelContent("PERSONNEL DOSSIER", content);

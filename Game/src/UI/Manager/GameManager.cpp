@@ -75,9 +75,16 @@ void GameManager::setPaused(bool paused)
 
 void GameManager::handleMouseClick(QPointF worldPos)
 {
-    m_selectedHex = worldPos;
+    const float size = 32.0f;
+    float q = (std::sqrt(3.0f) / 3.0f * worldPos.x() - 1.0f / 3.0f * worldPos.y()) / size;
+    float r = (2.0f / 3.0f * worldPos.y()) / size;
+
+    QPoint selection = Camera::getInstance().hexRound(q, r).toPoint();
+
+    m_selectedHex = QPointF(selection.x(), selection.y());
     m_hasSelection = true;
-    m_hud->setSelection(worldPos, true);
+
+    m_hud->setSelection(m_selectedHex, true);
 }
 
 bool GameManager::hasSelection() const
