@@ -1,4 +1,6 @@
-/* --- Global Reset --- */
+/* ========================================================================
+   1. GLOBAL & RESET
+   ======================================================================== */
 QWidget {
     font-family: 'Orbitron'; 
     color: #e0e0e0;
@@ -11,7 +13,9 @@ QWidget {
     margin-bottom: 5px;
 }
 
-/* --- Main Menu Title --- */
+/* ========================================================================
+   2. MAIN MENU & NAVIGATION
+   ======================================================================== */
 QLabel#mainMenuTitle {
     min-height: 120px;
     font-size: 72px;
@@ -22,7 +26,34 @@ QLabel#mainMenuTitle {
     margin-top: 20px;
 }
 
-/* --- Standard Menu Buttons --- */
+/* Menu Button Wrapper ('Socket') */
+MenuButton {
+    min-width: 500px; 
+    min-height: 80px;
+    background: transparent;
+}
+
+MenuButton:focus {
+    background-color: rgba(0, 242, 255, 40);
+    border: 1px solid #ffffff;
+    color: #ffffff;
+}
+
+/* Arrow Icon */
+QLabel#buttonArrow {
+    qproperty-pixmap: url(":/images/assets/images/arrow.png");
+    min-width: 102px;
+    max-width: 102px;
+    min-height: 22px;
+    max-height: 22px;
+    qproperty-scaledContents: true; 
+    background: transparent;
+}
+
+/* ========================================================================
+   3. PUSH BUTTON STYLES
+   ======================================================================== */
+/* Standard Menu Buttons */
 QPushButton#menuButton {
     min-width: 250px;
     min-height: 70px;
@@ -39,7 +70,7 @@ QPushButton#menuButton:hover {
     border-radius: 20px;
 }
 
-/* --- Quit Button --- */
+/* Quit Button */
 QPushButton#quitButton {
     min-width: 250px;
     min-height: 70px;
@@ -63,7 +94,21 @@ QPushButton#quitButton:pressed {
     color: #888888;
 }
 
-/* --- Side Information Panel --- */
+/* Settings/Action Buttons */
+QPushButton#applyButton {
+    background-color: #006600;
+    color: white;
+    padding: 10px 20px;
+}
+
+QPushButton#confirmBtn {
+    background-color: #700000;
+    border: 1px solid #FF3131;
+}
+
+/* ========================================================================
+   4. SIDE PANEL & SETTINGS SCREEN
+   ======================================================================== */
 QWidget#sidePanel {
     min-width: 380px;
     max-width: 380px;
@@ -104,25 +149,6 @@ QLabel#panelDescription {
     padding-top: 10px;
 }
 
-/* --- Menu Button Wrapper ('Socket') --- */
-MenuButton {
-    min-width: 500px; 
-    min-height: 80px;
-    background: transparent;
-}
-
-/* --- Arrow Icon --- */
-QLabel#buttonArrow {
-    qproperty-pixmap: url(":/images/assets/images/arrow.png");
-    min-width: 102px;
-    max-width: 102px;
-    min-height: 22px;
-    max-height: 22px;
-    qproperty-scaledContents: true; 
-    background: transparent;
-}
-
-/* Settings Container */
 #settingsScreen {
     background-color: rgba(10, 10, 10, 240);
     border: 3px solid #FFD700;
@@ -134,7 +160,7 @@ QLabel#settingsTitle {
     margin-bottom: 20px;
 }
 
-/* Styling Tabs */
+/* Tab Styling */
 QTabWidget::pane {
     border: 1px solid #FFD700;
     background: rgba(0, 40, 0, 100);
@@ -153,21 +179,17 @@ QTabBar::tab:selected {
     color: black;
 }
 
-/* Form Styling */
 QFormLayout QLabel {
     color: #00FF00;
     font-weight: bold;
 }
 
-QPushButton#applyButton {
-    background-color: #006600;
-    color: white;
-    padding: 10px 20px;
-}
-
+/* ========================================================================
+   5. TACTICAL HUD & DIALOGS
+   ======================================================================== */
 QWidget#tacticalDialog {
-    background-color: rgba(20, 0, 0, 245); /* Dark Red Tint */
-    border: 2px solid #FF3131; /* Bright Red Border */
+    background-color: rgba(20, 0, 0, 245);
+    border: 2px solid #FF3131;
 }
 
 QLabel#dialogTitle {
@@ -182,34 +204,21 @@ QLabel#dialogBody {
     margin-top: 10px;
 }
 
-QPushButton#confirmBtn {
-    background-color: #700000;
-    border: 1px solid #FF3131;
-}
-
 #captureDialog {
     background-color: rgba(20, 20, 20, 230);
     border: 2px solid #00ff00;
     border-radius: 5px;
 }
 
-#victoryTitle {
-    font-size: 60px;
-    color: #00f2ff; /* Cyan glow */
-    font-weight: bold;
-}
+#victoryTitle { font-size: 60px; color: #00f2ff; font-weight: bold; }
+#defeatTitle { font-size: 60px; color: #ff3333; font-weight: bold; }
 
-#defeatTitle {
-    font-size: 60px;
-    color: #ff3333; /* Red alert */
-    font-weight: bold;
-}
-
+/* Stats & HUD */
 #statsBox {
     background-color: rgba(0, 0, 0, 180);
     border: 1px solid #444;
     padding: 40px;
-    color: #00ff00; /* Matrix green stats */
+    color: #00ff00;
     font-family: 'Orbitron';
     line-height: 1.5;
 }
@@ -234,43 +243,8 @@ QProgressBar::chunk {
     margin: 1px;
 }
 
-#loadingTitle {
-    font-size: 24px;
-    color: #00ffff;
-    margin-bottom: 20px;
-}
+#tacticalHUD { background: transparent; }
 
-#statusLabel {
-    color: #888;
-    margin-top: 10px;
-    font-family: 'Orbitron';
-}
-
-#saveListWidget {
-    background-color: rgba(10, 20, 20, 200);
-    border: 1px solid #00ffff;
-    color: #00ffff;
-    font-family: 'Orbitron';
-    font-size: 16px;
-    outline: none;
-}
-
-#saveListWidget::item {
-    padding: 15px;
-    border-bottom: 1px solid #222;
-}
-
-#saveListWidget::item:selected {
-    background-color: #00ffff;
-    color: #000;
-}
-
-/* TacticalHUD specific identifiers */
-#tacticalHUD {
-    background: transparent;
-}
-
-/* We can style a helper info widget if you decide to use actual labels later */
 QLabel#hudHeader {
     font-family: 'Orbitron';
     color: #00ffff;
@@ -279,24 +253,24 @@ QLabel#hudHeader {
     border-left: 3px solid #00ffff;
 }
 
-/* Minimap border styling via the HUD Frame */
 #minimapFrame {
     border: 2px solid #444;
     background-color: rgba(0, 0, 0, 0.8);
 }
 
+/* ========================================================================
+   6. INFORMATION PANEL & SCROLLING
+   ======================================================================== */
 #infoDeclineBtn {
     background-color: transparent;
-    color: #ff4444; /* Warning Red */
+    color: #ff4444;
     border: 1px solid #ff4444;
     padding: 10px 20px;
     font-weight: bold;
     text-transform: uppercase;
 }
 
-#infoDeclineBtn:hover {
-    background-color: rgba(255, 68, 68, 30);
-}
+#infoDeclineBtn:hover { background-color: rgba(255, 68, 68, 30); }
 
 #infoConfirmBtn {
     background-color: #00f2ff;
@@ -307,28 +281,11 @@ QLabel#hudHeader {
     text-transform: uppercase;
 }
 
-#infoConfirmBtn:hover {
-    background-color: #ffffff;
-    box-shadow: 0 0 10px #00f2ff;
-}
-
-/* Scrollbar handle matching the cyan theme */
-#infoScrollArea QScrollBar::handle:vertical {
-    background: #00f2ff;
-    border-radius: 2px;
-}
-
-#infoBody {
-    color: #b0cacc;
-    line-height: 150%;
-}
-
-/* Styling the HTML tags used in the combined string */
-#infoBody h3 {
-    color: #00f2ff;
-    text-transform: uppercase;
-    margin-top: 20px;
-    border-bottom: 1px solid rgba(0, 242, 255, 50);
+#infoConfirmBtn:hover { background-color: #ffffff; }
+#infoConfirmBtn:disabled {
+    background-color: rgba(0, 242, 255, 20);
+    color: rgba(0, 242, 255, 40);
+    border: 1px solid rgba(0, 242, 255, 20);
 }
 
 #infoScrollArea {
@@ -337,111 +294,71 @@ QLabel#hudHeader {
     background-color: rgba(0, 0, 0, 50);
 }
 
-/* Styling the Checkbox Text */
+#infoScrollArea QScrollBar::handle:vertical {
+    background: #00f2ff;
+    border-radius: 2px;
+}
+
+/* Info Body Text Styling */
+#infoBody {
+    color: #b0cacc; /* Reverted to first color instance */
+    line-height: 150%;
+    font-family: "Consolas", "Monospace";
+    font-size: 13px;
+}
+
+#infoBody h2, #infoBody h3 {
+    color: #00f2ff;
+    text-transform: uppercase;
+    margin-top: 20px;
+    border-bottom: 1px solid rgba(0, 242, 255, 50);
+}
+
+#infoBody b, #infoBody a { color: #00f2ff; }
+#infoBody a { text-decoration: underline; font-weight: bold; }
+#infoBody a:hover { color: #ffffff; }
+
+/* ========================================================================
+   7. CHECKBOX STYLING
+   ======================================================================== */
 #infoCheckBox {
-    color: #444; /* Darker grey for 'locked' state */
+    color: #444;
     font-family: "Consolas";
     font-size: 11px;
     margin: 10px 0;
     background: #1e1e1e;
 }
 
-/* Standard active state */
-#infoCheckBox:enabled {
-    color: #00f2ff; /* Cyan when active */
-}
-
-/* Hover state (only works when enabled) */
-#infoCheckBox:enabled:hover {
-    color: #ffffff; /* Turns white when hovered for feedback */
-    text-shadow: 0 0 5px #00f2ff; /* Optional: adds a slight tactical glow */
-}
-
-#infoCheckBox::indicator:enabled:hover {
-    border: 1px solid #ffffff;
-    background-color: rgba(0, 242, 255, 40); /* Slight fill on hover */
-}
-
-/* Standard active state (Unchecked) */
-#infoCheckBox:enabled {
-    color: #00f2ff; 
-}
-
-/* Hover state while enabled */
-#infoCheckBox:enabled:hover {
-    color: #ffffff;
-}
-
-/* NEW: Active state (Checked) */
-/* This ensures the text looks different after the click */
+#infoCheckBox:enabled { color: #00f2ff; }
+#infoCheckBox:enabled:hover { color: #ffffff; }
 #infoCheckBox:enabled:checked {
     color: #ffffff;
     font-weight: bold;
-    text-shadow: 0 0 8px #00f2ff;
 }
 
-/* The Box itself */
 #infoCheckBox::indicator {
     width: 15px;
     height: 15px;
-    border: 1px solid #444; /* Grey border when disabled */
+    border: 1px solid #444;
     background: transparent;
 }
 
-/* Cyan border only when they can actually click it */
-#infoCheckBox::indicator:enabled {
-    border: 1px solid #00f2ff;
+#infoCheckBox::indicator:enabled { border: 1px solid #00f2ff; }
+#infoCheckBox::indicator:enabled:hover { background-color: rgba(0, 242, 255, 20); }
+#infoCheckBox::indicator:checked { background-color: #00f2ff; }
+
+#gameScreen {
+    background-color: #050505;
+    qproperty-fogColor: #0f0f14;
+    qproperty-selectionColor: #00E5FF;
+    qproperty-grassColor: #388E3C;
+    qproperty-waterColor: #1976D2;
+    qproperty-mountainColor: #757575;
+    qproperty-dirtColor: #D2B48C;
 }
 
-/* Hover effect for better UX */
-#infoCheckBox::indicator:enabled:hover {
-    background-color: rgba(0, 242, 255, 20);
-}
-
-/* Checked state */
-#infoCheckBox::indicator:checked {
-    background-color: #00f2ff;
-}
-
-/* Button Disabled States */
-#infoConfirmBtn:disabled {
-    background-color: rgba(0, 242, 255, 20);
-    color: rgba(0, 242, 255, 40);
-    border: 1px solid rgba(0, 242, 255, 20);
-}
-
-#infoBody {
-    color: #e0faff;
-    font-family: "Consolas", "Monospace";
-    font-size: 13px;
-    /* This adds space between lines for readability */
-    line-height: 140%; 
-}
-
-/* Style the HTML tags specifically */
-#infoBody h2, #infoBody h3 {
-    margin-top: 15px;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-}
-
-#infoBody b {
-    color: #00f2ff;
-}
-
-#infoBody a {
-    color: #00f2ff;
-    text-decoration: underline;
-    font-weight: bold;
-}
-
-#infoBody a:hover {
-    color: #ffffff;
-}
-
-/* Make the button look hovered when focused via keyboard */
-MenuButton:focus {
-    background-color: rgba(0, 242, 255, 40); /* Same as hover background */
-    border: 1px solid #ffffff;                /* Highlight border */
-    color: #ffffff;
+#gameScreen[theme="neon"] {
+    qproperty-grassColor: #00ff41;
+    qproperty-waterColor: #001219;
+    qproperty-selectionColor: #ff00ff;
 }

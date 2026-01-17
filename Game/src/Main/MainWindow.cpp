@@ -159,10 +159,9 @@ void MainWindow::updateWindowMetadata()
     auto &map = Map::getInstance();
     if (!map.getMapName().empty())
     {
-        setWindowTitle(QString("%1 - [%2] Seed: %3")
+        setWindowTitle(QString("%1 - %2")
                            .arg(Config::GAME_TITLE)
-                           .arg(QString::fromStdString(map.getMapName()))
-                           .arg(map.getSeed()));
+                           .arg(QString::fromStdString(map.getMapName())));
     }
     else
     {

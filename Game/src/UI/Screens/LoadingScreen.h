@@ -1,7 +1,7 @@
 #ifndef LOADINGSCREEN_H
 #define LOADINGSCREEN_H
 
-#include <UI/Manager/MenuManager.h>
+#include <UI/Screens/AbstractScreen.h>
 #include <QProgressBar>
 #include <QVBoxLayout>
 #include <QLabel>

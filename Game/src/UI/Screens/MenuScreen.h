@@ -2,10 +2,10 @@
 #define MENUSCREEN_H
 
 #include <UI/Screens/SettingsScreen.h>
+#include <UI/Screens/AbstractScreen.h>
 #include <UI/Components/MenuButton.h>
 #include <UI/Screens/NewGameScreen.h>
 #include <Core/Config/GameConfig.h>
-#include <UI/Manager/MenuManager.h>
 #include <QCoreApplication>
 #include <QResizeEvent>
 #include <QPushButton>

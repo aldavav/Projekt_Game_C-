@@ -1,6 +1,7 @@
 #ifndef NEWGAMESCREEN_H
 #define NEWGAMESCREEN_H
 
+#include <UI/Screens/AbstractScreen.h>
 #include <UI/Screens/LoadGameScreen.h>
 #include <UI/Screens/LoadingScreen.h>
 #include <UI/Manager/MenuManager.h>

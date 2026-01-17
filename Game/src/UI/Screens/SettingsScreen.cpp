@@ -2,40 +2,52 @@
 
 SettingsScreen::SettingsScreen(QWidget *parent) : AbstractScreen(parent)
 {
-    setObjectName("settingsScreen");
     setupUI();
 }
 
 void SettingsScreen::onEnter() { this->show(); }
+
 void SettingsScreen::onExit() { this->hide(); }
 
 void SettingsScreen::setupUI()
 {
-    auto *mainLayout = new QVBoxLayout(this);
-    mainLayout->setContentsMargins(50, 50, 50, 50);
+    auto *rootLayout = new QHBoxLayout(this);
+
+    rootLayout->addStretch(1);
+
+    auto *contentContainer = new QWidget();
+    contentContainer->setObjectName("settingsContent");
+    rootLayout->addWidget(contentContainer, 8);
+
+    rootLayout->addStretch(1);
+
+    auto *mainLayout = new QVBoxLayout(contentContainer);
 
     m_headerLabel = new QLabel(this);
     m_headerLabel->setObjectName("settingsTitle");
     mainLayout->addWidget(m_headerLabel);
 
     m_tabs = new QTabWidget(this);
+    m_tabs->setObjectName("settingsTabs");
     m_tabs->addTab(createGameTab(), "");
     m_tabs->addTab(createInputTab(), "");
     m_tabs->addTab(createDisplayTab(), "");
     m_tabs->addTab(createGraphicsTab(), "");
     m_tabs->addTab(createAudioTab(), "");
-
     mainLayout->addWidget(m_tabs);
 
     QHBoxLayout *btnLayout = new QHBoxLayout();
 
     QPushButton *resetBtn = new QPushButton(tr("RESET TO DEFAULTS"));
+    resetBtn->setObjectName("resetButton");
     connect(resetBtn, &QPushButton::clicked, this, &SettingsScreen::onResetClicked);
     btnLayout->addWidget(resetBtn);
 
     btnLayout->addStretch();
 
     QPushButton *cancelBtn = new QPushButton(tr("BACK"));
+    cancelBtn->setObjectName("cancelButton");
+
     QPushButton *applyBtn = new QPushButton(tr("APPLY CHANGES"));
     applyBtn->setObjectName("applyButton");
 
@@ -120,7 +132,8 @@ QWidget *SettingsScreen::createDisplayTab()
     vsyncCheck->setChecked(cfg.vsync);
 
     auto *infoLabel = new QLabel(tr("Resolution is locked to native in Borderless mode."), w);
-    infoLabel->setStyleSheet("font-size: 10px; color: #888; font-style: italic;");
+
+    infoLabel->setObjectName("resolutionInfoLabel");
     infoLabel->setVisible(cfg.windowModeIndex == 1);
 
     layout->addRow(tr("RESOLUTION"), resCombo);
@@ -152,7 +165,6 @@ QWidget *SettingsScreen::createDisplayTab()
         cfg.vsync = chk; });
 
     updateAvailability(cfg.windowModeIndex);
-
     return w;
 }
 
@@ -227,7 +239,7 @@ QWidget *SettingsScreen::createInputTab()
 
     layout->addRow(new QLabel(tr("KEY BINDINGS")));
 
-    auto createBindRow = [this, layout](const QString &label, ControlsSettingsManager::Action action)
+    auto createBindRow = [this, layout](const QString &label, Controls::Action action)
     {
         auto *btn = new QPushButton(ControlsSettingsManager::getInstance().getKeyName(action));
         btn->setObjectName("bindButton");
@@ -243,11 +255,11 @@ QWidget *SettingsScreen::createInputTab()
         layout->addRow(label, btn);
     };
 
-    createBindRow(tr("MOVE UP"), ControlsSettingsManager::Action::MOVE_UP);
-    createBindRow(tr("MOVE DOWN"), ControlsSettingsManager::Action::MOVE_DOWN);
-    createBindRow(tr("UNIT: STOP"), ControlsSettingsManager::Action::STOP);
-    createBindRow(tr("UNIT: GUARD"), ControlsSettingsManager::Action::GUARD);
-    createBindRow(tr("UNIT: SCATTER"), ControlsSettingsManager::Action::SCATTER);
+    createBindRow(tr("MOVE UP"), Controls::Action::MOVE_UP);
+    createBindRow(tr("MOVE DOWN"), Controls::Action::MOVE_DOWN);
+    createBindRow(tr("UNIT: STOP"), Controls::Action::STOP);
+    createBindRow(tr("UNIT: GUARD"), Controls::Action::GUARD);
+    createBindRow(tr("UNIT: SCATTER"), Controls::Action::SCATTER);
 
     return w;
 }
@@ -299,9 +311,11 @@ void SettingsScreen::onBackClicked()
     MenuManager::getInstance().popScreen();
 }
 
-void SettingsScreen::onBindButtonClicked(const QString& actionName) {
+void SettingsScreen::onBindButtonClicked(const QString &actionName)
+{
     KeyCaptureDialog dialog(this);
-    if (dialog.exec() == QDialog::Accepted) {
+    if (dialog.exec() == QDialog::Accepted)
+    {
         Input::KeyCode newKey = dialog.getCapturedKey();
     }
 }

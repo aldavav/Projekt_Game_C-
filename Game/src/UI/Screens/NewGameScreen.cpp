@@ -11,22 +11,36 @@ void NewGameScreen::onExit() { this->hide(); }
 
 void NewGameScreen::setupUI()
 {
-    auto *layout = new QVBoxLayout(this);
+    auto *rootLayout = new QHBoxLayout(this);
+    rootLayout->addStretch(1);
+
+    auto *contentContainer = new QWidget();
+    contentContainer->setObjectName("newGameContent");
+    rootLayout->addWidget(contentContainer, 8);
+
+    rootLayout->addStretch(1);
+
+    auto *layout = new QVBoxLayout(contentContainer);
     auto *form = new QFormLayout();
-    layout->setContentsMargins(100, 50, 100, 50);
 
     QLabel *header = new QLabel(tr("MISSION DEPLOYMENT"), this);
     header->setObjectName("settingsTitle");
     layout->addWidget(header);
 
     m_mapNameEdit = new QLineEdit("Sector_7");
+    m_mapNameEdit->setObjectName("missionInput");
     form->addRow(tr("MAP IDENTIFIER:"), m_mapNameEdit);
 
     QHBoxLayout *seedLayout = new QHBoxLayout();
     m_seedEdit = new QLineEdit(QString::number(QRandomGenerator::global()->generate()));
+    m_seedEdit->setObjectName("missionInput");
+
     QPushButton *rngBtn = new QPushButton(tr("RNG"));
+    rngBtn->setObjectName("secondaryButton");
+
     connect(rngBtn, &QPushButton::clicked, this, [this]()
             { m_seedEdit->setText(QString::number(QRandomGenerator::global()->generate())); });
+
     seedLayout->addWidget(m_seedEdit);
     seedLayout->addWidget(rngBtn);
     form->addRow(tr("TERRAIN SEED:"), seedLayout);
@@ -42,6 +56,8 @@ void NewGameScreen::setupUI()
     layout->addLayout(form);
 
     QPushButton *cancelBtn = new QPushButton(tr("BACK"));
+    cancelBtn->setObjectName("cancelButton");
+
     QPushButton *launchBtn = new QPushButton(tr("INITIALIZE DEPLOYMENT"));
     launchBtn->setObjectName("applyButton");
 
@@ -74,6 +90,7 @@ void NewGameScreen::onLaunchClicked()
             loading->setProgress(60);
             
             GameEngine::getInstance().startGame();
+            MenuManager::getInstance().updateMetadata();
 
             QTimer::singleShot(500, loading, []() {
     auto* game = new GameScreen();

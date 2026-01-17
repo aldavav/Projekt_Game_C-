@@ -14,19 +14,6 @@ class AbstractScreen;
 class GameEngine;
 class QWidget;
 
-class AbstractScreen : public QWidget
-{
-    Q_OBJECT
-public:
-    explicit AbstractScreen(QWidget *parent = nullptr) : QWidget(parent) {}
-
-    virtual ~AbstractScreen() = default;
-
-    virtual void onEnter() = 0;
-
-    virtual void onExit() = 0;
-};
-
 class MenuManager : public QObject
 {
     Q_OBJECT
@@ -58,6 +45,8 @@ public:
     void popScreen();
 
     void setScreen(AbstractScreen *screen);
+
+    void updateMetadata();
 
 public slots:
     void handleGameStateChange(int newState);

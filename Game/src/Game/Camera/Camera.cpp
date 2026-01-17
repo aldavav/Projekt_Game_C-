@@ -69,15 +69,11 @@ QPoint Camera::toScreen(int q, int r, int tileSize) const
 
 QPointF Camera::screenToWorld(const QPoint &screenPos) const
 {
+
     float worldX = (screenPos.x() - m_viewportWidth / 2.0f) / m_zoom + m_currentPos.x();
     float worldY = (screenPos.y() - m_viewportHeight / 2.0f) / m_zoom + m_currentPos.y();
 
-    const float size = 32.0f;
-
-    float q = (2.0f / 3.0f * worldX) / size;
-    float r = (-1.0f / 3.0f * worldX + std::sqrt(3.0f) / 3.0f * worldY) / size;
-
-    return hexRound(q, r);
+    return QPointF(worldX, worldY);
 }
 
 QPointF Camera::hexRound(float q, float r) const
@@ -137,11 +133,12 @@ void Camera::handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHe
     }
 }
 
-void Camera::setTargetPos(QPointF worldPos)
+void Camera::setTargetPos(QPointF hexCoords)
 {
-    float size = 32.0f;
-    float x = size * (3.0f / 2.0f * worldPos.x());
-    float y = size * (std::sqrt(3.0f) / 2.0f * worldPos.x() + std::sqrt(3.0f) * worldPos.y());
+    const float size = 32.0f;
+
+    float x = size * (3.0f / 2.0f * hexCoords.x());
+    float y = size * (std::sqrt(3.0f) / 2.0f * hexCoords.x() + std::sqrt(3.0f) * hexCoords.y());
 
     m_targetPos = QPointF(x, y);
 }
@@ -151,18 +148,15 @@ QPointF Camera::getCurrentPos()
     return m_currentPos;
 }
 
-QPoint Camera::screenToHex(const QPoint& screenPos) const {
+QPoint Camera::screenToHex(const QPoint &screenPos) const
+{
     QPointF worldPos = screenToWorld(screenPos);
-    
-    // For Pointy-Top Hexagons:
-    // Size is the distance from center to a corner (radius)
-    const float size = 32.0f; 
 
-    // Matrix to convert Cartesian (x, y) to Fractional Hex (q, r)
-    float q = (sqrt(3.0f)/3.0f * worldPos.x() - 1.0f/3.0f * worldPos.y()) / size;
-    float r = (2.0f/3.0f * worldPos.y()) / size;
+    const float size = 32.0f;
 
-    // Use hexRound to snap the fractional values to the nearest integer grid
+    float q = (2.0f / 3.0f * worldPos.x()) / size;
+    float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size;
+
     QPointF rounded = hexRound(q, r);
     return QPoint(static_cast<int>(rounded.x()), static_cast<int>(rounded.y()));
 }

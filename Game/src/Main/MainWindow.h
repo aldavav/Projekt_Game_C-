@@ -7,6 +7,7 @@
 #include <Core/Logger/LoggerMacros.h>
 #include <Core/Assets/AssetManager.h>
 #include <Core/Config/GameConfig.h>
+#include <UI/Manager/MenuManager.h>
 #include <UI/Screens/MenuScreen.h>
 #include <qguiapplication.h>
 #include <qfontdatabase.h>
@@ -43,6 +44,8 @@ public:
 
     void applyDisplaySettings();
 
+    void updateWindowMetadata();
+
 protected:
     void keyPressEvent(QKeyEvent *event) override;
 
@@ -56,8 +59,6 @@ protected:
 
 private slots:
     void on_actionQuit_triggered();
-
-    void updateWindowMetadata();
 
 private:
     QWidget *m_centralWidget;

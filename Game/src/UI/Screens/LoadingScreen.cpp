@@ -30,6 +30,12 @@ void LoadingScreen::onEnter() { this->show(); }
 
 void LoadingScreen::onExit() { this->hide(); }
 
-void LoadingScreen::setProgress(int value) { m_progressBar->setValue(value); }
+void LoadingScreen::setProgress(int value)
+{
+    m_progressBar->setValue(value);
+}
 
-void LoadingScreen::setStatus(const QString &status) { m_statusLabel->setText(status); }
+void LoadingScreen::setStatus(const QString &status)
+{
+    m_statusLabel->setText(status);
+}

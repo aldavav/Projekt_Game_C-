@@ -1,6 +1,7 @@
 #ifndef LOADGAMESCREEN_H
 #define LOADGAMESCREEN_H
 
+#include <UI/Screens/AbstractScreen.h>
 #include <UI/Screens/LoadingScreen.h>
 #include <UI/Manager/MenuManager.h>
 #include <Game/Engine/GameEngine.h>

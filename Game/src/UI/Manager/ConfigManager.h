@@ -6,28 +6,10 @@
 #include <UI/Manager/DisplaySettingsManager.h>
 #include <UI/Manager/AudioSettingsManager.h>
 #include <UI/Manager/GameSettingsManager.h>
+#include <Core/Config/ConfigTypes.h>
 #include <QCoreApplication>
 #include <QSettings>
 #include <QString>
-
-struct GameSettings
-{
-    int languageIndex = 1;
-    bool showTooltips = true;
-    bool legalAccepted = false;
-
-    int resolutionIndex = 3;
-    int windowModeIndex = 0;
-    bool vsync = true;
-
-    int textureQualityIndex = 2;
-    int gamma = 50;
-
-    int masterVol = 75;
-    int musicVol = 75;
-    int sfxVol = 75;
-    int voiceVol = 75;
-};
 
 class ConfigManager
 {
