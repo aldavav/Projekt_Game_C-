@@ -19,7 +19,11 @@ void InputManager::setupDefaultBindings()
 
 void InputManager::onKeyPress(int keyCode)
 {
+    bool isRepeat = m_activeKeys.count(keyCode) > 0;
     m_activeKeys.insert(keyCode);
+
+    if (isRepeat)
+        return;
 
     RawInputEvent event;
     event.type = RawInputEvent::Type::Keyboard;
@@ -69,12 +73,12 @@ CommandPtr InputManager::translateRawInput(const RawInputEvent &event)
         switch (event.keyCode)
         {
         case Qt::Key_S:
-            return qSharedPointerCast<ICommand>(QSharedPointer<StopAction>::create());
+            return QSharedPointer<StopAction>::create().staticCast<ICommand>();
+        case Qt::Key_Minus:
+            return QSharedPointer<ZoomAction>::create(-0.1f).staticCast<ICommand>();
         case Qt::Key_Plus:
         case Qt::Key_Equal:
             return qSharedPointerCast<ICommand>(QSharedPointer<ZoomAction>::create(0.1f));
-        case Qt::Key_Minus:
-            return qSharedPointerCast<ICommand>(QSharedPointer<ZoomAction>::create(-0.1f));
         default:
             break;
         }
@@ -93,6 +97,7 @@ CommandPtr InputManager::translateRawInput(const RawInputEvent &event)
 
 CommandPtr InputManager::getNextCommand()
 {
+    QMutexLocker locker(&m_inputMutex);
     return m_commandQueue.isEmpty() ? nullptr : m_commandQueue.dequeue();
 }
 

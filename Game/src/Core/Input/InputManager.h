@@ -6,6 +6,7 @@
 #include <Game/Actions/UnitActions.h>
 #include <Core/Input/RawInputEvent.h>
 #include <Core/Common/KeyCodes.h>
+#include <qmutex.h>
 #include <QObject>
 #include <QQueue>
 #include <QPoint>
@@ -53,6 +54,8 @@ private:
     std::set<int> m_activeKeys;
 
     std::map<int, QString> m_keyBindings;
+
+    mutable QMutex m_inputMutex;
 
     void setupDefaultBindings();
 };

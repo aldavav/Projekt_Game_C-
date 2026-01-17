@@ -3,6 +3,7 @@
 GameScreen::GameScreen(QWidget *parent)
     : AbstractScreen(parent), m_updateTimer(new QTimer(this))
 {
+    setObjectName("gameScreen");
     m_cloudTexture.load(":/images/assets/images/cloud.png");
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
@@ -40,6 +41,7 @@ void GameScreen::paintEvent(QPaintEvent *event)
 void GameScreen::mousePressEvent(QMouseEvent *event)
 {
     auto &gm = GameManager::getInstance();
+    auto &cam = Camera::getInstance();
 
     if (gm.getHUD()->handleMousePress(event, width(), height()))
     {
@@ -52,27 +54,24 @@ void GameScreen::mousePressEvent(QMouseEvent *event)
         m_isDragging = true;
         m_lastMousePos = event->pos();
 
-        QPointF clickedHex = Camera::getInstance().screenToWorld(event->pos());
-        gm.handleMouseClick(clickedHex);
+        gm.handleMouseClick(event->pos());
     }
+
     update();
 }
 
 void GameScreen::mouseMoveEvent(QMouseEvent *event)
 {
+
     if (m_isDragging)
     {
         QPoint delta = event->pos() - m_lastMousePos;
-
         float zoom = Camera::getInstance().getZoom();
-        float moveX = -static_cast<float>(delta.x()) / zoom;
-        float moveY = -static_cast<float>(delta.y()) / zoom;
 
-        Camera::getInstance().move(moveX, moveY);
+        Camera::getInstance().move(-delta.x() / zoom, -delta.y() / zoom);
         m_lastMousePos = event->pos();
     }
 
-    m_hoveredHex = Camera::getInstance().screenToWorld(event->pos());
     update();
 }
 
@@ -110,22 +109,16 @@ void GameScreen::updateGameDisplay()
     auto &cam = Camera::getInstance();
     float zoom = cam.getZoom();
 
-    float baseSpeed = 10.0f / zoom;
-    QPointF velocity(0, 0);
+    float speed = 8.0f / zoom;
 
     if (m_pressedKeys.contains(Qt::Key_W))
-        velocity.setY(-baseSpeed);
+        cam.move(0, -speed);
     if (m_pressedKeys.contains(Qt::Key_S))
-        velocity.setY(baseSpeed);
+        cam.move(0, speed);
     if (m_pressedKeys.contains(Qt::Key_A))
-        velocity.setX(-baseSpeed);
+        cam.move(-speed, 0);
     if (m_pressedKeys.contains(Qt::Key_D))
-        velocity.setX(baseSpeed);
-
-    if (!velocity.isNull())
-    {
-        cam.move(velocity.x(), velocity.y());
-    }
+        cam.move(speed, 0);
 
     GameManager::getInstance().update(0.016f);
     update();
@@ -141,59 +134,62 @@ void GameScreen::drawMap(QPainter &painter)
     float dayCycle = (std::sin(gameTime * (2.0f * M_PI / 60.0f)) * 0.5f) + 0.5f;
     float zoom = cam.getZoom();
     const float BASE_TILE = 32.0f;
-    const int VIEW_RADIUS = 20;
+    const int VIEW_RADIUS = 25;
 
-    QPointF centerCoord = cam.screenToWorld(QPoint(width() / 2, height() / 2));
-    int cq = static_cast<int>(centerCoord.x());
-    int cr = static_cast<int>(centerCoord.y());
+    QPoint mouseLocal = mapFromGlobal(QCursor::pos());
+    QPointF mouseWorld = cam.screenToWorld(mouseLocal);
+
+    float hq = (2.0f / 3.0f * mouseWorld.x()) / BASE_TILE;
+    float hr = (-1.0f / 3.0f * mouseWorld.x() + std::sqrt(3.0f) / 3.0f * mouseWorld.y()) / BASE_TILE;
+
+    QPoint currentHover = cam.hexRound(hq, hr).toPoint();
+
+    QPointF centerCoord = cam.getCurrentPos();
+    int cq = static_cast<int>(centerCoord.x() / (1.5f * BASE_TILE));
+    int cr = static_cast<int>(centerCoord.y() / (std::sqrt(3.0f) * BASE_TILE));
 
     float baseVisualRadius = (BASE_TILE * zoom) * 0.98f;
-    float gTime = gm.getGameTime();
 
     for (int q = cq - VIEW_RADIUS; q <= cq + VIEW_RADIUS; ++q)
     {
-        int r_start = std::max(cr - VIEW_RADIUS, cr - q + cq - VIEW_RADIUS);
-        int r_end = std::min(cr + VIEW_RADIUS, cr - q + cq + VIEW_RADIUS);
-
-        for (int r = r_start; r <= r_end; ++r)
+        for (int r = cr - VIEW_RADIUS; r <= cr + VIEW_RADIUS; ++r)
         {
             QPoint screenPos = cam.toScreen(q, r, BASE_TILE);
-
-            if (screenPos.x() < -100 || screenPos.x() > width() + 100 ||
-                screenPos.y() < -100 || screenPos.y() > height() + 100)
+            if (screenPos.x() < -50 || screenPos.x() > width() + 50 ||
+                screenPos.y() < -50 || screenPos.y() > height() + 50)
                 continue;
 
             Tile &tile = map.getTileAt(q, r);
-            QColor tileColor = getTileVisualColor(tile, gTime);
+            QColor tileColor = getTileVisualColor(tile, gameTime);
 
-            bool isHovered = (q == m_hoveredHex.x() && r == m_hoveredHex.y());
+            bool isHovered = (q == currentHover.x() && r == currentHover.y());
             bool isSelected = (gm.hasSelection() && q == gm.getSelectedHex().x() && r == gm.getSelectedHex().y());
 
             if (!tile.discovered)
             {
-                painter.setBrush(QColor(20, 20, 25));
+                painter.setBrush(property("fogColor").value<QColor>());
                 painter.setPen(Qt::NoPen);
             }
             else
             {
                 if (isSelected)
                 {
-                    painter.setBrush(tileColor.lighter(160));
-                    painter.setPen(QPen(Qt::white, 2));
+                    painter.setBrush(tileColor.lighter(150));
+
+                    painter.setPen(QPen(property("selectionColor").value<QColor>(), 3));
                 }
                 else if (isHovered)
                 {
-                    int pulse = 170 + static_cast<int>(std::sin(gTime * 3.0f) * 30);
-                    painter.setPen(QPen(QColor(255, 255, 0, pulse), 2));
-                    painter.setBrush(tileColor.lighter(115));
+                    painter.setBrush(tileColor.lighter(120));
+                    painter.setPen(QPen(QColor(255, 255, 255, 180), 1));
                 }
                 else
                 {
-                    painter.setPen(Qt::NoPen);
+                    painter.setPen(QPen(QColor(0, 0, 0, 30), 1));
                     painter.setBrush(tileColor);
                 }
             }
-            drawHexagon(painter, screenPos, baseVisualRadius);
+            drawHexagon(painter, screenPos, (BASE_TILE * zoom) * 0.98f);
         }
     }
     drawClouds(painter, cam, gameTime, zoom, dayCycle);
@@ -263,16 +259,17 @@ QColor GameScreen::getTileVisualColor(const Tile &tile, float gameTime)
     {
     case TileType::WATER:
     {
-        float wave = std::sin(GameManager::getInstance().getGameTime() * 2.0f) * 0.5f + 0.5f;
-        return QColor::fromRgb(25 + wave * 10, 118 + wave * 30, 210 + wave * 40);
+        float wave = std::sin(gameTime * 2.0f) * 0.5f + 0.5f;
+        // m_waterColor is automatically updated from QSS
+        return m_waterColor.lighter(100 + wave * 20);
     }
-    case TileType::GRASS:
-        return QColor("#388E3C");
-    case TileType::MOUNTAIN:
-        return QColor("#757575");
-    case TileType::DIRT:
-        return QColor("#D2B48C");
-    default:
-        return QColor("#2E7D32");
+    case TileType::GRASS:    return m_grassColor;
+    case TileType::MOUNTAIN: return m_mountainColor;
+    case TileType::DIRT:     return m_dirtColor;
+    default:                 return m_grassColor;
     }
 }
+
+// Inside drawMap logic:
+
+

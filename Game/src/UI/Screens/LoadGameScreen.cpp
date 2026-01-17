@@ -67,20 +67,39 @@ void LoadGameScreen::onEntrySelected(QListWidgetItem *item)
 
 void LoadGameScreen::onLoadClicked()
 {
+    if (!m_saveList->currentItem())
+        return;
+
     QString selectedMap = m_saveList->currentItem()->text();
 
     auto *loading = new LoadingScreen();
     MenuManager::getInstance().setScreen(loading);
 
-    QTimer::singleShot(100, this, [selectedMap, loading]()
+    QTimer::singleShot(100, loading, [selectedMap, loading]()
                        {
-        loading->setStatus(tr("RECONSTRUCTING TERRAIN..."));
-        loading->setProgress(50);
-        
-        GameEngine::getInstance().loadMatch(selectedMap);
-        
-        loading->setProgress(100);
-        QTimer::singleShot(500, [](){
-            MenuManager::getInstance().setScreen(new GameScreen());
+        loading->setStatus(tr("RETRIEVING SECTOR DATA..."));
+        loading->setProgress(25);
+
+        QTimer::singleShot(200, loading, [selectedMap, loading]() {
+            loading->setStatus(tr("RECONSTRUCTING TERRAIN..."));
+            loading->setProgress(60);
+            
+            GameEngine::getInstance().loadMatch(selectedMap);
+
+            QTimer::singleShot(200, loading, [loading]() {
+                loading->setStatus(tr("SYNCHRONIZING UPLINK..."));
+                loading->setProgress(100);
+                
+                QTimer::singleShot(500, loading, []() {
+                    auto* game = new GameScreen();
+                    MenuManager::getInstance().setScreen(game);
+                    
+                    
+                    QTimer::singleShot(0, game, [game]() {
+                        game->setFocus();
+                        game->update();
+                    });
+                });
+            });
         }); });
 }

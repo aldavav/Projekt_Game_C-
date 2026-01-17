@@ -11,12 +11,15 @@ class KeyCaptureDialog : public QDialog
 {
     Q_OBJECT
 public:
-    Input::KeyCode capturedKey = Input::KeyCode::ESC;
-
     explicit KeyCaptureDialog(QWidget *parent = nullptr);
+
+    Input::KeyCode getCapturedKey() const { return capturedKey; }
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+
+private:
+    Input::KeyCode capturedKey = Input::KeyCode::ESC;
 };
 
 #endif

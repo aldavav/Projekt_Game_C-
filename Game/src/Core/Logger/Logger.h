@@ -4,6 +4,7 @@
 #include <Core/Logger/LoggerTypes.h>
 #include <Core/Common/AnsiCodes.h>
 #include <filesystem>
+#include <qlogging.h>
 #include <algorithm>
 #include <iostream>
 #include <iostream>

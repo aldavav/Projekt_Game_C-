@@ -13,7 +13,9 @@ QStringList DisplaySettingsManager::getAvailableResolutions() const
     QScreen *screen = QGuiApplication::primaryScreen();
     if (!screen)
     {
-        return {"1920x1080"};
+        return {QString("%1x%2")
+                    .arg(Config::DEFAULT_WIDTH)
+                    .arg(Config::DEFAULT_HEIGHT)};
     }
 
     QSize logicalSize = screen->size();

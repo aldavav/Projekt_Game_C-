@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QKeyEvent>
 #include <QDialog>
 #include <QFrame>
 #include <QLabel>
@@ -16,6 +17,8 @@ public:
 
 private:
     void setupUI(const QString &title, const QString &message);
+
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif

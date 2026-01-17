@@ -45,12 +45,11 @@ void GameEngine::saveCurrentMatch()
     QDir dir;
     if (!dir.exists(mapFolder))
     {
-        dir.mkpath(mapFolder); // Creates /saves/MapName/
+        dir.mkpath(mapFolder);
     }
 
     QString savePath = mapFolder + "/initial_state.sav";
 
-    // Perform binary or INI save here
     QSettings saveFile(savePath, QSettings::IniFormat);
     saveFile.setValue("Seed", m_currentSeed);
     saveFile.setValue("Timestamp", QDateTime::currentDateTime().toString());
@@ -59,17 +58,17 @@ void GameEngine::saveCurrentMatch()
     LOG_INFO("Game auto-saved at: " + savePath);
 }
 
-void GameEngine::loadMatch(const QString &mapName) {
+void GameEngine::loadMatch(const QString &mapName)
+{
     m_currentMapName = mapName;
     QString path = QCoreApplication::applicationDirPath() + "/saves/" + mapName + "/initial_state.sav";
 
     QSettings saveFile(path, QSettings::IniFormat);
     uint32_t seed = saveFile.value("Seed").toUInt();
-    
-    // Restore engine state
+
     setupMatch(mapName, seed);
     setState(STATE_RUNNING);
-    
+
     LOG_INFO("Match successfully reconstructed from " + path);
 }
 
@@ -112,54 +111,56 @@ void GameEngine::gameLoopTick()
 
 void GameEngine::updateSimulation(float fixedStep)
 {
+
     auto &input = InputManager::getInstance();
-    auto &cam = Camera::getInstance();
-
-    const float scrollSpeed = 800.0f;
-    float distance = scrollSpeed * fixedStep;
-    bool moved = false;
-
-    if (input.isKeyPressed(Qt::Key_W))
-    {
-        cam.move(0, -scrollSpeed * fixedStep);
-        moved = true;
-    }
-    if (input.isKeyPressed(Qt::Key_S))
-    {
-        cam.move(0, distance);
-        moved = true;
-    }
-    if (input.isKeyPressed(Qt::Key_A))
-    {
-        cam.move(-distance, 0);
-        moved = true;
-    }
-    if (input.isKeyPressed(Qt::Key_D))
-    {
-        cam.move(distance, 0);
-        moved = true;
-    }
-
-    if (moved)
-    {
-    }
-
     while (input.hasPendingCommands())
     {
-        CommandPtr cmd = input.getNextCommand();
-        if (cmd)
-            cmd->execute(*this);
-    }
-
-    for (const auto &entity : m_entities)
-    {
-        if (entity)
+        if (CommandPtr cmd = input.getNextCommand())
         {
-            entity->update(fixedStep);
+            cmd->execute(*this);
         }
     }
 
-    cam.update(fixedStep);
+    updateCameraMovement(fixedStep);
+
+    for (auto it = m_entities.begin(); it != m_entities.end();)
+    {
+        if (*it)
+        {
+            (*it)->update(fixedStep);
+            ++it;
+        }
+        else
+        {
+            it = m_entities.erase(it);
+        }
+    }
+
+    Camera::getInstance().update(fixedStep);
+}
+
+void GameEngine::updateCameraMovement(float fixedStep)
+{
+    auto &input = InputManager::getInstance();
+    auto &cam = Camera::getInstance();
+
+    QPointF velocity(0, 0);
+    const float speed = 800.0f;
+
+    if (input.isKeyPressed(static_cast<int>(Input::KeyCode::UP_ARROW)))
+        velocity.setY(-1);
+    if (input.isKeyPressed(static_cast<int>(Input::KeyCode::DOWN_ARROW)))
+        velocity.setY(1);
+    if (input.isKeyPressed(static_cast<int>(Input::KeyCode::LEFT_ARROW)))
+        velocity.setX(-1);
+    if (input.isKeyPressed(static_cast<int>(Input::KeyCode::RIGHT_ARROW)))
+        velocity.setX(1);
+
+    if (!velocity.isNull())
+    {
+        QPointF delta = velocity * speed * fixedStep;
+        cam.move(delta.x(), delta.y());
+    }
 }
 
 void GameEngine::initializeSystems()
@@ -178,10 +179,8 @@ void GameEngine::setState(State newState)
 
     m_currentState = newState;
 
-    // Log the state change for debugging
     LOG_INFO("Engine State Transition: " + QString::number(static_cast<int>(newState)));
 
-    // Notify MenuManager and MainWindow
     emit gameStateChanged(static_cast<int>(m_currentState));
 }
 
@@ -189,7 +188,4 @@ void GameEngine::triggerEndGame(bool victory)
 {
     m_playerWon = victory;
     setState(STATE_GAMEOVER);
-
-    // Stop internal game systems here (timers, pathfinding, etc.)
-    // StopGameLoop();
 }

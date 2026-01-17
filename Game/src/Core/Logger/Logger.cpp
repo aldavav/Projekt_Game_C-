@@ -1,3 +1,4 @@
+#include <Core/Logger/LoggerMacros.h>
 #include "Logger.h"
 
 Logger::Logger()
@@ -195,4 +196,14 @@ void Logger::archiveLogFile()
 std::string Logger::stripPath(const std::string& path) {
     size_t pos = path.find_last_of("\\/");
     return (pos == std::string::npos) ? path : path.substr(pos + 1);
+}
+
+void qtMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    switch (type) {
+    case QtDebugMsg:    LOG_INFO(msg); break;
+    case QtWarningMsg:  LOG_WARNING(msg); break;
+    case QtCriticalMsg: LOG_ERROR(msg); break;
+    case QtFatalMsg:    LOG_ERROR("FATAL: " + msg.toStdString()); abort();
+    }
 }

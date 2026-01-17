@@ -2,6 +2,7 @@
 #define GRAPHICSSETTINGSMANAGER_H
 
 #include <UI/Manager/ConfigManager.h>
+#include <Core/Config/GraphicsTypes.h>
 #include <QObject>
 
 class GraphicsSettingsManager : public QObject
@@ -10,16 +11,8 @@ class GraphicsSettingsManager : public QObject
 public:
     static GraphicsSettingsManager &getInstance();
 
-    enum class QualityLevel
-    {
-        Low = 0,
-        Medium,
-        High,
-        Ultra
-    };
-
     void applyGraphicsSettings();
-
+    
     float getGammaValue() const;
 
 signals:
@@ -27,6 +20,12 @@ signals:
 
 private:
     GraphicsSettingsManager() = default;
+    
+    ~GraphicsSettingsManager() = default;
+
+    GraphicsSettingsManager(const GraphicsSettingsManager &) = delete;
+    
+    GraphicsSettingsManager &operator=(const GraphicsSettingsManager &) = delete;
 };
 
 #endif

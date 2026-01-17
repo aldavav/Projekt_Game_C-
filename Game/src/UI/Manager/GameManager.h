@@ -29,7 +29,7 @@ public:
 
     void setPaused(bool paused);
 
-    void handleMouseClick(QPointF worldPos);
+    void handleMouseClick(QPoint screenPos);
 
     bool hasSelection() const;
 

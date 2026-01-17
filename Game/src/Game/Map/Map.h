@@ -7,6 +7,7 @@
 #include <Game/Map/Chunk.h>
 #include <Game/Map/Tile.h>
 #include <unordered_map>
+#include <qpoint.h>
 #include <cstdint>
 #include <random>
 #include <string>

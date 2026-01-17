@@ -7,6 +7,7 @@
 #include <UI/Manager/AudioSettingsManager.h>
 #include <UI/Manager/GameSettingsManager.h>
 #include <UI/Widgets/KeyCaptureDialog.h>
+#include <UI/Screens/AbstractScreen.h>
 #include <UI/Widgets/TacticalDialog.h>
 #include <UI/Manager/ConfigManager.h>
 #include <UI/Manager/MenuManager.h>
@@ -66,6 +67,8 @@ private slots:
     void onResetClicked();
 
     void onBackClicked();
+    
+    void onBindButtonClicked(const QString &actionName);
 };
 
 #endif

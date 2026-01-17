@@ -2,6 +2,7 @@
 #define DISPLAYSETTINGSMANAGER_H
 
 #include <UI/Manager/ConfigManager.h>
+#include <Core/Config/GameConfig.h>
 #include <QGuiApplication>
 #include <QObject>
 #include <QScreen>

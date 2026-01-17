@@ -6,17 +6,17 @@ ControlsSettingsManager &ControlsSettingsManager::getInstance()
     return instance;
 }
 
-void ControlsSettingsManager::setKey(Action action, Key key)
+void ControlsSettingsManager::setKey(Controls::Action action, Controls::Key key)
 {
     m_bindings[action] = key;
 }
 
-ControlsSettingsManager::Key ControlsSettingsManager::getKey(Action action) const
+Controls::Key ControlsSettingsManager::getKey(Controls::Action action) const
 {
     return m_bindings.value(action);
 }
 
-QString ControlsSettingsManager::getKeyName(Action action) const
+QString ControlsSettingsManager::getKeyName(Controls::Action action) const
 {
     int qtKey = static_cast<int>(m_bindings.value(action));
     return QKeySequence(qtKey).toString();
@@ -24,11 +24,11 @@ QString ControlsSettingsManager::getKeyName(Action action) const
 
 ControlsSettingsManager::ControlsSettingsManager()
 {
-    m_bindings[Action::MOVE_UP] = Key::UP_ARROW;
-    m_bindings[Action::MOVE_DOWN] = Key::DOWN_ARROW;
-    m_bindings[Action::MOVE_LEFT] = Key::LEFT_ARROW;
-    m_bindings[Action::MOVE_RIGHT] = Key::RIGHT_ARROW;
-    m_bindings[Action::STOP] = Key::STOP;
-    m_bindings[Action::GUARD] = Key::GUARD;
-    m_bindings[Action::SCATTER] = Key::SCATTER;
+    m_bindings[Controls::Action::MOVE_UP] = Controls::Key::UP_ARROW;
+    m_bindings[Controls::Action::MOVE_DOWN] = Controls::Key::DOWN_ARROW;
+    m_bindings[Controls::Action::MOVE_LEFT] = Controls::Key::LEFT_ARROW;
+    m_bindings[Controls::Action::MOVE_RIGHT] = Controls::Key::RIGHT_ARROW;
+    m_bindings[Controls::Action::STOP] = Controls::Key::STOP;
+    m_bindings[Controls::Action::GUARD] = Controls::Key::GUARD;
+    m_bindings[Controls::Action::SCATTER] = Controls::Key::SCATTER;
 }

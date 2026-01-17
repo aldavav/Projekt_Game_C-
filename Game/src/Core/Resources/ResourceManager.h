@@ -4,6 +4,7 @@
 #include <Core/Logger/LoggerMacros.h>
 #include <QSharedPointer>
 #include <QSoundEffect>
+#include <qmutex.h>
 #include <QObject>
 #include <QString>
 #include <QPixmap>
@@ -30,6 +31,8 @@ private:
     TexturePtr loadTextureFromFile(const QString &filePath);
 
     AudioPtr loadAudioFromFile(const QString &filePath);
+
+    mutable QMutex m_mutex;
 
 public:
     static ResourceManager &getInstance();

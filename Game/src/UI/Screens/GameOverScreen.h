@@ -1,7 +1,7 @@
 #ifndef GAMEOVERSCREEN_H
 #define GAMEOVERSCREEN_H
 
-#include <UI/Manager/MenuManager.h>
+#include <UI/Screens/AbstractScreen.h>
 #include <Game/Engine/GameEngine.h>
 #include <QApplication>
 #include <QPushButton>
@@ -11,18 +11,19 @@
 class GameOverScreen : public AbstractScreen
 {
     Q_OBJECT
+
 public:
     explicit GameOverScreen(bool victory, QWidget *parent = nullptr);
 
     void onEnter() override;
-    
+
     void onExit() override;
 
 private:
     void setupUI(bool victory);
 
     QLabel *m_titleLabel;
-    
+
     QLabel *m_statsLabel;
 };
 

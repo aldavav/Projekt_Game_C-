@@ -1,6 +1,7 @@
 #include <UI/Screens/GameOverScreen.h>
 #include <UI/Screens/MenuScreen.h>
 #include "MenuManager.h"
+#include <Main/MainWindow.h>
 
 MenuManager &MenuManager::getInstance()
 {
@@ -82,6 +83,16 @@ void MenuManager::setScreen(AbstractScreen *screen)
     }
 
     pushScreen(screen);
+}
+
+void MenuManager::updateMetadata()
+{
+    if (m_mainWindow)
+    {
+        auto *dw = qobject_cast<MainWindow *>(m_mainWindow->window());
+        if (dw)
+            dw->updateWindowMetadata();
+    }
 }
 
 void MenuManager::updateScreenVisibility()

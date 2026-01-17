@@ -18,14 +18,20 @@ ResourceManager::~ResourceManager()
 
 TexturePtr ResourceManager::getTexture(const QString &resourceId)
 {
+    QMutexLocker locker(&m_mutex);
     if (m_textureCache.contains(resourceId))
         return m_textureCache.value(resourceId);
 
     TexturePtr newTexture = loadTextureFromFile(resourceId);
 
-    if (!newTexture)
+    if (newTexture.isNull())
     {
-        return getTexture(":/images/assets/images/missing.png");
+        LOG_ERROR(QString("Texture not found: %1").arg(resourceId));
+        const QString fallback = ":/images/assets/images/missing.png";
+        if (resourceId == fallback)
+            return TexturePtr();
+
+        return getTexture(fallback);
     }
 
     m_textureCache.insert(resourceId, newTexture);
@@ -72,7 +78,7 @@ TexturePtr ResourceManager::loadTextureFromFile(const QString &filePath)
 AudioPtr ResourceManager::loadAudioFromFile(const QString &filePath)
 {
     AudioPtr sound(new QSoundEffect());
-    sound->setSource(QUrl::fromLocalFile(filePath));
+    sound->setSource(QUrl(filePath));
 
     return sound;
 }

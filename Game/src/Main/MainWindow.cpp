@@ -3,8 +3,10 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), m_isFullscreen(false)
 {
-
     ConfigManager::getInstance().loadConfiguration();
+    auto &cfg = ConfigManager::getInstance().getSettings();
+    QString langCode = (cfg.languageIndex == 1) ? "cz" : "en";
+    GameSettingsManager::getInstance().setLanguage(langCode);
 
     applyGlobalStyles();
     setWindowTitle(Config::GAME_TITLE);
@@ -12,22 +14,66 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_centralWidget = new QWidget(this);
     setCentralWidget(m_centralWidget);
-
-    setCursor(AssetManager::getCursor(AssetManager::CursorType::Standard));
-
-    setupBackgroundMusic();
-
-    setupDisplayConnections();
-
-    QTimer::singleShot(0, this, [this]()
-                       { applyDisplaySettings(); });
-
     MenuManager::getInstance().setMainWindow(m_centralWidget);
-    MenuManager::getInstance().pushScreen(new MenuScreen(m_centralWidget));
 
-    auto &cfg = ConfigManager::getInstance().getSettings();
-    QString langCode = (cfg.languageIndex == 1) ? "cz" : "en";
-    GameSettingsManager::getInstance().setLanguage(langCode);
+    auto *loading = new LoadingScreen();
+    MenuManager::getInstance().setScreen(loading);
+
+    QTimer::singleShot(100, loading, [this, loading]()
+                       {
+        loading->setStatus(tr("LOADING ASSETS..."));
+        loading->setProgress(30);
+        
+        setCursor(AssetManager::getCursor(AssetManager::CursorType::Standard));
+        setupBackgroundMusic();
+
+        QTimer::singleShot(200, loading, [this, loading]() {
+            loading->setStatus(tr("CONFIGURING DISPLAY..."));
+            loading->setProgress(70);
+            
+            applyDisplaySettings();
+            setupDisplayConnections();
+
+            QTimer::singleShot(200, loading, [this, loading]() {
+                loading->setStatus(tr("SYSTEM READY"));
+                loading->setProgress(100);
+
+                QTimer::singleShot(300, loading, [this]() {
+                    auto &config = ConfigManager::getInstance();
+                    
+                    if (!config.getSettings().legalAccepted) {
+                        auto loadLegalDoc = [](const QString &path) -> QString {
+                            QFile file(path);
+                            if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                                return QString::fromUtf8(file.readAll());
+                            }
+                            return "CRITICAL ERROR: DOCUMENT NOT FOUND.";
+                        };
+
+                        QString combinedLegal = QString(
+                            "<h3>%1</h3><p>%2</p>"
+                            "<br><hr><br>"
+                            "<h3>%3</h3><p>%4</p>")
+                            .arg(tr("END USER LICENSE AGREEMENT"), 
+                                 loadLegalDoc(":/legal/assets/legal/EULA/EULA.html"), 
+                                 tr("TERMS OF SERVICE"), 
+                                 loadLegalDoc(":/legal/assets/legal/ToS/ToS.html"));
+
+                        InformationDialog dialog(tr("LEGAL PROTOCOLS"), combinedLegal, this);
+                        
+                        if (dialog.exec() == QDialog::Accepted) {
+                            config.getSettings().legalAccepted = true;
+                            config.saveConfiguration();
+                            MenuManager::getInstance().setScreen(new MenuScreen(m_centralWidget));
+                        } else {
+                            QCoreApplication::exit(0);
+                        }
+                    } else {
+                        MenuManager::getInstance().setScreen(new MenuScreen(m_centralWidget));
+                    }
+                });
+            });
+        }); });
 
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -113,10 +159,9 @@ void MainWindow::updateWindowMetadata()
     auto &map = Map::getInstance();
     if (!map.getMapName().empty())
     {
-        setWindowTitle(QString("%1 - [%2] Seed: %3")
+        setWindowTitle(QString("%1 - %2")
                            .arg(Config::GAME_TITLE)
-                           .arg(QString::fromStdString(map.getMapName()))
-                           .arg(map.getSeed()));
+                           .arg(QString::fromStdString(map.getMapName())));
     }
     else
     {
