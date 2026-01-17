@@ -7,7 +7,6 @@ TacticalDialog::TacticalDialog(const QString &title, const QString &message, QWi
     setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
     setObjectName("tacticalDialog");
     setFixedSize(400, 200);
-
     setupUI(title, message);
 }
 
@@ -37,10 +36,28 @@ void TacticalDialog::setupUI(const QString &title, const QString &message)
     auto *confirmBtn = new QPushButton("PROCEED");
     confirmBtn->setObjectName("confirmBtn");
 
+    confirmBtn->setFocus();
+
     connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
     connect(confirmBtn, &QPushButton::clicked, this, &QDialog::accept);
 
     btnLayout->addWidget(cancelBtn);
     btnLayout->addWidget(confirmBtn);
     layout->addLayout(btnLayout);
+}
+
+void TacticalDialog::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    {
+        accept();
+    }
+    else if (event->key() == Qt::Key_Escape)
+    {
+        reject();
+    }
+    else
+    {
+        QDialog::keyPressEvent(event);
+    }
 }

@@ -237,7 +237,7 @@ QWidget *SettingsScreen::createInputTab()
             KeyCaptureDialog diag(this);
             if (diag.exec() == QDialog::Accepted) {
                 m_isDirty = true; 
-                ControlsSettingsManager::getInstance().setKey(action, static_cast<Input::KeyCode>(diag.capturedKey));
+                ControlsSettingsManager::getInstance().setKey(action, static_cast<Input::KeyCode>(diag.getCapturedKey()));
                 btn->setText(ControlsSettingsManager::getInstance().getKeyName(action));
             } });
         layout->addRow(label, btn);
@@ -297,4 +297,11 @@ void SettingsScreen::onBackClicked()
         ConfigManager::getInstance().loadConfiguration();
     }
     MenuManager::getInstance().popScreen();
+}
+
+void SettingsScreen::onBindButtonClicked(const QString& actionName) {
+    KeyCaptureDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted) {
+        Input::KeyCode newKey = dialog.getCapturedKey();
+    }
 }

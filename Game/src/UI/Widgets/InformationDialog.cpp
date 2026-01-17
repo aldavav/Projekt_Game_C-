@@ -82,5 +82,27 @@ void InformationDialog::checkRequirements()
 
 void InformationDialog::onDecline()
 {
-    QCoreApplication::exit(0);
+    QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+}
+
+void InformationDialog::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Down || event->key() == Qt::Key_PageDown)
+    {
+        m_scrollArea->verticalScrollBar()->setValue(m_scrollArea->verticalScrollBar()->value() + 20);
+        return;
+    }
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    {
+        if (m_confirmBtn->isEnabled())
+            accept();
+    }
+    else if (event->key() == Qt::Key_Escape)
+    {
+        onDecline();
+    }
+    else
+    {
+        QDialog::keyPressEvent(event);
+    }
 }

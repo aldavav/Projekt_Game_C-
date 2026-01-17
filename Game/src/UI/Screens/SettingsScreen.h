@@ -66,6 +66,8 @@ private slots:
     void onResetClicked();
 
     void onBackClicked();
+    
+    void onBindButtonClicked(const QString &actionName);
 };
 
 #endif

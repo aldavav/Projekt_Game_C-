@@ -1,11 +1,11 @@
 #ifndef ASSETMANAGER_H
 #define ASSETMANAGER_H
 
+#include <QFontDatabase>
 #include <QString>
-#include <QFont>
 #include <QCursor>
 #include <QPixmap>
-#include <QFontDatabase>
+#include <QFont>
 
 class AssetManager
 {

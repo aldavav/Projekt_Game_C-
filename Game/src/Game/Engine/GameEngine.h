@@ -67,6 +67,8 @@ private:
 
     void updateSimulation(float fixedStep);
 
+    void updateCameraMovement(float fixedStep);
+
     QTimer m_gameTimer;
 
     std::chrono::steady_clock::time_point m_lastTime;

@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QKeyEvent>
 #include <QCheckBox>
 #include <QDialog>
 #include <QLabel>
@@ -18,6 +19,9 @@ class InformationDialog : public QDialog
 
 public:
     explicit InformationDialog(const QString &header, const QString &body, QWidget *parent = nullptr);
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
     void onDecline();

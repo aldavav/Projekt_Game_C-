@@ -1,6 +1,8 @@
 #ifndef TACTICALHUD_H
 #define TACTICALHUD_H
 
+#include <Core/Config/GameConfig.h>
+#include <Game/Engine/GameSpeed.h>
 #include <Game/Camera/Camera.h>
 #include <Game/Map/Map.h>
 #include <QElapsedTimer>
@@ -13,13 +15,6 @@
 
 class QPainter;
 class QMouseEvent;
-
-enum class GameSpeed
-{
-    SLOW,
-    NORMAL,
-    FAST
-};
 
 class TacticalHUD : public QObject
 {

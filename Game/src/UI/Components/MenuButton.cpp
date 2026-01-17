@@ -29,21 +29,27 @@ bool MenuButton::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj == m_btn)
     {
-        if (event->type() == QEvent::Enter)
+        if (event->type() == QEvent::Enter || event->type() == QEvent::FocusIn)
         {
             m_btn->setFixedSize(265, 75);
             m_btn->move(92, 2);
             m_arrow->move(m_btn->x() + m_btn->width() + 10, (height() - m_arrow->height()) / 2);
             m_arrow->show();
-            m_btn->graphicsEffect()->setEnabled(true);
+
+            if (auto *glow = m_btn->graphicsEffect())
+                glow->setEnabled(true);
         }
-        else if (event->type() == QEvent::Leave)
+        else if (event->type() == QEvent::Leave || event->type() == QEvent::FocusOut)
         {
             m_btn->setFixedSize(250, 70);
             m_btn->move(100, 5);
             m_arrow->hide();
+
             if (m_btn->objectName() != "quitButton")
-                m_btn->graphicsEffect()->setEnabled(false);
+            {
+                if (auto *glow = m_btn->graphicsEffect())
+                    glow->setEnabled(false);
+            }
         }
     }
     return QWidget::eventFilter(obj, event);
