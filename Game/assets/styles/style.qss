@@ -98,7 +98,7 @@ QFrame#panelLine {
 
 QLabel#panelDescription {
     color: #00FF00;
-    font-family: 'Consolas';
+    font-family: 'Orbitron';
     font-size: 13px;
     border: none;
     padding-top: 10px;
@@ -283,4 +283,164 @@ QLabel#hudHeader {
 #minimapFrame {
     border: 2px solid #444;
     background-color: rgba(0, 0, 0, 0.8);
+}
+
+#infoDeclineBtn {
+    background-color: transparent;
+    color: #ff4444; /* Warning Red */
+    border: 1px solid #ff4444;
+    padding: 10px 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#infoDeclineBtn:hover {
+    background-color: rgba(255, 68, 68, 30);
+}
+
+#infoConfirmBtn {
+    background-color: #00f2ff;
+    color: #000000;
+    border: 1px solid #00f2ff;
+    padding: 10px 30px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#infoConfirmBtn:hover {
+    background-color: #ffffff;
+    box-shadow: 0 0 10px #00f2ff;
+}
+
+/* Scrollbar handle matching the cyan theme */
+#infoScrollArea QScrollBar::handle:vertical {
+    background: #00f2ff;
+    border-radius: 2px;
+}
+
+#infoBody {
+    color: #b0cacc;
+    line-height: 150%;
+}
+
+/* Styling the HTML tags used in the combined string */
+#infoBody h3 {
+    color: #00f2ff;
+    text-transform: uppercase;
+    margin-top: 20px;
+    border-bottom: 1px solid rgba(0, 242, 255, 50);
+}
+
+#infoScrollArea {
+    border-top: 1px solid rgba(0, 242, 255, 30);
+    border-bottom: 1px solid rgba(0, 242, 255, 30);
+    background-color: rgba(0, 0, 0, 50);
+}
+
+/* Styling the Checkbox Text */
+#infoCheckBox {
+    color: #444; /* Darker grey for 'locked' state */
+    font-family: "Consolas";
+    font-size: 11px;
+    margin: 10px 0;
+}
+
+/* Standard active state */
+#infoCheckBox:enabled {
+    color: #00f2ff; /* Cyan when active */
+}
+
+/* Hover state (only works when enabled) */
+#infoCheckBox:enabled:hover {
+    color: #ffffff; /* Turns white when hovered for feedback */
+    text-shadow: 0 0 5px #00f2ff; /* Optional: adds a slight tactical glow */
+}
+
+#infoCheckBox::indicator:enabled:hover {
+    border: 1px solid #ffffff;
+    background-color: rgba(0, 242, 255, 40); /* Slight fill on hover */
+}
+
+/* Standard active state (Unchecked) */
+#infoCheckBox:enabled {
+    color: #00f2ff; 
+}
+
+/* Hover state while enabled */
+#infoCheckBox:enabled:hover {
+    color: #ffffff;
+}
+
+/* NEW: Active state (Checked) */
+/* This ensures the text looks different after the click */
+#infoCheckBox:enabled:checked {
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 0 0 8px #00f2ff;
+}
+
+/* The Box itself */
+#infoCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1px solid #444; /* Grey border when disabled */
+    background: transparent;
+}
+
+/* Cyan border only when they can actually click it */
+#infoCheckBox::indicator:enabled {
+    border: 1px solid #00f2ff;
+}
+
+/* Hover effect for better UX */
+#infoCheckBox::indicator:enabled:hover {
+    background-color: rgba(0, 242, 255, 20);
+}
+
+/* Checked state */
+#infoCheckBox::indicator:checked {
+    background-color: #00f2ff;
+}
+
+/* Button Disabled States */
+#infoConfirmBtn:disabled {
+    background-color: rgba(0, 242, 255, 20);
+    color: rgba(0, 242, 255, 40);
+    border: 1px solid rgba(0, 242, 255, 20);
+}
+
+#infoBody {
+    color: #e0faff;
+    font-family: "Consolas", "Monospace";
+    font-size: 13px;
+    /* This adds space between lines for readability */
+    line-height: 140%; 
+}
+
+/* Style the HTML tags specifically */
+#infoBody h2, #infoBody h3 {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+#infoBody b {
+    color: #00f2ff;
+}
+
+#infoBody a {
+    color: #00f2ff;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+#infoBody a:hover {
+    color: #ffffff;
+}
+
+/* Make the button look hovered when focused via keyboard */
+MenuButton:focus {
+    background-color: rgba(0, 242, 255, 40); /* Same as hover background */
+    border: 1px solid #ffffff;                /* Highlight border */
+    color: #ffffff;
 }

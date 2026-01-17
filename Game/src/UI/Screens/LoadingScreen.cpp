@@ -12,7 +12,7 @@ LoadingScreen::LoadingScreen(QWidget *parent) : AbstractScreen(parent)
     m_progressBar = new QProgressBar(this);
     m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
-    m_progressBar->setFixedSize(600, 30);
+    m_progressBar->setFixedSize(560, 30);
     m_progressBar->setTextVisible(false);
 
     m_statusLabel = new QLabel(tr("INITIALIZING ENGINE..."), this);

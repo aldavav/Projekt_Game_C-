@@ -30,6 +30,52 @@ void MenuScreen::resizeEvent(QResizeEvent *event)
     }
 }
 
+void MenuScreen::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+
+    if (m_buttonLayout->count() > 0)
+    {
+        if (auto *firstBtn = qobject_cast<QWidget *>(m_buttonLayout->itemAt(0)->widget()))
+        {
+            firstBtn->setFocus();
+        }
+    }
+}
+
+void MenuScreen::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key())
+    {
+    case Qt::Key_Up:
+        focusNextPrevChild(false);
+        break;
+
+    case Qt::Key_Down:
+        focusNextPrevChild(true);
+        break;
+
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
+    {
+        auto *focused = qApp->focusWidget();
+        auto *btn = qobject_cast<MenuButton *>(focused);
+        if (btn)
+        {
+            emit btn->clicked();
+        }
+        break;
+    }
+
+    case Qt::Key_Escape:
+        QCoreApplication::quit();
+        break;
+
+    default:
+        QWidget::keyPressEvent(event);
+    }
+}
+
 void MenuScreen::onNewGameClicked()
 {
     MenuManager::getInstance().pushScreen(new NewGameScreen(this->parentWidget()));
@@ -131,6 +177,7 @@ void MenuScreen::setupUI()
         auto *btn = new MenuButton(e.text, e.isQuit, this);
         connect(btn, &MenuButton::clicked, this, e.slot);
         m_buttonLayout->addWidget(btn);
+        btn->setFocusPolicy(Qt::StrongFocus);
     }
 
     contentLayout->addWidget(buttonContainer);

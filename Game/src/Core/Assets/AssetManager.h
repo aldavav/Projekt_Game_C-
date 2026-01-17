@@ -18,10 +18,10 @@ public:
             ":/fonts/assets/fonts/Orbitron-ExtraBold.ttf",
             ":/fonts/assets/fonts/Orbitron-Medium.ttf",
             ":/fonts/assets/fonts/Orbitron-Regular.ttf",
-            ":/fonts/assets/fonts/Orbitron-SemiBold.ttf"
-        };
+            ":/fonts/assets/fonts/Orbitron-SemiBold.ttf"};
 
-        for (const QString& fontPath : fonts) {
+        for (const QString &fontPath : fonts)
+        {
             QFontDatabase::addApplicationFont(fontPath);
         }
     }
@@ -34,21 +34,34 @@ public:
         return font;
     }
 
-    enum class CursorType { Standard, Attack, Select, Wait };
+    enum class CursorType
+    {
+        Standard,
+        Attack,
+        Select,
+        Wait
+    };
 
     static QCursor getCursor(CursorType type)
     {
         QString path;
         switch (type)
         {
-            case CursorType::Standard: path = ":/images/assets/images/cursor.png"; break;
-            case CursorType::Select: path = ":/images/assets/images/cursor-pointer.png"; break;
-            default:                 path = ":/images/assets/images/cursor.png";        break;
+        case CursorType::Standard:
+            path = ":/images/assets/images/cursor.png";
+            break;
+        case CursorType::Select:
+            path = ":/images/assets/images/cursor-pointer.png";
+            break;
+        default:
+            path = ":/images/assets/images/cursor.png";
+            break;
         }
 
         QPixmap pix(path);
-        if (pix.isNull()) return QCursor(Qt::ArrowCursor);
-        
+        if (pix.isNull())
+            return QCursor(Qt::ArrowCursor);
+
         return QCursor(pix.scaled(32, 32, Qt::KeepAspectRatio, Qt::SmoothTransformation), 0, 0);
     }
 };

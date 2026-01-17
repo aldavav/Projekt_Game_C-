@@ -46,6 +46,7 @@ set(PROJECT_SOURCES
     src/UI/Screens/LoadGameScreen.cpp
     src/UI/HUD/TacticalHUD.cpp
     src/UI/Manager/GameManager.cpp
+    src/UI/Widgets/InformationDialog.cpp
 )
 
 add_executable(Game ${PROJECT_SOURCES})

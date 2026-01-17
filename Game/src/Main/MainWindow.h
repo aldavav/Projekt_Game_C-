@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <UI/Manager/DisplaySettingsManager.h>
+#include <UI/Widgets/InformationDialog.h>
 #include <UI/Widgets/TacticalDialog.h>
 #include <Core/Logger/LoggerMacros.h>
 #include <Core/Assets/AssetManager.h>

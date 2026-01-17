@@ -29,4 +29,8 @@
     <file>assets/i18n/game_en.qm</file>
     <file>assets/i18n/game_cz.qm</file>
   </qresource>
+  <qresource prefix="/legal">
+    <file>assets/legal/ToS/ToS.html</file>
+    <file>assets/legal/EULA/EULA.html</file>
+  </qresource>
 </RCC>

@@ -38,6 +38,10 @@ public:
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
+    void showEvent(QShowEvent *event) override;
+
+    void keyPressEvent(QKeyEvent *event) override;
+
 private slots:
     void onNewGameClicked();
 
@@ -63,6 +67,8 @@ private:
     QLabel *m_panelText = nullptr;
 
     QVBoxLayout *m_buttonLayout = nullptr;
+
+    QList<MenuButton*> m_buttons;
 
     void setupUI();
 

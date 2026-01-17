@@ -14,6 +14,7 @@ struct GameSettings
 {
     int languageIndex = 1;
     bool showTooltips = true;
+    bool legalAccepted = false;
 
     int resolutionIndex = 3;
     int windowModeIndex = 0;

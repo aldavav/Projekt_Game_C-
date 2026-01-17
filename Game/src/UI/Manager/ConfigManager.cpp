@@ -19,6 +19,7 @@ void ConfigManager::saveConfiguration()
     settings.beginGroup("Game");
     settings.setValue("Language", m_cachedSettings.languageIndex);
     settings.setValue("Tooltips", m_cachedSettings.showTooltips);
+    settings.setValue("LegalAccepted", m_cachedSettings.legalAccepted);
     settings.endGroup();
 
     settings.beginGroup("Controls");
@@ -60,6 +61,7 @@ void ConfigManager::loadConfiguration()
     settings.beginGroup("Game");
     m_cachedSettings.languageIndex = settings.value("Language", 0).toInt();
     m_cachedSettings.showTooltips = settings.value("Tooltips", true).toBool();
+    m_cachedSettings.legalAccepted = settings.value("LegalAccepted", false).toBool();
     settings.endGroup();
 
     settings.beginGroup("Controls");
@@ -109,9 +111,13 @@ void ConfigManager::resetToDefaults()
     csm.setKey(ControlsSettingsManager::Action::GUARD, Input::KeyCode::GUARD);
     csm.setKey(ControlsSettingsManager::Action::SCATTER, Input::KeyCode::SCATTER);
 
-    GameSettingsManager::getInstance().setLanguage(m_cachedSettings.languageIndex == 0 ? "en" : "cz");
+    QString langCode = (m_cachedSettings.languageIndex == 1) ? "cz" : "en";
+    GameSettingsManager::getInstance().setLanguage(langCode);
     GameSettingsManager::getInstance().setTooltipsEnabled(m_cachedSettings.showTooltips);
+
     AudioSettingsManager::getInstance().volumesChanged();
     DisplaySettingsManager::getInstance().applySettings();
     GraphicsSettingsManager::getInstance().applyGraphicsSettings();
+
+    saveConfiguration();
 }
