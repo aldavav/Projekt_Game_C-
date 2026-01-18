@@ -1,7 +1,6 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 
-#include <Core/Logger/LoggerMacros.h>
 #include <QSharedPointer>
 #include <QSoundEffect>
 #include <qmutex.h>
@@ -21,8 +20,6 @@ class ResourceManager
 {
 private:
     ResourceManager();
-
-    ~ResourceManager();
 
     QMap<QString, TexturePtr> m_textureCache;
 

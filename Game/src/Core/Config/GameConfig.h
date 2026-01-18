@@ -1,8 +1,8 @@
 #ifndef GAMECONFIG_H
 #define GAMECONFIG_H
 
-#include <QString>
 #include <QStringList>
+#include <QString>
 
 namespace Config
 {

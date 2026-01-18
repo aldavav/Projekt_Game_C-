@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
         loading->setStatus(tr("LOADING ASSETS..."));
         loading->setProgress(30);
         
-        setCursor(AssetManager::getCursor(AssetManager::CursorType::Standard));
+        setCursor(AssetManager::getCursor(Asset::CursorType::Standard));
         setupBackgroundMusic();
 
         QTimer::singleShot(200, loading, [this, loading]() {
