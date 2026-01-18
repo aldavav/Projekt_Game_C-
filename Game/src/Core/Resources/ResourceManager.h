@@ -19,7 +19,7 @@ using AudioPtr = QSharedPointer<QSoundEffect>;
 class ResourceManager
 {
 private:
-    ResourceManager();
+    ResourceManager() = default;
 
     QMap<QString, TexturePtr> m_textureCache;
 
