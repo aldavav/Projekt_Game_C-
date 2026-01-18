@@ -12,13 +12,14 @@ void NewGameScreen::onExit() { this->hide(); }
 void NewGameScreen::setupUI()
 {
     auto *rootLayout = new QHBoxLayout(this);
-    rootLayout->addStretch(1);
+
+    rootLayout->addStretch(Config::UI_SIDE_STRETCH);
 
     auto *contentContainer = new QWidget();
     contentContainer->setObjectName("newGameContent");
-    rootLayout->addWidget(contentContainer, 8);
+    rootLayout->addWidget(contentContainer, Config::UI_CONTENT_STRETCH);
 
-    rootLayout->addStretch(1);
+    rootLayout->addStretch(Config::UI_SIDE_STRETCH);
 
     auto *layout = new QVBoxLayout(contentContainer);
     auto *form = new QFormLayout();
@@ -27,7 +28,7 @@ void NewGameScreen::setupUI()
     header->setObjectName("settingsTitle");
     layout->addWidget(header);
 
-    m_mapNameEdit = new QLineEdit("Sector_7");
+    m_mapNameEdit = new QLineEdit(Config::DEFAULT_MISSION_NAME);
     m_mapNameEdit->setObjectName("missionInput");
     form->addRow(tr("MAP IDENTIFIER:"), m_mapNameEdit);
 
@@ -46,11 +47,11 @@ void NewGameScreen::setupUI()
     form->addRow(tr("TERRAIN SEED:"), seedLayout);
 
     m_difficultyCombo = new QComboBox();
-    m_difficultyCombo->addItems({tr("EASY"), tr("NORMAL"), tr("HARD"), tr("BRUTAL")});
+    m_difficultyCombo->addItems(GameConfig::DIFFICULTIES);
     form->addRow(tr("COMBAT DIFFICULTY:"), m_difficultyCombo);
 
     m_opponentCombo = new QComboBox();
-    m_opponentCombo->addItems({tr("AI: NEURAL NETWORK"), tr("HUMAN: UPLINK (NETWORK)")});
+    m_opponentCombo->addItems(GameConfig::OPPONENTS);
     form->addRow(tr("OPPONENT TYPE:"), m_opponentCombo);
 
     layout->addLayout(form);
@@ -77,31 +78,29 @@ void NewGameScreen::onLaunchClicked()
     auto *loading = new LoadingScreen();
     MenuManager::getInstance().setScreen(loading);
 
-    QTimer::singleShot(500, loading, [loading, mapName, seed]()
+    QTimer::singleShot(Config::GENERATION_DELAY, loading, [loading, mapName, seed]()
                        {
         loading->setStatus(tr("GENERATING TERRAIN..."));
         loading->setProgress(30);
         
-        
         GameEngine::getInstance().setupMatch(mapName, seed);
 
-        QTimer::singleShot(100, loading, [loading]() {
+        QTimer::singleShot(Config::LOADING_STEP_DELAY, loading, [loading]() {
             loading->setStatus(tr("CREATING SECURE ARCHIVE..."));
             loading->setProgress(60);
             
             GameEngine::getInstance().startGame();
             MenuManager::getInstance().updateMetadata();
 
-            QTimer::singleShot(500, loading, []() {
-    auto* game = new GameScreen();
-    MenuManager::getInstance().setScreen(game);
-    
-    
-    QTimer::singleShot(0, game, [game]() {
-        game->setFocus();
-        game->update(); 
-    });
-});
+            QTimer::singleShot(Config::LOADING_FINAL_PAUSE, loading, []() {
+                auto* game = new GameScreen();
+                MenuManager::getInstance().setScreen(game);
+                
+                QTimer::singleShot(0, game, [game]() {
+                    game->setFocus();
+                    game->update(); 
+                });
+            });
         }); });
 }
 

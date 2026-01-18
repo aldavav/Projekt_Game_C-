@@ -6,7 +6,7 @@ InformationDialog::InformationDialog(const QString &header, const QString &body,
     setModal(true);
     setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
     setAttribute(Qt::WA_TranslucentBackground);
-    setFixedSize(650, 550);
+    setFixedSize(Config::INFO_DIALOG_WIDTH, Config::INFO_DIALOG_HEIGHT);
 
     setupUI(header, body);
 }
@@ -68,7 +68,7 @@ void InformationDialog::setupUI(const QString &header, const QString &body)
 void InformationDialog::handleScroll(int value)
 {
     QScrollBar *bar = m_scrollArea->verticalScrollBar();
-    if (value >= (bar->maximum() * 0.95))
+    if (value >= (bar->maximum() * Config::LEGAL_SCROLL_THRESHOLD))
     {
         m_scrolledToBottom = true;
         m_acceptCheck->setEnabled(true);
@@ -89,7 +89,8 @@ void InformationDialog::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Down || event->key() == Qt::Key_PageDown)
     {
-        m_scrollArea->verticalScrollBar()->setValue(m_scrollArea->verticalScrollBar()->value() + 20);
+        m_scrollArea->verticalScrollBar()->setValue(
+            m_scrollArea->verticalScrollBar()->value() + Config::KEYBOARD_SCROLL_STEP);
         return;
     }
     if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)

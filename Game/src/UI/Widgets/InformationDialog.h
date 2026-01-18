@@ -1,6 +1,7 @@
 #ifndef INFORMATIONDIALOG_H
 #define INFORMATIONDIALOG_H
 
+#include <Core/Config/Config.h>
 #include <QCoreApplication>
 #include <QVBoxLayout>
 #include <QHBoxLayout>

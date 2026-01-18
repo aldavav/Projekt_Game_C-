@@ -13,13 +13,13 @@ void SettingsScreen::setupUI()
 {
     auto *rootLayout = new QHBoxLayout(this);
 
-    rootLayout->addStretch(1);
+    rootLayout->addStretch(Config::SETTINGS_SIDE_STRETCH);
 
     auto *contentContainer = new QWidget();
     contentContainer->setObjectName("settingsContent");
-    rootLayout->addWidget(contentContainer, 8);
+    rootLayout->addWidget(contentContainer, Config::SETTINGS_CONTENT_STRETCH);
 
-    rootLayout->addStretch(1);
+    rootLayout->addStretch(Config::SETTINGS_SIDE_STRETCH);
 
     auto *mainLayout = new QVBoxLayout(contentContainer);
 
@@ -80,6 +80,11 @@ void SettingsScreen::changeEvent(QEvent *event)
     AbstractScreen::changeEvent(event);
 }
 
+void SettingsScreen::markDirty()
+{
+    m_isDirty = true;
+}
+
 QWidget *SettingsScreen::createGameTab()
 {
     auto *w = new QWidget();
@@ -87,8 +92,10 @@ QWidget *SettingsScreen::createGameTab()
     auto &cfg = ConfigManager::getInstance().getSettings();
 
     auto *langCombo = new QComboBox();
-    langCombo->addItem("English", "en");
-    langCombo->addItem("Čeština", "cz");
+    for (const auto &lang : Config::LANGUAGES)
+    {
+        langCombo->addItem(lang.first, lang.second);
+    }
     langCombo->setCurrentIndex(cfg.languageIndex);
 
     auto *tooltipsCheck = new QCheckBox(tr("Enable Context Tooltips"));
@@ -99,14 +106,14 @@ QWidget *SettingsScreen::createGameTab()
 
     connect(langCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg, langCombo](int index)
             {
-        m_isDirty = true;
+        markDirty();
         cfg.languageIndex = index;
         QString langCode = langCombo->itemData(index).toString();
         GameSettingsManager::getInstance().setLanguage(langCode); });
 
     connect(tooltipsCheck, &QCheckBox::toggled, this, [this, &cfg](bool checked)
             {
-        m_isDirty = true;
+        markDirty();
         cfg.showTooltips = checked;
         GameSettingsManager::getInstance().setTooltipsEnabled(checked); });
 
@@ -150,18 +157,18 @@ QWidget *SettingsScreen::createDisplayTab()
 
     connect(resCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg](int idx)
             {
-        m_isDirty = true; 
+        markDirty(); 
         cfg.resolutionIndex = idx; });
 
     connect(winCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg, updateAvailability](int idx)
             {
-        m_isDirty = true; 
+        markDirty(); 
         cfg.windowModeIndex = idx;
         updateAvailability(idx); });
 
     connect(vsyncCheck, &QCheckBox::toggled, this, [this, &cfg](bool chk)
             {
-        m_isDirty = true; 
+        markDirty(); 
         cfg.vsync = chk; });
 
     updateAvailability(cfg.windowModeIndex);
@@ -179,7 +186,7 @@ QWidget *SettingsScreen::createGraphicsTab()
     texCombo->setCurrentIndex(cfg.textureQualityIndex);
 
     auto *gammaSlider = new QSlider(Qt::Horizontal);
-    gammaSlider->setRange(10, 90);
+    gammaSlider->setRange(GameConfig::GAMMA_MIN, GameConfig::GAMMA_MAX);
     gammaSlider->setValue(cfg.gamma);
 
     layout->addRow(tr("TEXTURE QUALITY"), texCombo);
@@ -187,12 +194,12 @@ QWidget *SettingsScreen::createGraphicsTab()
 
     connect(texCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this, &cfg](int index)
             {
-        m_isDirty = true;
+        markDirty();
         cfg.textureQualityIndex = index; });
 
     connect(gammaSlider, &QSlider::valueChanged, this, [this, &cfg](int val)
             {
-        m_isDirty = true;
+        markDirty();
         cfg.gamma = val;
         GraphicsSettingsManager::getInstance().applyGraphicsSettings(); });
 
@@ -205,30 +212,30 @@ QWidget *SettingsScreen::createAudioTab()
     auto *layout = new QFormLayout(w);
     auto &cfg = ConfigManager::getInstance().getSettings();
 
-    auto *masterSlider = new QSlider(Qt::Horizontal);
-    auto *musicSlider = new QSlider(Qt::Horizontal);
-    auto *sfxSlider = new QSlider(Qt::Horizontal);
-    auto *voiceSlider = new QSlider(Qt::Horizontal);
-
-    QList<QPair<QSlider *, int *>> sliderPairs = {
-        {masterSlider, &cfg.masterVol}, {musicSlider, &cfg.musicVol}, {sfxSlider, &cfg.sfxVol}, {voiceSlider, &cfg.voiceVol}};
-
-    for (auto &pair : sliderPairs)
+    struct AudioRow
     {
-        pair.first->setRange(0, 100);
-        pair.first->setValue(*pair.second);
-        connect(pair.first, &QSlider::valueChanged, this, [this, pair](int val)
+        QString label;
+        int *valuePtr;
+    };
+    QList<AudioRow> rows = {
+        {tr("MASTER VOLUME"), &cfg.masterVol},
+        {tr("MUSIC VOLUME"), &cfg.musicVol},
+        {tr("SFX VOLUME"), &cfg.sfxVol},
+        {tr("VOICE VOLUME"), &cfg.voiceVol}};
+
+    for (const auto &row : rows)
+    {
+        auto *slider = new QSlider(Qt::Horizontal);
+        slider->setRange(GameConfig::VOLUME_MIN, GameConfig::VOLUME_MAX);
+        slider->setValue(*row.valuePtr);
+
+        connect(slider, &QSlider::valueChanged, this, [this, row](int val)
                 {
-            m_isDirty = true;
-            *pair.second = val;
+            markDirty();
+            *row.valuePtr = val;
             emit AudioSettingsManager::getInstance().volumesChanged(); });
+        layout->addRow(row.label, slider);
     }
-
-    layout->addRow(tr("MASTER VOLUME"), masterSlider);
-    layout->addRow(tr("MUSIC VOLUME"), musicSlider);
-    layout->addRow(tr("SFX VOLUME"), sfxSlider);
-    layout->addRow(tr("VOICE VOLUME"), voiceSlider);
-
     return w;
 }
 
@@ -248,7 +255,7 @@ QWidget *SettingsScreen::createInputTab()
                 {
             KeyCaptureDialog diag(this);
             if (diag.exec() == QDialog::Accepted) {
-                m_isDirty = true; 
+                markDirty(); 
                 ControlsSettingsManager::getInstance().setKey(action, static_cast<Input::KeyCode>(diag.getCapturedKey()));
                 btn->setText(ControlsSettingsManager::getInstance().getKeyName(action));
             } });
@@ -286,7 +293,7 @@ void SettingsScreen::onResetClicked()
 
         ConfigManager::getInstance().resetToDefaults();
 
-        m_isDirty = true;
+        markDirty();
 
         QTimer::singleShot(0, this, [this]()
                            {

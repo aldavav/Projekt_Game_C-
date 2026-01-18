@@ -4,19 +4,53 @@
 #include <QStringList>
 #include <QString>
 
-namespace Config
+namespace GameConfig
 {
-    const QString GAME_TITLE = "Command & Conquer";
-    const QString VERSION = "1.0.0 Beta";
-    const QString LEAD_DEV = "Michael Szotkowski";
-    const int DEFAULT_WIDTH = 1920;
-    const int DEFAULT_HEIGHT = 1080;
+    constexpr int GAMMA_MIN = 10;
+    constexpr int GAMMA_MAX = 90;
+    constexpr int GAMMA_DEFAULT = 50;
 
-    namespace Strings
-    {
-        const QStringList PROGRAMMING_TEAM = {LEAD_DEV, "Aleš Vavřinec"};
-        const QStringList CONTRIBUTIONS = {"Marek Hovorka"};
-    }
+    constexpr int VOLUME_MIN = 0;
+    constexpr int VOLUME_MAX = 100;
+
+    const QStringList DIFFICULTIES = {"EASY", "NORMAL", "HARD", "BRUTAL"};
+
+    const QStringList OPPONENTS = {
+        "AI: NEURAL NETWORK",
+        "HUMAN: UPLINK (NETWORK)"};
+
+    constexpr int LOAD_STEP_RETRIEVE = 100;
+    constexpr int LOAD_STEP_RECONSTRUCT = 200;
+
+    const QString STATS_HEADER = "OPERATIONAL DATA:";
+    const QString STATS_UNITS = "UNITS PRODUCED:";
+    const QString STATS_LOSSES = "STRUCTURES LOST:";
+    const QString STATS_TIME = "TOTAL TIME:";
+
+    constexpr int FRAME_MS = 16;
+    constexpr float DELTA_TIME = 0.016f;
+
+    constexpr float CLOUD_MAX_RANGE = 4000.0f;
+    constexpr float CLOUD_SPEED_BASE = 5.0f;
+    constexpr float CLOUD_SPEED_MULT = 15.0f;
+
+    constexpr int CULLING_MARGIN = 50;
+    constexpr float HEX_VISUAL_SCALE = 0.98f;
+
+    constexpr float CAMERA_BASE_SPEED = 15.0f;
+    constexpr float ZOOM_STEP = 0.1f;
+    constexpr float MIN_ZOOM = 0.5f;
+    constexpr float MAX_ZOOM = 3.0f;
+
+    constexpr float BASE_TILE_SIZE = 32.0f;
+    constexpr int VIEW_RADIUS = 25;
+    constexpr int CLOUD_COUNT = 50;
+
+    constexpr float DAY_CYCLE_DURATION = 60.0f;
+
+    constexpr float WATER_WAVE_SPEED = 2.0f;
+    constexpr int   WATER_BRIGHTNESS_BASE = 100;
+    constexpr int   WATER_BRIGHTNESS_SWING = 20;
 }
 
 #endif

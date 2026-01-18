@@ -2,6 +2,7 @@
 #define MENUBUTTON_H
 
 #include <QGraphicsDropShadowEffect>
+#include <Core/Config/Config.h>
 #include <QPushButton>
 #include <QWidget>
 #include <QLabel>

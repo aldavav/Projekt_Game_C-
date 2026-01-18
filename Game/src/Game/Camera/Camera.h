@@ -18,6 +18,8 @@ public:
 
     void setTargetPos(QPointF worldPos);
 
+    void setTargetRawPos(QPointF worldPos);
+
     QPointF getCurrentPos();
 
     static constexpr float MIN_ZOOM = 0.75f;

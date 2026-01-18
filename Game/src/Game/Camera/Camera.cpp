@@ -69,7 +69,6 @@ QPoint Camera::toScreen(int q, int r, int tileSize) const
 
 QPointF Camera::screenToWorld(const QPoint &screenPos) const
 {
-
     float worldX = (screenPos.x() - m_viewportWidth / 2.0f) / m_zoom + m_currentPos.x();
     float worldY = (screenPos.y() - m_viewportHeight / 2.0f) / m_zoom + m_currentPos.y();
 
@@ -141,6 +140,11 @@ void Camera::setTargetPos(QPointF hexCoords)
     float y = size * (std::sqrt(3.0f) / 2.0f * hexCoords.x() + std::sqrt(3.0f) * hexCoords.y());
 
     m_targetPos = QPointF(x, y);
+}
+
+void Camera::setTargetRawPos(QPointF worldPos)
+{
+    m_targetPos = worldPos;
 }
 
 QPointF Camera::getCurrentPos()

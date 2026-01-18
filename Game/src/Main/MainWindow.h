@@ -9,6 +9,7 @@
 #include <Core/Config/GameConfig.h>
 #include <UI/Manager/MenuManager.h>
 #include <UI/Screens/MenuScreen.h>
+#include <Core/Config/Config.h>
 #include <qguiapplication.h>
 #include <qfontdatabase.h>
 #include <QFontDatabase>
