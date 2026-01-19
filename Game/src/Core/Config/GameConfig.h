@@ -44,8 +44,14 @@ namespace GameConfig
 
     constexpr int WORLD_BOUNDS = 50;
     constexpr float BASE_TILE_SIZE = 32.0f;
+    constexpr int HEIGHT_OFFSET = 15;
     constexpr int VIEW_RADIUS = 25;
     constexpr int CLOUD_COUNT = 50;
+
+    constexpr int MOUNTAIN_HEIGHT = 15;
+    constexpr int GRASS_HEIGHT = 10;
+    constexpr int DIRT_HEIGHT = 5;
+    constexpr int WATER_HEIGHT = 0;
 
     constexpr float DAY_CYCLE_DURATION = 60.0f;
 

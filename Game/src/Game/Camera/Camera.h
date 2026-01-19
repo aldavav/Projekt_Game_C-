@@ -1,6 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <Core/Config/GameConfig.h>
 #include <algorithm>
 #include <QPointF>
 #include <QRect>
@@ -10,7 +11,7 @@ class Camera
 public:
     static Camera &getInstance();
 
-    QPointF screenToWorld(const QPoint& screenPos) const;
+    QPointF screenToWorld(const QPoint& screenPos, bool is3D = false) const;
 
     QPointF hexRound(float q, float r) const;
 
@@ -44,11 +45,11 @@ public:
 
     float getZoom() const { return m_zoom; }
 
-    QPoint toScreen(int tileX, int tileY, int tileSize) const;
+    QPoint toScreen(int tileX, int tileY, int tileSize, bool is3D = false) const;
 
     void shake(float intensity) { m_shakeIntensity = intensity; }
     
-    QPoint screenToHex(const QPoint& screenPos) const;
+    QPoint screenToHex(const QPoint& screenPos, bool is3D = false) const;
 
     int getViewportWidth() const { return m_viewportWidth; }
 

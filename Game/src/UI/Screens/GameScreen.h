@@ -63,6 +63,12 @@ private slots:
 private:
     void drawMap(QPainter &painter);
 
+    void drawMap3D(QPainter &painter, QPoint currentHover);
+
+    void drawMap2D(QPainter &painter, QPoint currentHover);
+
+    void drawHexagon(QPainter &painter, QPoint center, float radius, QColor color, float height);
+
     void drawHexagon(QPainter &painter, QPoint center, float radius);
 
     void drawClouds(QPainter &painter, Camera &cam, float gameTime, float zoom);
@@ -96,6 +102,8 @@ private:
     QColor m_selectionColor;
 
     QColor m_fogColor;
+
+    bool m_is3D = false;
 };
 
 #endif
