@@ -1,10 +1,5 @@
 #include "TacticalHUD.h"
 
-static constexpr int WORLD_BOUNDS = 60;
-static constexpr float TILE_S = 32.0f;
-
-static constexpr float TOTAL_MM_WORLD_WIDTH = WORLD_BOUNDS * TILE_S * 3.0f;
-
 TacticalHUD::TacticalHUD(QObject *parent)
     : QObject(parent), m_fps(0), m_frameCount(0), m_isPaused(false),
       m_hasSelection(false), m_currentSpeed(GameSpeed::NORMAL)
@@ -103,15 +98,19 @@ bool TacticalHUD::handleMousePress(QMouseEvent *event, int width, int height)
 
     if (minimapRect.contains(event->pos()))
     {
-
-        float localX = event->pos().x() - (mmX + mmSize / 2.0f);
-        float localY = event->pos().y() - (mmY + mmSize / 2.0f);
-
-        float worldX = (localX / (float)mmSize) * TOTAL_MM_WORLD_WIDTH;
-        float worldY = (localY / (float)mmSize) * TOTAL_MM_WORLD_WIDTH;
-
         auto &cam = Camera::getInstance();
-        cam.setTargetRawPos(QPointF(worldX, worldY));
+
+        float relX = (event->pos().x() - (mmX + mmSize / 2.0f)) / (float)mmSize;
+        float relY = (event->pos().y() - (mmY + mmSize / 2.0f)) / (float)mmSize;
+
+        float viewPortScale = cam.getViewportWidth() * 3.0f;
+
+        QPointF currentCamPos = cam.getCurrentPos();
+
+        float targetWorldX = currentCamPos.x() + (relX * viewPortScale);
+        float targetWorldY = currentCamPos.y() + (relY * viewPortScale);
+
+        cam.setTargetRawPos(QPointF(targetWorldX, targetWorldY));
 
         return true;
     }
@@ -393,13 +392,13 @@ void TacticalHUD::updateMinimapCache(int size, int width, int height)
 
     auto &map = Map::getInstance();
 
-    const int WORLD_BOUNDS = 50;
-    const float tileS = 32.0f;
-
-    float totalMapWidth = WORLD_BOUNDS * tileS * 3.0f;
+    const int WORLD_BOUNDS = GameConfig::WORLD_BOUNDS;
+    const float tileS = GameConfig::BASE_TILE_SIZE;
 
     auto &cam = Camera::getInstance();
     QPointF camPos = cam.getCurrentPos();
+
+    int viewPortWidth = cam.getViewportWidth() * 3;
 
     for (int q = -WORLD_BOUNDS * 2; q <= WORLD_BOUNDS * 2; ++q)
     {
@@ -425,8 +424,8 @@ void TacticalHUD::updateMinimapCache(int size, int width, int height)
             float worldX = tileS * (1.5f * q);
             float worldY = tileS * (0.866f * q + 1.732f * r);
 
-            float mmX = (size / 2.0f) + (worldX / totalMapWidth) * size;
-            float mmY = (size / 2.0f) + (worldY / totalMapWidth) * size;
+            float mmX = (size / 2.0f) + ((worldX - camPos.x()) / viewPortWidth) * size;
+            float mmY = (size / 2.0f) + ((worldY - camPos.y()) / viewPortWidth) * size;
 
             if (mmX >= 0 && mmX < size && mmY >= 0 && mmY < size)
             {
@@ -436,13 +435,9 @@ void TacticalHUD::updateMinimapCache(int size, int width, int height)
     }
 
     float zoom = cam.getZoom();
-
-    float camMMX = (size / 2.0f) + (camPos.x() / TOTAL_MM_WORLD_WIDTH) * size;
-    float camMMY = (size / 2.0f) + (camPos.y() / TOTAL_MM_WORLD_WIDTH) * size;
-
-    float viewW = (width / zoom) / TOTAL_MM_WORLD_WIDTH * size;
-    float viewH = (height / zoom) / TOTAL_MM_WORLD_WIDTH * size;
+    float viewW = (width / zoom) / viewPortWidth * size;
+    float viewH = (height / zoom) / viewPortWidth * size;
 
     cachePainter.setPen(QPen(Qt::white, 1));
-    cachePainter.drawRect(QRectF(camMMX - viewW / 2.0f, camMMY - viewH / 2.0f, viewW, viewH));
+    cachePainter.drawRect(QRectF((size - viewW) / 2.0f, (size - viewH) / 2.0f, viewW, viewH));
 }

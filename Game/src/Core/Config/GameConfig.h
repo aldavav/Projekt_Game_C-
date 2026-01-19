@@ -42,6 +42,7 @@ namespace GameConfig
     constexpr float MIN_ZOOM = 0.5f;
     constexpr float MAX_ZOOM = 3.0f;
 
+    constexpr int WORLD_BOUNDS = 50;
     constexpr float BASE_TILE_SIZE = 32.0f;
     constexpr int VIEW_RADIUS = 25;
     constexpr int CLOUD_COUNT = 50;

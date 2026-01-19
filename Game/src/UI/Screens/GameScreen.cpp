@@ -135,6 +135,9 @@ void GameScreen::drawMap(QPainter &painter)
     auto &gm = GameManager::getInstance();
     const float BASE_TILE = GameConfig::BASE_TILE_SIZE;
 
+    QPoint mouseLocal = mapFromGlobal(QCursor::pos());
+    QPoint currentHover = cam.screenToHex(mouseLocal);
+
     QPointF topLeft = cam.screenToWorld(QPoint(0, 0));
     QPointF bottomRight = cam.screenToWorld(QPoint(width(), height()));
 
@@ -153,8 +156,11 @@ void GameScreen::drawMap(QPainter &painter)
         for (int r = minR; r <= maxR; ++r)
         {
             Tile &tile = map.getTileAt(q, r);
+
             if (!tile.discovered)
+            {
                 continue;
+            }
 
             QPoint screenPos = cam.toScreen(q, r, BASE_TILE);
 
@@ -163,9 +169,25 @@ void GameScreen::drawMap(QPainter &painter)
                 continue;
 
             bool isSelected = (gm.hasSelection() && q == gm.getSelectedHex().x() && r == gm.getSelectedHex().y());
+            bool isHovered = (q == currentHover.x() && r == currentHover.y());
 
-            painter.setBrush(getTileVisualColor(tile, gm.getGameTime()));
-            painter.setPen(isSelected ? QPen(selectionColor, 2) : QPen(QColor(0, 0, 0, 40), 1));
+            QColor tileColor = getTileVisualColor(tile, gm.getGameTime());
+
+            if (isSelected)
+            {
+                painter.setBrush(tileColor.lighter(150));
+                painter.setPen(QPen(selectionColor, 2));
+            }
+            else if (isHovered)
+            {
+                painter.setBrush(tileColor.lighter(120));
+                painter.setPen(QPen(QColor(255, 255, 255, 180), 1));
+            }
+            else
+            {
+                painter.setBrush(tileColor);
+                painter.setPen(QPen(QColor(0, 0, 0, 40), 1));
+            }
 
             drawHexagon(painter, screenPos, visualRadius);
         }

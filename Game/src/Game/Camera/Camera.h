@@ -50,6 +50,8 @@ public:
     
     QPoint screenToHex(const QPoint& screenPos) const;
 
+    int getViewportWidth() const { return m_viewportWidth; }
+
 private:
     Camera();
 
