@@ -36,13 +36,15 @@ signals:
     void minimapClicked(QPointF worldPos);
 
 private:
-    void drawSelectionBox(QPainter &painter, int height);
+    void drawSelectionBox(QPainter &painter, int width, int height);
 
-    void drawResourceStats(QPainter &painter, int width);
+    void drawResourceStats(QPainter &painter, int width, int height);
 
     void drawMinimap(QPainter &painter, int width, int height);
 
     void drawDayNightCycle(QPainter &painter, int width, int height);
+
+    void drawMinimapCached(QPainter &painter, int width, int height);
 
     QString getTileTypeName(TileType type);
 
@@ -73,6 +75,8 @@ private:
     bool m_minimapNeedsUpdate = true;
 
     QRect m_minimapBox;
+
+    QElapsedTimer m_minimapThrottleTimer;
 };
 
 #endif

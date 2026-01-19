@@ -46,6 +46,8 @@ public:
 
     void revealRadius(int centerQ, int centerR, int radius);
 
+    void debugRevealAll();
+
     std::string getMapName() const { return m_mapName; }
 
     void clear();

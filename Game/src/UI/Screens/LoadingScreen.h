@@ -2,6 +2,7 @@
 #define LOADINGSCREEN_H
 
 #include <UI/Screens/AbstractScreen.h>
+#include <Core/Config/Config.h>
 #include <QProgressBar>
 #include <QVBoxLayout>
 #include <QLabel>

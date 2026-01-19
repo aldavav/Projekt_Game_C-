@@ -1,7 +1,6 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 
-#include <Core/Logger/LoggerMacros.h>
 #include <QSharedPointer>
 #include <QSoundEffect>
 #include <qmutex.h>
@@ -20,9 +19,7 @@ using AudioPtr = QSharedPointer<QSoundEffect>;
 class ResourceManager
 {
 private:
-    ResourceManager();
-
-    ~ResourceManager();
+    ResourceManager() = default;
 
     QMap<QString, TexturePtr> m_textureCache;
 

@@ -24,19 +24,19 @@ public:
     void onExit() override;
 
 private:
-    void setupUI();
-
-    void refreshSaveList();
-
-    void onEntrySelected(QListWidgetItem *item);
-
-    void onLoadClicked();
-
     QListWidget *m_saveList;
 
     QPushButton *m_loadBtn;
 
     QLabel *m_detailsLabel;
+
+    void setupUI();
+
+    void refreshSaveList();
+
+    void onLoadClicked();
+
+    void onEntrySelected(QListWidgetItem *item);
 };
 
 #endif

@@ -24,10 +24,52 @@ void TacticalHUD::update(float gameTime, bool isPaused, GameSpeed speed)
 
 void TacticalHUD::draw(QPainter &painter, int width, int height)
 {
-    drawSelectionBox(painter, height);
-    drawResourceStats(painter, width);
-    drawMinimap(painter, width, height);
+    painter.setRenderHint(QPainter::Antialiasing, false);
+
+    drawSelectionBox(painter, width, height);
+    drawResourceStats(painter, width, height);
+
+    int mmSize = 150, mmMargin = 15;
+    int mmX = width - mmSize - mmMargin;
+    int mmY = mmMargin;
+
+    if (m_minimapNeedsUpdate || m_minimapCache.isNull())
+    {
+        if (!m_minimapThrottleTimer.isValid() || m_minimapThrottleTimer.elapsed() > 100)
+        {
+            updateMinimapCache(mmSize, width, height);
+            m_minimapNeedsUpdate = false;
+            m_minimapThrottleTimer.restart();
+        }
+    }
+
+    painter.drawPixmap(mmX, mmY, m_minimapCache);
+
+    painter.setPen(QPen(QColor("#4FC3F7"), 2));
+    painter.setBrush(Qt::NoBrush);
+    painter.drawRect(mmX, mmY, mmSize, mmSize);
+
     drawDayNightCycle(painter, width, height);
+
+    m_minimapNeedsUpdate = true;
+}
+
+void TacticalHUD::drawMinimapCached(QPainter &painter, int width, int height)
+{
+    int mmSize = 150, mmMargin = 15;
+    int mmX = width - mmSize - mmMargin;
+    int mmY = mmMargin;
+
+    if (m_minimapNeedsUpdate || m_minimapCache.isNull())
+    {
+        updateMinimapCache(mmSize, width, height);
+    }
+
+    painter.drawPixmap(mmX, mmY, m_minimapCache);
+
+    painter.setPen(QPen(Qt::white, 1));
+    int viSize = 20;
+    painter.drawRect(mmX + (mmSize / 2) - (viSize / 2), mmY + (mmSize / 2) - (viSize / 2), viSize, viSize);
 }
 
 bool TacticalHUD::handleMousePress(QMouseEvent *event, int width, int height)
@@ -49,33 +91,34 @@ bool TacticalHUD::handleMousePress(QMouseEvent *event, int width, int height)
         }
     }
 
-    int mmSize = 150;
-    int mmMargin = 15;
+    int mmSize = 150, mmMargin = 15;
     int mmX = width - mmSize - mmMargin;
-    int mmY = height - mmSize - mmMargin;
+    int mmY = mmMargin;
     QRect minimapRect(mmX, mmY, mmSize, mmSize);
 
     if (minimapRect.contains(event->pos()))
     {
-        float localX = event->pos().x() - (mmX + mmSize / 2);
-        float localY = event->pos().y() - (mmY + mmSize / 2);
-
-        const int MM_RANGE = 40;
-        float dotSize = static_cast<float>(mmSize) / (MM_RANGE * 2);
-
-        float q = (2.0f / 3.0f * localX) / dotSize;
-        float r = (-1.0f / 3.0f * localX + std::sqrt(3.0f) / 3.0f * localY) / dotSize;
-
         auto &cam = Camera::getInstance();
-        QPointF camCenter = cam.screenToWorld(QPoint(width / 2, height / 2));
-        emit minimapClicked(QPointF(camCenter.x() + q, camCenter.y() + r));
+
+        float relX = (event->pos().x() - (mmX + mmSize / 2.0f)) / (float)mmSize;
+        float relY = (event->pos().y() - (mmY + mmSize / 2.0f)) / (float)mmSize;
+
+        float viewPortScale = cam.getViewportWidth() * 3.0f;
+
+        QPointF currentCamPos = cam.getCurrentPos();
+
+        float targetWorldX = currentCamPos.x() + (relX * viewPortScale);
+        float targetWorldY = currentCamPos.y() + (relY * viewPortScale);
+
+        cam.setTargetRawPos(QPointF(targetWorldX, targetWorldY));
+
         return true;
     }
 
     return false;
 }
 
-void TacticalHUD::drawSelectionBox(QPainter &painter, int height)
+void TacticalHUD::drawSelectionBox(QPainter &painter, int width, int height)
 {
     int totalSeconds = static_cast<int>(m_gameTime);
     QString timeStr = QString("Game time: %1:%2")
@@ -84,7 +127,9 @@ void TacticalHUD::drawSelectionBox(QPainter &painter, int height)
 
     int boxW = 220;
     int boxH = m_hasSelection ? 130 : 100;
-    QRect boxRect(10, 10, boxW, boxH);
+    int padding = 15;
+
+    QRect boxRect(padding, padding, boxW, boxH);
 
     painter.setBrush(QColor(0, 0, 10, 180));
     painter.setPen(QPen(QColor("#4FC3F7"), 1));
@@ -94,7 +139,10 @@ void TacticalHUD::drawSelectionBox(QPainter &painter, int height)
 
     painter.setPen(Qt::white);
     painter.setFont(QFont("Consolas", 10, QFont::Bold));
-    int startX = 20, startY = 30, lineSpacing = 20;
+
+    int startX = boxRect.x() + 10;
+    int startY = boxRect.y() + 20;
+    int lineSpacing = 20;
 
     painter.drawText(startX, startY, "FPS: " + QString::number(m_fps));
     painter.drawText(startX, startY + lineSpacing, timeStr);
@@ -106,10 +154,10 @@ void TacticalHUD::drawSelectionBox(QPainter &painter, int height)
         Tile &tile = Map::getInstance().getTileAt(sq, sr);
 
         painter.setPen(QColor("#4FC3F7"));
-        painter.drawText(startX, startY + (lineSpacing * 2.5), "--- SELECTION ---");
+        painter.drawText(startX, startY + (lineSpacing * 2.2), "--- SELECTION ---");
         painter.setPen(Qt::white);
-        painter.drawText(startX, startY + (lineSpacing * 3.5), QString("Coords: %1, %2").arg(sq).arg(sr));
-        painter.drawText(startX, startY + (lineSpacing * 4.5), "Type: " + getTileTypeName(tile.type));
+        painter.drawText(startX, startY + (lineSpacing * 3.2), QString("Coords: %1, %2").arg(sq).arg(sr));
+        painter.drawText(startX, startY + (lineSpacing * 4.2), "Type: " + getTileTypeName(tile.type));
     }
     else
     {
@@ -124,13 +172,16 @@ void TacticalHUD::setSelection(QPointF hexCoords, bool hasSelection)
     m_hasSelection = hasSelection;
 }
 
-void TacticalHUD::drawResourceStats(QPainter &painter, int width)
+void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
 {
     auto &map = Map::getInstance();
     auto &stats = map.getStats();
 
-    int rightBoxW = 180, rightBoxH = 120, padding = 10;
-    QRect statsBox(width - rightBoxW - padding, padding, rightBoxW, rightBoxH);
+    int rightBoxW = 180;
+    int rightBoxH = 120;
+    int padding = 15;
+
+    QRect statsBox(width - rightBoxW - padding, height - rightBoxH - padding, rightBoxW, rightBoxH);
 
     painter.setBrush(QColor(0, 0, 0, 160));
     painter.setPen(Qt::NoPen);
@@ -148,11 +199,11 @@ void TacticalHUD::drawResourceStats(QPainter &painter, int width)
     painter.drawText(textX, textY, "RESOURCES DISCOVERED");
 
     painter.setPen(QColor("#FFD600"));
-    painter.drawText(textX, textY + spacing, "Gold Ore:  " + QString::number(stats.oreCount));
+    painter.drawText(textX, textY + spacing, "Gold Ore:   " + QString::number(stats.oreCount));
     painter.setPen(QColor("#81C784"));
     painter.drawText(textX, textY + spacing * 2, "Habitable: " + QString::number(stats.grassCount));
     painter.setPen(QColor("#64B5F6"));
-    painter.drawText(textX, textY + spacing * 3, "Water:     " + QString::number(stats.waterCount));
+    painter.drawText(textX, textY + spacing * 3, "Water:      " + QString::number(stats.waterCount));
 
     painter.setPen(QColor(200, 200, 200, 150));
     painter.setFont(QFont("Consolas", 8));
@@ -166,7 +217,7 @@ void TacticalHUD::drawMinimap(QPainter &painter, int width, int height)
 
     int mmSize = 150, mmMargin = 15;
     int mmX = width - mmSize - mmMargin;
-    int mmY = height - mmSize - mmMargin;
+    int mmY = mmMargin;
 
     painter.setBrush(QColor(0, 0, 0, 200));
     painter.setPen(QPen(QColor("#444444"), 2));
@@ -179,8 +230,9 @@ void TacticalHUD::drawMinimap(QPainter &painter, int width, int height)
     float dotSize = static_cast<float>(mmSize) / (MM_RANGE * 2);
 
     QPointF camCenter = cam.screenToWorld(QPoint(width / 2, height / 2));
-    int cq = static_cast<int>(camCenter.x());
-    int cr = static_cast<int>(camCenter.y());
+    const float size = 32.0f;
+    float cq = (2.0f / 3.0f * camCenter.x()) / size;
+    float cr = (-1.0f / 3.0f * camCenter.x() + std::sqrt(3.0f) / 3.0f * camCenter.y()) / size;
 
     for (int q = cq - MM_RANGE; q <= cq + MM_RANGE; ++q)
     {
@@ -333,46 +385,59 @@ void TacticalHUD::drawScanlines(QPainter &painter, QRect rect)
 void TacticalHUD::updateMinimapCache(int size, int width, int height)
 {
     if (m_minimapCache.size() != QSize(size, size))
-    {
         m_minimapCache = QPixmap(size, size);
-    }
 
-    m_minimapCache.fill(QColor(0, 0, 0, 200));
+    m_minimapCache.fill(QColor(10, 10, 10, 200));
     QPainter cachePainter(&m_minimapCache);
-    cachePainter.setRenderHint(QPainter::Antialiasing, false);
 
     auto &map = Map::getInstance();
+
+    const int WORLD_BOUNDS = GameConfig::WORLD_BOUNDS;
+    const float tileS = GameConfig::BASE_TILE_SIZE;
+
     auto &cam = Camera::getInstance();
+    QPointF camPos = cam.getCurrentPos();
 
-    const int MM_RANGE = 40;
-    float dotSize = static_cast<float>(size) / (MM_RANGE * 2);
+    int viewPortWidth = cam.getViewportWidth() * 3;
 
-    QPointF camCenter = cam.screenToWorld(QPoint(width / 2, height / 2));
-    int cq = static_cast<int>(camCenter.x());
-    int cr = static_cast<int>(camCenter.y());
-
-    for (int q = cq - MM_RANGE; q <= cq + MM_RANGE; ++q)
+    for (int q = -WORLD_BOUNDS * 2; q <= WORLD_BOUNDS * 2; ++q)
     {
-        for (int r = cr - MM_RANGE; r <= cr + MM_RANGE; ++r)
+        int rStart = -WORLD_BOUNDS - (q / 2) - 10;
+        int rEnd = WORLD_BOUNDS - (q / 2) + 10;
+
+        for (int r = rStart; r <= rEnd; ++r)
         {
             Tile &tile = map.getTileAt(q, r);
-            if (!tile.discovered)
+
+            QColor dotColor;
+            if (tile.type == TileType::WATER)
+                dotColor = QColor("#1976D2");
+            else if (tile.type == TileType::GRASS)
+                dotColor = QColor("#388E3C");
+            else if (tile.type == TileType::MOUNTAIN)
+                dotColor = QColor("#757575");
+            else if (tile.type == TileType::DIRT)
+                dotColor = QColor("#795548");
+            else
                 continue;
 
-            QColor dotColor = (tile.type == TileType::WATER) ? QColor("#1976D2") : (tile.type == TileType::GRASS)  ? QColor("#388E3C")
-                                                                               : (tile.type == TileType::MOUNTAIN) ? QColor("#757575")
-                                                                                                                   : QColor("#555555");
+            float worldX = tileS * (1.5f * q);
+            float worldY = tileS * (0.866f * q + 1.732f * r);
 
-            float worldX = (1.5f * q);
-            float worldY = (0.866f * q + 1.732f * r);
-            float centerX = (1.5f * cq);
-            float centerY = (0.866f * cq + 1.732f * cr);
+            float mmX = (size / 2.0f) + ((worldX - camPos.x()) / viewPortWidth) * size;
+            float mmY = (size / 2.0f) + ((worldY - camPos.y()) / viewPortWidth) * size;
 
-            float screenX = (size / 2.0f) + (worldX - centerX) * dotSize;
-            float screenY = (size / 2.0f) + (worldY - centerY) * dotSize;
-
-            cachePainter.fillRect(QRectF(screenX, screenY, dotSize + 1.0f, dotSize + 1.0f), dotColor);
+            if (mmX >= 0 && mmX < size && mmY >= 0 && mmY < size)
+            {
+                cachePainter.fillRect(QRectF(mmX, mmY, 2, 2), dotColor);
+            }
         }
     }
-    m_minimapNeedsUpdate = false;
+
+    float zoom = cam.getZoom();
+    float viewW = (width / zoom) / viewPortWidth * size;
+    float viewH = (height / zoom) / viewPortWidth * size;
+
+    cachePainter.setPen(QPen(Qt::white, 1));
+    cachePainter.drawRect(QRectF((size - viewW) / 2.0f, (size - viewH) / 2.0f, viewW, viewH));
 }

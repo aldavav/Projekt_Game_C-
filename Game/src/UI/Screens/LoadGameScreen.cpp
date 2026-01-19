@@ -13,7 +13,9 @@ void LoadGameScreen::onExit() { this->hide(); }
 void LoadGameScreen::setupUI()
 {
     auto *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(100, 50, 100, 50);
+
+    layout->setContentsMargins(Config::LIST_SCREEN_MARGIN_H, Config::LIST_SCREEN_MARGIN_V,
+                               Config::LIST_SCREEN_MARGIN_H, Config::LIST_SCREEN_MARGIN_V);
 
     QLabel *header = new QLabel(tr("RE-ESTABLISH COMMAND UPLINK"), this);
     header->setObjectName("settingsTitle");
@@ -29,9 +31,11 @@ void LoadGameScreen::setupUI()
 
     QHBoxLayout *btnLayout = new QHBoxLayout();
     m_loadBtn = new QPushButton(tr("RESUME MISSION"));
+    m_loadBtn->setObjectName("applyButton");
     m_loadBtn->setEnabled(false);
 
     QPushButton *backBtn = new QPushButton(tr("BACK"));
+    backBtn->setObjectName("cancelButton");
 
     btnLayout->addWidget(backBtn);
     btnLayout->addWidget(m_loadBtn);
@@ -46,23 +50,18 @@ void LoadGameScreen::setupUI()
 void LoadGameScreen::refreshSaveList()
 {
     m_saveList->clear();
-    QString saveRoot = QCoreApplication::applicationDirPath() + "/saves";
+
+    QString saveRoot = QCoreApplication::applicationDirPath() + Config::SAVE_DIR_NAME;
     QDir dir(saveRoot);
 
-    QStringList folders = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    if (!dir.exists())
+        dir.mkpath(".");
 
+    QStringList folders = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     for (const QString &folder : folders)
     {
-        QListWidgetItem *item = new QListWidgetItem(folder);
-
-        m_saveList->addItem(item);
+        m_saveList->addItem(new QListWidgetItem(folder));
     }
-}
-
-void LoadGameScreen::onEntrySelected(QListWidgetItem *item)
-{
-    m_loadBtn->setEnabled(true);
-    m_detailsLabel->setText(tr("Target Sector: ") + item->text());
 }
 
 void LoadGameScreen::onLoadClicked()
@@ -71,29 +70,27 @@ void LoadGameScreen::onLoadClicked()
         return;
 
     QString selectedMap = m_saveList->currentItem()->text();
-
     auto *loading = new LoadingScreen();
     MenuManager::getInstance().setScreen(loading);
 
-    QTimer::singleShot(100, loading, [selectedMap, loading]()
+    QTimer::singleShot(GameConfig::LOAD_STEP_RETRIEVE, loading, [selectedMap, loading]()
                        {
         loading->setStatus(tr("RETRIEVING SECTOR DATA..."));
         loading->setProgress(25);
 
-        QTimer::singleShot(200, loading, [selectedMap, loading]() {
+        QTimer::singleShot(GameConfig::LOAD_STEP_RECONSTRUCT, loading, [selectedMap, loading]() {
             loading->setStatus(tr("RECONSTRUCTING TERRAIN..."));
             loading->setProgress(60);
             
             GameEngine::getInstance().loadMatch(selectedMap);
 
-            QTimer::singleShot(200, loading, [loading]() {
+            QTimer::singleShot(Config::LOADING_STEP_DELAY, loading, [loading]() {
                 loading->setStatus(tr("SYNCHRONIZING UPLINK..."));
                 loading->setProgress(100);
                 
-                QTimer::singleShot(500, loading, []() {
+                QTimer::singleShot(Config::LOADING_FINAL_PAUSE, loading, []() {
                     auto* game = new GameScreen();
                     MenuManager::getInstance().setScreen(game);
-                    
                     
                     QTimer::singleShot(0, game, [game]() {
                         game->setFocus();
@@ -102,4 +99,10 @@ void LoadGameScreen::onLoadClicked()
                 });
             });
         }); });
+}
+
+void LoadGameScreen::onEntrySelected(QListWidgetItem *item)
+{
+    m_loadBtn->setEnabled(true);
+    m_detailsLabel->setText(tr("Target Sector: ") + item->text());
 }

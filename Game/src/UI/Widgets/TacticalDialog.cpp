@@ -6,7 +6,9 @@ TacticalDialog::TacticalDialog(const QString &title, const QString &message, QWi
     setModal(true);
     setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
     setObjectName("tacticalDialog");
-    setFixedSize(400, 200);
+
+    setFixedSize(Config::DIALOG_WIDTH, Config::DIALOG_HEIGHT);
+
     setupUI(title, message);
 }
 
@@ -32,8 +34,9 @@ void TacticalDialog::setupUI(const QString &title, const QString &message)
     layout->addStretch();
 
     auto *btnLayout = new QHBoxLayout();
-    auto *cancelBtn = new QPushButton("ABORT");
-    auto *confirmBtn = new QPushButton("PROCEED");
+
+    auto *cancelBtn = new QPushButton(Config::STR_ABORT);
+    auto *confirmBtn = new QPushButton(Config::STR_PROCEED);
     confirmBtn->setObjectName("confirmBtn");
 
     confirmBtn->setFocus();

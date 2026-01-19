@@ -3,12 +3,17 @@
 KeyCaptureDialog::KeyCaptureDialog(QWidget *parent)
 {
     setModal(true);
+
     setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
     setObjectName("keyCaptureDialog");
-    setFixedSize(300, 150);
+
+    setFixedSize(Config::KEY_DIALOG_WIDTH, Config::KEY_DIALOG_HEIGHT);
 
     auto *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(20, 20, 20, 20);
+    layout->setContentsMargins(Config::KEY_DIALOG_MARGINS,
+                               Config::KEY_DIALOG_MARGINS,
+                               Config::KEY_DIALOG_MARGINS,
+                               Config::KEY_DIALOG_MARGINS);
 
     auto *infoLabel = new QLabel(tr("Press a key to bind, or ESC to cancel"));
     infoLabel->setObjectName("keyCaptureInfo");
@@ -18,7 +23,10 @@ KeyCaptureDialog::KeyCaptureDialog(QWidget *parent)
 
 void KeyCaptureDialog::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Control || event->key() == Qt::Key_Shift || event->key() == Qt::Key_Alt)
+    if (event->key() == Qt::Key_Control ||
+        event->key() == Qt::Key_Shift ||
+        event->key() == Qt::Key_Alt ||
+        event->key() == Qt::Key_Meta)
         return;
 
     if (event->key() == Qt::Key_Escape)

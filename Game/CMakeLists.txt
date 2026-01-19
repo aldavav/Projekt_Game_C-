@@ -20,9 +20,12 @@ set(SRC_MAIN
 )
 
 set(SRC_CORE
+    src/Core/Assets/AssetManager.cpp
     src/Core/Assets/AssetManager.h
+    src/Core/Assets/CursorTypes.h
     src/Core/Common/AnsiCodes.h
     src/Core/Common/KeyCodes.h
+    src/Core/Config/Config.h
     src/Core/Config/ConfigTypes.h
     src/Core/Config/ControlTypes.h
     src/Core/Config/GameConfig.h

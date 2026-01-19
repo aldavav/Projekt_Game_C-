@@ -18,6 +18,8 @@ public:
 
     void setTargetPos(QPointF worldPos);
 
+    void setTargetRawPos(QPointF worldPos);
+
     QPointF getCurrentPos();
 
     static constexpr float MIN_ZOOM = 0.75f;
@@ -47,6 +49,8 @@ public:
     void shake(float intensity) { m_shakeIntensity = intensity; }
     
     QPoint screenToHex(const QPoint& screenPos) const;
+
+    int getViewportWidth() const { return m_viewportWidth; }
 
 private:
     Camera();

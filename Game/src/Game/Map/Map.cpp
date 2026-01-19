@@ -183,3 +183,14 @@ void Map::revealRadius(int centerQ, int centerR, int radius)
         }
     }
 }
+
+// Temporary debug function in Map.cpp to test the HUD
+void Map::debugRevealAll() {
+    for (auto& pair : m_chunks) {
+        for (int x = 0; x < Chunk::SIZE; ++x) {
+            for (int y = 0; y < Chunk::SIZE; ++y) {
+                pair.second->tiles[x][y].discovered = true;
+            }
+        }
+    }
+}

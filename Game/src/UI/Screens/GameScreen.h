@@ -3,6 +3,8 @@
 
 #include <UI/Screens/AbstractScreen.h>
 #include <UI/Manager/GameManager.h>
+#include <Core/Config/GameConfig.h>
+#include <Core/Config/Config.h>
 #include <qpainter.h>
 #include <QPolygonF>
 #include <QPointF>
@@ -63,7 +65,7 @@ private:
 
     void drawHexagon(QPainter &painter, QPoint center, float radius);
 
-    void drawClouds(QPainter &painter, Camera &cam, float gameTime, float zoom, float dayCycle);
+    void drawClouds(QPainter &painter, Camera &cam, float gameTime, float zoom);
 
     QColor getTileVisualColor(const Tile &tile, float gameTime);
 

@@ -1,6 +1,8 @@
 #ifndef CONFIGTYPES_H
 #define CONFIGTYPES_H
 
+#include <Core/Config/GameConfig.h>
+
 struct GameSettings
 {
     int languageIndex = 1;
@@ -12,7 +14,7 @@ struct GameSettings
     bool vsync = true;
 
     int textureQualityIndex = 2;
-    int gamma = 50;
+    int gamma = GameConfig::GAMMA_DEFAULT;
 
     int masterVol = 75;
     int musicVol = 75;

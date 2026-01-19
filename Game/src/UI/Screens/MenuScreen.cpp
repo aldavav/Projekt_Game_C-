@@ -93,28 +93,7 @@ void MenuScreen::onSettingsClicked()
 
 void MenuScreen::onHelpClicked()
 {
-    const QString helpContent = R"(CONTROLS:
- - Left Click: Select unit / structure / hex
- - Left Click Drag: Box select multiple units
- - Right Click: Issue command / move / interact
- - Right Click Drag: Pan camera
- - Scroll Wheel: Zoom in / out
-
-COMMANDS:
- - Attack: Right click on enemy target
- - Move: Right click on terrain
- - Stop: Cancel current order
-
-BASE OPERATIONS:
- - Construct buildings to unlock units and upgrades
- - Protect resource structures to maintain economy
-
-STRATEGIC OBJECTIVE:
- - Explore fogged areas to reveal the battlefield
- - Secure resources to expand your forces
- - Eliminate enemy presence to achieve victory)";
-
-    updatePanelContent("SYSTEM MANUAL", helpContent);
+    updatePanelContent(Config::MANUAL_TITLE, Config::MANUAL_TEXT);
 }
 
 void MenuScreen::onCreditsClicked()
@@ -143,7 +122,7 @@ void MenuScreen::setupUI()
 {
     auto *mainLayout = new QVBoxLayout(this);
     mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    mainLayout->setContentsMargins(200, 20, 40, 40);
+    mainLayout->setContentsMargins(Config::MENU_LEFT_MARGIN, 20, 40, 40);
 
     auto *titleLabel = new QLabel(Config::GAME_TITLE, this);
     titleLabel->setObjectName("mainMenuTitle");
@@ -236,8 +215,8 @@ void MenuScreen::setupBackground()
     m_backgroundLabel = new QLabel(this);
     m_backgroundLabel->setScaledContents(true);
 
-    m_bgMovie = new QMovie(":/animations/assets/animations/menu.gif");
-    m_bgMovie->setSpeed(50);
+    m_bgMovie = new QMovie(Config::PATH_MENU_BG);
+    m_bgMovie->setSpeed(Config::BG_ANIM_SPEED);
     m_bgMovie->setCacheMode(QMovie::CacheAll);
     m_backgroundLabel->setMovie(m_bgMovie);
 

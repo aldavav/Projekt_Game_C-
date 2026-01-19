@@ -5,17 +5,18 @@ LoadingScreen::LoadingScreen(QWidget *parent) : AbstractScreen(parent)
     auto *layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    QLabel *title = new QLabel(tr("ESTABLISHING UPLINK..."), this);
+    QLabel *title = new QLabel(tr(Config::DEFAULT_UPLINK_TEXT.toUtf8()), this);
     title->setObjectName("loadingTitle");
     title->setAlignment(Qt::AlignCenter);
 
     m_progressBar = new QProgressBar(this);
     m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
-    m_progressBar->setFixedSize(560, 30);
+
+    m_progressBar->setFixedSize(Config::LOADING_BAR_WIDTH, Config::LOADING_BAR_HEIGHT);
     m_progressBar->setTextVisible(false);
 
-    m_statusLabel = new QLabel(tr("INITIALIZING ENGINE..."), this);
+    m_statusLabel = new QLabel(tr(Config::DEFAULT_STATUS_TEXT.toUtf8()), this);
     m_statusLabel->setObjectName("statusLabel");
     m_statusLabel->setAlignment(Qt::AlignCenter);
 

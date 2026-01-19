@@ -12,6 +12,7 @@
 #include <UI/Manager/ConfigManager.h>
 #include <UI/Manager/MenuManager.h>
 #include <Core/Common/KeyCodes.h>
+#include <Core/Config/Config.h>
 #include <qpushbutton.h>
 #include <qformlayout.h>
 #include <qtabwidget.h>
@@ -50,6 +51,8 @@ private:
     void retranslateUi();
 
     void changeEvent(QEvent *event);
+
+    void markDirty();
 
     QWidget *createGameTab();
 
