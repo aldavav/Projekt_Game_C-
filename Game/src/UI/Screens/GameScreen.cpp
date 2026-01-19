@@ -94,7 +94,19 @@ void GameScreen::resizeEvent(QResizeEvent *event)
 
 void GameScreen::keyPressEvent(QKeyEvent *event)
 {
-    m_pressedKeys.insert(event->key());
+    if (event->key() == Qt::Key_F3)
+    {
+        auto &gm = GameManager::getInstance();
+        if (gm.getHUD())
+        {
+            gm.getHUD()->toggleDiagnostics();
+            update();
+        }
+    }
+    else
+    {
+        m_pressedKeys.insert(event->key());
+    }
 }
 
 void GameScreen::keyReleaseEvent(QKeyEvent *event)
@@ -131,12 +143,19 @@ void GameScreen::updateGameDisplay()
 void GameScreen::drawMap(QPainter &painter)
 {
     auto &cam = Camera::getInstance();
-    auto &map = Map::getInstance();
     auto &gm = GameManager::getInstance();
-    const float BASE_TILE = GameConfig::BASE_TILE_SIZE;
+    auto &map = Map::getInstance();
+    auto *hud = gm.getHUD();
 
     QPoint mouseLocal = mapFromGlobal(QCursor::pos());
-    QPoint currentHover = cam.screenToHex(mouseLocal);
+    QPointF mouseWorld = cam.screenToWorld(mouseLocal);
+
+    const float BASE_TILE = GameConfig::BASE_TILE_SIZE;
+    float hq = (2.0f / 3.0f * mouseWorld.x()) / BASE_TILE;
+    float hr = (-1.0f / 3.0f * mouseWorld.x() + std::sqrt(3.0f) / 3.0f * mouseWorld.y()) / BASE_TILE;
+    QPoint currentHover = cam.hexRound(hq, hr).toPoint();
+
+    hud->setDiagnosticsData(mouseLocal, mouseWorld, currentHover);
 
     QPointF topLeft = cam.screenToWorld(QPoint(0, 0));
     QPointF bottomRight = cam.screenToWorld(QPoint(width(), height()));

@@ -26,7 +26,10 @@ void TacticalHUD::draw(QPainter &painter, int width, int height)
 {
     painter.setRenderHint(QPainter::Antialiasing, false);
 
-    drawSelectionBox(painter, width, height);
+    if (m_showDiagnostics)
+    {
+        drawDiagnostics(painter, width, height);
+    }
     drawResourceStats(painter, width, height);
 
     int mmSize = Config::HUD_MINIMAP_SIZE, mmMargin = Config::HUD_MARGIN;
@@ -118,54 +121,6 @@ bool TacticalHUD::handleMousePress(QMouseEvent *event, int width, int height)
     return false;
 }
 
-void TacticalHUD::drawSelectionBox(QPainter &painter, int width, int height)
-{
-    int totalSeconds = static_cast<int>(m_gameTime);
-    QString timeStr = QString("Game time: %1:%2")
-                          .arg(totalSeconds / 60, 2, 10, QChar('0'))
-                          .arg(totalSeconds % 60, 2, 10, QChar('0'));
-
-    int boxW = Config::HUD_BOX_WIDTH;
-    int boxH = m_hasSelection ? 130 : 100;
-    int padding = 15;
-
-    QRect boxRect(padding, padding, boxW, boxH);
-
-    painter.setBrush(QColor(0, 0, 10, 180));
-    painter.setPen(QPen(QColor(Config::COLOR_TACTICAL_BLUE), 1));
-    painter.drawRoundedRect(boxRect, 5, 5);
-
-    drawScanlines(painter, boxRect);
-
-    painter.setPen(Qt::white);
-    painter.setFont(QFont("Consolas", 10, QFont::Bold));
-
-    int startX = boxRect.x() + 10;
-    int startY = boxRect.y() + 20;
-    int lineSpacing = 20;
-
-    painter.drawText(startX, startY, "FPS: " + QString::number(m_fps));
-    painter.drawText(startX, startY + lineSpacing, timeStr);
-
-    if (m_hasSelection)
-    {
-        int sq = static_cast<int>(m_selectedHex.x());
-        int sr = static_cast<int>(m_selectedHex.y());
-        Tile &tile = Map::getInstance().getTileAt(sq, sr);
-
-        painter.setPen(QColor(Config::COLOR_TACTICAL_BLUE));
-        painter.drawText(startX, startY + (lineSpacing * 2.2), "--- SELECTION ---");
-        painter.setPen(Qt::white);
-        painter.drawText(startX, startY + (lineSpacing * 3.2), QString("Coords: %1, %2").arg(sq).arg(sr));
-        painter.drawText(startX, startY + (lineSpacing * 4.2), "Type: " + getTileTypeName(tile.type));
-    }
-    else
-    {
-        painter.setPen(Qt::gray);
-        painter.drawText(startX, startY + (lineSpacing * 3), "No Selection");
-    }
-}
-
 void TacticalHUD::setSelection(QPointF hexCoords, bool hasSelection)
 {
     m_selectedHex = hexCoords;
@@ -174,40 +129,69 @@ void TacticalHUD::setSelection(QPointF hexCoords, bool hasSelection)
 
 void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
 {
-    auto &map = Map::getInstance();
-    auto &stats = map.getStats();
-
-    int rightBoxW = Config::HUD_STATS_WIDTH;
-    int rightBoxH = 120;
+    int rightBoxW = Config::HUD_STATS_WIDTH * 2;
+    int rightBoxH = 110;
     int padding = 15;
-
     QRect statsBox(width - rightBoxW - padding, height - rightBoxH - padding, rightBoxW, rightBoxH);
 
-    painter.setBrush(QColor(0, 0, 0, 160));
-    painter.setPen(Qt::NoPen);
-    painter.drawRoundedRect(statsBox, 5, 5);
-
+    painter.setBrush(QColor(0, 5, 10, 190));
+    painter.setPen(QPen(QColor(Config::COLOR_TACTICAL_BLUE), 1));
+    painter.drawRoundedRect(statsBox, 2, 2);
     drawScanlines(painter, statsBox);
 
-    painter.setPen(Qt::white);
-    painter.setFont(QFont("Consolas", 9, QFont::Bold));
+    int textX = statsBox.x() + 12;
+    int textY = statsBox.y() + 22;
+    int spacing = 20;
+    painter.setFont(QFont("Consolas", 10, QFont::Bold));
 
-    int textX = statsBox.x() + 10;
-    int textY = statsBox.y() + 25;
-    int spacing = 18;
+    if (m_hasSelection)
+    {
+        int sq = static_cast<int>(m_selectedHex.x());
+        int sr = static_cast<int>(m_selectedHex.y());
+        Tile &tile = Map::getInstance().getTileAt(sq, sr);
 
-    painter.drawText(textX, textY, "RESOURCES DISCOVERED");
+        painter.setPen(QColor(Config::COLOR_TACTICAL_BLUE));
+        painter.drawText(textX, textY, ">> TACTICAL INTEL");
 
-    painter.setPen(QColor(Config::COLOR_GOLD_ORE));
-    painter.drawText(textX, textY + spacing, "Gold Ore:   " + QString::number(stats.oreCount));
-    painter.setPen(QColor(Config::COLOR_HABITABLE));
-    painter.drawText(textX, textY + spacing * 2, "Habitable: " + QString::number(stats.grassCount));
-    painter.setPen(QColor(Config::COLOR_WATER_INFO));
-    painter.drawText(textX, textY + spacing * 3, "Water:      " + QString::number(stats.waterCount));
+        painter.setPen(Qt::white);
+        painter.setFont(QFont("Consolas", 9));
+        painter.drawText(textX, textY + spacing, "CLASSIFICATION: " + getTileTypeName(tile.type).toUpper());
 
-    painter.setPen(QColor(200, 200, 200, 150));
-    painter.setFont(QFont("Consolas", 8));
-    painter.drawText(textX, textY + spacing * 4 + 5, "Seed: " + QString::number(map.getSeed()));
+        painter.setPen(QColor(200, 200, 200, 200));
+        QString statusLine;
+        if (tile.type == TileType::WATER)
+        {
+            painter.setPen(QColor(Config::COLOR_WATER_INFO));
+            statusLine = "ANALYSIS: H2O Sourced - Cooling Available";
+        }
+        else if (tile.type == TileType::MOUNTAIN)
+        {
+            painter.setPen(QColor(200, 100, 50));
+            statusLine = "ANALYSIS: High Mineral Density Detected";
+        }
+        else if (tile.type == TileType::GRASS)
+        {
+            painter.setPen(QColor(Config::COLOR_HABITABLE));
+            statusLine = "ANALYSIS: Bio-Habitable Terrain";
+        }
+        else
+        {
+            statusLine = "ANALYSIS: Standard Surface Composition";
+        }
+
+        painter.drawText(textX, textY + (spacing * 2), statusLine);
+
+        painter.setPen(QColor(Config::COLOR_TACTICAL_BLUE));
+        painter.drawText(textX, textY + (spacing * 3.2), "STATUS: SECURE");
+    }
+    else
+    {
+        painter.setPen(QColor(100, 100, 100));
+        painter.drawText(textX, textY, ">> SYSTEM STANDBY");
+        painter.setFont(QFont("Consolas", 8));
+        painter.drawText(textX, textY + spacing, "NO ACTIVE SELECTION DETECTED...");
+        painter.drawText(textX, textY + spacing * 2, "AWAITING TARGET COORDINATES");
+    }
 }
 
 void TacticalHUD::drawMinimap(QPainter &painter, int width, int height)
@@ -354,6 +338,38 @@ void TacticalHUD::drawDayNightCycle(QPainter &painter, int width, int height)
         painter.setPen(Qt::red);
         painter.drawText(rectX + boxW - 65, rectY + 25, "PAUSED");
     }
+}
+
+void TacticalHUD::drawDiagnostics(QPainter &painter, int width, int height)
+{
+    int boxW = 250;
+    int boxH = 100;
+    int padding = Config::HUD_MARGIN;
+
+    QRect diagRect(padding, padding, boxW, boxH);
+
+    painter.setBrush(QColor(0, 0, 0, 160));
+    painter.setPen(QPen(QColor(Config::COLOR_TACTICAL_BLUE), 1));
+    painter.drawRoundedRect(diagRect, 2, 2);
+    drawScanlines(painter, diagRect);
+
+    painter.setPen(Qt::white);
+    painter.setFont(QFont("Consolas", 9));
+
+    int x = diagRect.x() + 10;
+    int y = diagRect.y() + 20;
+    int step = 18;
+
+    painter.setPen(m_fps < 30 ? Qt::red : QColor(Config::COLOR_TACTICAL_BLUE));
+    painter.drawText(x, y, QString("FPS: %1").arg(m_fps));
+
+    painter.setPen(Qt::white);
+    painter.drawText(x, y + step, QString("SCREEN XY: [%1, %2]").arg(m_mouseScreenPos.x()).arg(m_mouseScreenPos.y()));
+
+    painter.drawText(x, y + step * 2, QString("WORLD  XY: [%1, %2]").arg(static_cast<int>(m_mouseWorldPos.x())).arg(static_cast<int>(m_mouseWorldPos.y())));
+
+    painter.setPen(QColor(Config::COLOR_HABITABLE));
+    painter.drawText(x, y + step * 3, QString("TILE   QR: %1, %2").arg(m_hoveredHex.x()).arg(m_hoveredHex.y()));
 }
 
 QString TacticalHUD::getTileTypeName(TileType type)

@@ -31,6 +31,15 @@ public:
 
     void setSelection(QPointF hexCoords, bool hasSelection);
 
+    void setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos)
+    {
+        m_hoveredHex = hoveredHex;
+        m_mouseWorldPos = mouseWorldPos;
+        m_mouseScreenPos = mouseScreenPos;
+    }
+
+    void toggleDiagnostics() { m_showDiagnostics = !m_showDiagnostics; }
+
 signals:
     void hudButtonClicked(int buttonIndex);
 
@@ -44,6 +53,8 @@ private:
     void drawMinimap(QPainter &painter, int width, int height);
 
     void drawDayNightCycle(QPainter &painter, int width, int height);
+
+    void drawDiagnostics(QPainter &painter, int width, int height);
 
     void drawMinimapCached(QPainter &painter, int width, int height);
 
@@ -78,6 +89,14 @@ private:
     QRect m_minimapBox;
 
     QElapsedTimer m_minimapThrottleTimer;
+
+    QPoint m_hoveredHex;
+    
+    QPointF m_mouseWorldPos;
+    
+    QPoint m_mouseScreenPos;
+
+    bool m_showDiagnostics = false;
 };
 
 #endif
