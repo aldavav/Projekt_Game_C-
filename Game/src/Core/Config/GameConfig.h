@@ -50,8 +50,19 @@ namespace GameConfig
     constexpr float DAY_CYCLE_DURATION = 60.0f;
 
     constexpr float WATER_WAVE_SPEED = 2.0f;
-    constexpr int   WATER_BRIGHTNESS_BASE = 100;
-    constexpr int   WATER_BRIGHTNESS_SWING = 20;
+    constexpr int WATER_BRIGHTNESS_BASE = 100;
+    constexpr int WATER_BRIGHTNESS_SWING = 20;
+
+    constexpr int MINIMAP_UPDATE_MS = 100;
+    constexpr int MINIMAP_RANGE = 40;
+
+    const QString COLOR_PHASE_NOON = "#FFD600";
+    const QString COLOR_PHASE_AFTERNOON = "#FFA000";
+    const QString COLOR_PHASE_EVENING = "#FF5722";
+    const QString COLOR_PHASE_NIGHT = "#3F51B5";
+    const QString COLOR_PHASE_MIDNIGHT = "#1A237E";
+
+    constexpr int SCANLINE_SPACING = 3;
 }
 
 #endif

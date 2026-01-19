@@ -29,13 +29,13 @@ void TacticalHUD::draw(QPainter &painter, int width, int height)
     drawSelectionBox(painter, width, height);
     drawResourceStats(painter, width, height);
 
-    int mmSize = 150, mmMargin = 15;
+    int mmSize = Config::HUD_MINIMAP_SIZE, mmMargin = Config::HUD_MARGIN;
     int mmX = width - mmSize - mmMargin;
     int mmY = mmMargin;
 
     if (m_minimapNeedsUpdate || m_minimapCache.isNull())
     {
-        if (!m_minimapThrottleTimer.isValid() || m_minimapThrottleTimer.elapsed() > 100)
+        if (!m_minimapThrottleTimer.isValid() || m_minimapThrottleTimer.elapsed() > GameConfig::MINIMAP_UPDATE_MS)
         {
             updateMinimapCache(mmSize, width, height);
             m_minimapNeedsUpdate = false;
@@ -45,7 +45,7 @@ void TacticalHUD::draw(QPainter &painter, int width, int height)
 
     painter.drawPixmap(mmX, mmY, m_minimapCache);
 
-    painter.setPen(QPen(QColor("#4FC3F7"), 2));
+    painter.setPen(QPen(QColor(Config::COLOR_TACTICAL_BLUE), 2));
     painter.setBrush(Qt::NoBrush);
     painter.drawRect(mmX, mmY, mmSize, mmSize);
 
@@ -56,7 +56,7 @@ void TacticalHUD::draw(QPainter &painter, int width, int height)
 
 void TacticalHUD::drawMinimapCached(QPainter &painter, int width, int height)
 {
-    int mmSize = 150, mmMargin = 15;
+    int mmSize = Config::HUD_MINIMAP_SIZE, mmMargin = Config::HUD_MARGIN;
     int mmX = width - mmSize - mmMargin;
     int mmY = mmMargin;
 
@@ -91,7 +91,7 @@ bool TacticalHUD::handleMousePress(QMouseEvent *event, int width, int height)
         }
     }
 
-    int mmSize = 150, mmMargin = 15;
+    int mmSize = Config::HUD_MINIMAP_SIZE, mmMargin = Config::HUD_MARGIN;
     int mmX = width - mmSize - mmMargin;
     int mmY = mmMargin;
     QRect minimapRect(mmX, mmY, mmSize, mmSize);
@@ -125,14 +125,14 @@ void TacticalHUD::drawSelectionBox(QPainter &painter, int width, int height)
                           .arg(totalSeconds / 60, 2, 10, QChar('0'))
                           .arg(totalSeconds % 60, 2, 10, QChar('0'));
 
-    int boxW = 220;
+    int boxW = Config::HUD_BOX_WIDTH;
     int boxH = m_hasSelection ? 130 : 100;
     int padding = 15;
 
     QRect boxRect(padding, padding, boxW, boxH);
 
     painter.setBrush(QColor(0, 0, 10, 180));
-    painter.setPen(QPen(QColor("#4FC3F7"), 1));
+    painter.setPen(QPen(QColor(Config::COLOR_TACTICAL_BLUE), 1));
     painter.drawRoundedRect(boxRect, 5, 5);
 
     drawScanlines(painter, boxRect);
@@ -153,7 +153,7 @@ void TacticalHUD::drawSelectionBox(QPainter &painter, int width, int height)
         int sr = static_cast<int>(m_selectedHex.y());
         Tile &tile = Map::getInstance().getTileAt(sq, sr);
 
-        painter.setPen(QColor("#4FC3F7"));
+        painter.setPen(QColor(Config::COLOR_TACTICAL_BLUE));
         painter.drawText(startX, startY + (lineSpacing * 2.2), "--- SELECTION ---");
         painter.setPen(Qt::white);
         painter.drawText(startX, startY + (lineSpacing * 3.2), QString("Coords: %1, %2").arg(sq).arg(sr));
@@ -177,7 +177,7 @@ void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
     auto &map = Map::getInstance();
     auto &stats = map.getStats();
 
-    int rightBoxW = 180;
+    int rightBoxW = Config::HUD_STATS_WIDTH;
     int rightBoxH = 120;
     int padding = 15;
 
@@ -198,11 +198,11 @@ void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
 
     painter.drawText(textX, textY, "RESOURCES DISCOVERED");
 
-    painter.setPen(QColor("#FFD600"));
+    painter.setPen(QColor(Config::COLOR_GOLD_ORE));
     painter.drawText(textX, textY + spacing, "Gold Ore:   " + QString::number(stats.oreCount));
-    painter.setPen(QColor("#81C784"));
+    painter.setPen(QColor(Config::COLOR_HABITABLE));
     painter.drawText(textX, textY + spacing * 2, "Habitable: " + QString::number(stats.grassCount));
-    painter.setPen(QColor("#64B5F6"));
+    painter.setPen(QColor(Config::COLOR_WATER_INFO));
     painter.drawText(textX, textY + spacing * 3, "Water:      " + QString::number(stats.waterCount));
 
     painter.setPen(QColor(200, 200, 200, 150));
@@ -215,7 +215,7 @@ void TacticalHUD::drawMinimap(QPainter &painter, int width, int height)
     auto &map = Map::getInstance();
     auto &cam = Camera::getInstance();
 
-    int mmSize = 150, mmMargin = 15;
+    int mmSize = Config::HUD_MINIMAP_SIZE, mmMargin = Config::HUD_MARGIN;
     int mmX = width - mmSize - mmMargin;
     int mmY = mmMargin;
 
@@ -226,7 +226,7 @@ void TacticalHUD::drawMinimap(QPainter &painter, int width, int height)
     painter.save();
     painter.setClipRect(mmX, mmY, mmSize, mmSize);
 
-    const int MM_RANGE = 40;
+    const int MM_RANGE = GameConfig::MINIMAP_RANGE;
     float dotSize = static_cast<float>(mmSize) / (MM_RANGE * 2);
 
     QPointF camCenter = cam.screenToWorld(QPoint(width / 2, height / 2));
@@ -290,27 +290,27 @@ void TacticalHUD::drawDayNightCycle(QPainter &painter, int width, int height)
     if (cycleVal < 0.2f)
     {
         phaseText = "NOON";
-        phaseColor = QColor("#FFD600");
+        phaseColor = QColor(GameConfig::COLOR_PHASE_NOON);
     }
     else if (cycleVal < 0.4f)
     {
         phaseText = "AFTERNOON";
-        phaseColor = QColor("#FFA000");
+        phaseColor = QColor(GameConfig::COLOR_PHASE_AFTERNOON);
     }
     else if (cycleVal < 0.6f)
     {
         phaseText = "EVENING";
-        phaseColor = QColor("#FF5722");
+        phaseColor = QColor(GameConfig::COLOR_PHASE_EVENING);
     }
     else if (cycleVal < 0.8f)
     {
         phaseText = "NIGHT";
-        phaseColor = QColor("#3F51B5");
+        phaseColor = QColor(GameConfig::COLOR_PHASE_NIGHT);
     }
     else
     {
         phaseText = "MIDNIGHT";
-        phaseColor = QColor("#1A237E");
+        phaseColor = QColor(GameConfig::COLOR_PHASE_MIDNIGHT);
     }
 
     int margin = 20;
@@ -398,7 +398,7 @@ void TacticalHUD::updateMinimapCache(int size, int width, int height)
     auto &cam = Camera::getInstance();
     QPointF camPos = cam.getCurrentPos();
 
-    int viewPortWidth = cam.getViewportWidth() * 3;
+    int viewPortWidth = cam.getViewportWidth() * GameConfig::SCANLINE_SPACING;
 
     for (int q = -WORLD_BOUNDS * 2; q <= WORLD_BOUNDS * 2; ++q)
     {

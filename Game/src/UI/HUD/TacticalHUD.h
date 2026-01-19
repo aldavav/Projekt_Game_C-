@@ -4,6 +4,7 @@
 #include <Core/Config/GameConfig.h>
 #include <Game/Engine/GameSpeed.h>
 #include <Game/Camera/Camera.h>
+#include <Core/Config/Config.h>
 #include <Game/Map/Map.h>
 #include <QElapsedTimer>
 #include <qpainter.h>

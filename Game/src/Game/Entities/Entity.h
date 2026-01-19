@@ -15,7 +15,7 @@ class Entity
 protected:
     std::string m_name;
 
-    EntityType m_type;
+    EntityTypes::EntityType m_type;
 
     std::string m_symbol;
 
@@ -28,7 +28,7 @@ protected:
     float m_speed = 200.0f;
 
 public:
-    Entity(EntityType type, const std::string &name, const std::string &symbol, Player *owner = nullptr);
+    Entity(EntityTypes::EntityType type, const std::string &name, const std::string &symbol, Player *owner = nullptr);
 
     virtual ~Entity() = default;
 
@@ -44,7 +44,7 @@ public:
 
     void setTarget(const QPointF &target) { m_targetPosition = target; }
 
-    EntityType getType() const { return m_type; }
+    EntityTypes::EntityType getType() const { return m_type; }
 
     std::string getName() const { return m_name; }
 

@@ -112,6 +112,16 @@ STRATEGIC OBJECTIVE:
 
     constexpr int BTN_X_NORMAL = 100;
     constexpr int BTN_X_HOVER = 92;
+
+    constexpr int HUD_MARGIN = 15;
+    constexpr int HUD_MINIMAP_SIZE = 150;
+    constexpr int HUD_BOX_WIDTH = 220;
+    constexpr int HUD_STATS_WIDTH = 180;
+
+    const QString COLOR_TACTICAL_BLUE = "#4FC3F7";
+    const QString COLOR_GOLD_ORE = "#FFD600";
+    const QString COLOR_HABITABLE = "#81C784";
+    const QString COLOR_WATER_INFO = "#64B5F6";
 }
 
 #endif
