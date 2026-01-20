@@ -58,16 +58,16 @@ MainWindow::MainWindow(QWidget *parent)
                                  loadLegalDoc(Config::PATH_EULA), 
                                  tr("TERMS OF SERVICE"), 
                                  loadLegalDoc(Config::PATH_TOS));
+                                InformationDialog dialog(tr("LEGAL PROTOCOLS"), combinedLegal, this);
 
-                        InformationDialog dialog(tr("LEGAL PROTOCOLS"), combinedLegal, this);
-                        
-                        if (dialog.exec() == QDialog::Accepted) {
-                            config.getSettings().legalAccepted = true;
-                            config.saveConfiguration();
-                            MenuManager::getInstance().setScreen(new MenuScreen(m_centralWidget));
-                        } else {
-                            QCoreApplication::exit(0);
-                        }
+                                if (dialog.exec() == QDialog::Accepted) {
+                                    config.getSettings().legalAccepted = true;
+                                    config.saveConfiguration();
+                                    
+                                    MenuManager::getInstance().setScreen(new MenuScreen(m_centralWidget));
+                                } else {
+                                    QCoreApplication::quit();
+                                }
                     } else {
                         MenuManager::getInstance().setScreen(new MenuScreen(m_centralWidget));
                     }
@@ -135,8 +135,8 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     TacticalDialog quitDialog(
-        "TERMINATE SESSION",
-        "Are you sure you want to disconnect from the command uplink?",
+        tr("TERMINATE CONNECTION"),
+        tr("ARE YOU SURE YOU WANT TO DISCONNECT FROM THE COMMAND UPLINK? \nUNSAVED PROGRESS WILL BE LOST."),
         this);
 
     if (quitDialog.exec() == QDialog::Accepted)
@@ -240,40 +240,42 @@ void MainWindow::applyDisplaySettings()
 {
     auto &cfg = ConfigManager::getInstance().getSettings();
 
-    this->hide();
+    Qt::WindowFlags flags = Qt::Window;
+
+    if (cfg.windowModeIndex == 1)
+    {
+        flags |= Qt::FramelessWindowHint;
+    }
+    else if (cfg.windowModeIndex == 2)
+    {
+        flags |= (Qt::WindowTitleHint | Qt::WindowSystemMenuHint |
+                  Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint);
+    }
+
+    this->setWindowFlags(flags);
 
     if (cfg.windowModeIndex == 0)
     {
-        setWindowFlags(Qt::Window);
-        this->show();
         this->showFullScreen();
     }
     else if (cfg.windowModeIndex == 1)
     {
-        setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-
-        this->show();
         this->showMaximized();
-
-        QScreen *screen = QGuiApplication::primaryScreen();
-        if (screen)
+        if (QScreen *screen = QGuiApplication::primaryScreen())
         {
             this->setGeometry(screen->geometry());
         }
     }
     else
     {
-        setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint);
-
         QStringList res = DisplaySettingsManager::getInstance().getAvailableResolutions();
         if (cfg.resolutionIndex < res.size())
         {
             QStringList parts = res[cfg.resolutionIndex].split('x');
-            this->resize(parts[0].toInt(), parts[1].toInt());
+            this->setFixedSize(parts[0].toInt(), parts[1].toInt());
         }
-
-        this->show();
         this->showNormal();
         centerOnScreen();
     }
+    this->show();
 }

@@ -13,6 +13,7 @@
 #include <QDialog>
 #include <QLabel>
 #include <QFrame>
+#include <QTimer>
 
 class InformationDialog : public QDialog
 {

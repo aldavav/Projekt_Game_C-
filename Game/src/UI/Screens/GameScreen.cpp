@@ -1,4 +1,6 @@
 #include "GameScreen.h"
+#include <UI/Widgets/TacticalDialog.h>
+#include <UI/Manager/MenuManager.h>
 
 GameScreen::GameScreen(QWidget *parent)
     : AbstractScreen(parent), m_updateTimer(new QTimer(this))
@@ -31,11 +33,16 @@ void GameScreen::onExit()
 void GameScreen::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
+
     painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
     drawMap(painter);
 
-    GameManager::getInstance().getHUD()->draw(painter, width(), height());
+    if (auto *hud = GameManager::getInstance().getHUD())
+    {
+        hud->draw(painter, width(), height());
+    }
 }
 
 void GameScreen::mousePressEvent(QMouseEvent *event)
@@ -94,7 +101,53 @@ void GameScreen::resizeEvent(QResizeEvent *event)
 
 void GameScreen::keyPressEvent(QKeyEvent *event)
 {
-    m_pressedKeys.insert(event->key());
+    if (event->key() == Qt::Key_Escape)
+    {
+        TacticalDialog pauseMenu(tr("UPLINK SUSPENDED"),
+                                 tr("PAUSE ACTIVE. DISCONNECT FROM THE CURRENT THEATER?"),
+                                 this);
+
+        if (pauseMenu.exec() == QDialog::Accepted)
+        {
+            auto *loading = new LoadingScreen(this->parentWidget());
+            MenuManager::getInstance().setScreen(loading);
+
+            QTimer::singleShot(100, loading, [loading]()
+                               {
+                loading->setStatus(tr("ARCHIVING MISSION DATA..."));
+                loading->setProgress(50);
+                
+                GameEngine::getInstance().saveCurrentMatch();
+
+                loading->setStatus(tr("UPLINK TERMINATED"));
+                loading->setProgress(100);
+                
+                QTimer::singleShot(Config::LOADING_FINAL_PAUSE, [loading]() {
+                    auto* mainMenu = new MenuScreen(loading->parentWidget());
+                    MenuManager::getInstance().setScreen(mainMenu);
+                });
+            });
+            return;
+        }
+    }
+    else if (event->key() == Qt::Key_M)
+    {
+        m_is3D = !m_is3D;
+        update();
+    }
+    if (event->key() == Qt::Key_F3)
+    {
+        auto &gm = GameManager::getInstance();
+        if (gm.getHUD())
+        {
+            gm.getHUD()->toggleDiagnostics();
+            update();
+        }
+    }
+    else
+    {
+        m_pressedKeys.insert(event->key());
+    }
 }
 
 void GameScreen::keyReleaseEvent(QKeyEvent *event)
@@ -131,15 +184,102 @@ void GameScreen::updateGameDisplay()
 void GameScreen::drawMap(QPainter &painter)
 {
     auto &cam = Camera::getInstance();
-    auto &map = Map::getInstance();
     auto &gm = GameManager::getInstance();
+
+    QPoint mousePos = mapFromGlobal(QCursor::pos());
+    QPoint currentHover = cam.screenToHex(mousePos, m_is3D);
+
+    if (auto *hud = gm.getHUD())
+    {
+        hud->setDiagnosticsData(mousePos, cam.screenToWorld(mousePos, m_is3D), currentHover);
+    }
+
+    m_is3D ? drawMap3D(painter, currentHover) : drawMap2D(painter, currentHover);
+
+    drawClouds(painter, cam, gm.getGameTime(), cam.getZoom());
+}
+
+void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
+{
+    auto &cam = Camera::getInstance();
+    auto &map = Map::getInstance();
+    const float BASE_TILE = GameConfig::BASE_TILE_SIZE;
+    float zoom = cam.getZoom();
+
+    QPointF tl = cam.screenToWorld(QPoint(0, 0), true);
+    QPointF br = cam.screenToWorld(QPoint(width(), height()), true);
+
+    struct TileData
+    {
+        int q, r;
+        QPoint pos;
+        float h;
+    };
+    std::vector<TileData> visibleTiles;
+
+    int minQ = static_cast<int>(floor((2.0f / 3.0f * tl.x()) / BASE_TILE)) - 2;
+    int maxQ = static_cast<int>(ceil((2.0f / 3.0f * br.x()) / BASE_TILE)) + 2;
+
+    for (int q = minQ; q <= maxQ; ++q)
+    {
+        int minR = static_cast<int>(floor((-1.0f / 3.0f * q * 1.5f * BASE_TILE + 0.577f * tl.y()) / BASE_TILE)) - 2;
+        int maxR = static_cast<int>(ceil((-1.0f / 3.0f * q * 1.5f * BASE_TILE + 0.577f * br.y()) / BASE_TILE)) + 2;
+
+        for (int r = minR; r <= maxR; ++r)
+        {
+            Tile &tile = map.getTileAt(q, r);
+            if (!tile.discovered)
+                continue;
+
+            QPoint screenPos = cam.toScreen(q, r, BASE_TILE, true);
+            if (screenPos.x() < -100 || screenPos.x() > width() + 100 ||
+                screenPos.y() < -100 || screenPos.y() > height() + 100)
+                continue;
+
+            float h = GameConfig::HEIGHT_OFFSET;
+            if (tile.type == TileType::MOUNTAIN)
+                h = GameConfig::MOUNTAIN_HEIGHT;
+            else if (tile.type == TileType::GRASS)
+                h = GameConfig::GRASS_HEIGHT;
+            else if (tile.type == TileType::DIRT)
+                h = GameConfig::DIRT_HEIGHT;
+            else if (tile.type == TileType::WATER)
+                h = GameConfig::WATER_HEIGHT;
+
+            visibleTiles.push_back({q, r, screenPos, h * zoom});
+        }
+    }
+
+    std::sort(visibleTiles.begin(), visibleTiles.end(), [](const TileData &a, const TileData &b)
+              { return a.pos.y() < b.pos.y(); });
+
+    float radius = (BASE_TILE * zoom) * GameConfig::HEX_VISUAL_SCALE;
+    for (const auto &d : visibleTiles)
+    {
+        bool hovered = (d.q == currentHover.x() && d.r == currentHover.y());
+        bool selected = (GameManager::getInstance().hasSelection() &&
+                         d.q == GameManager::getInstance().getSelectedHex().x() &&
+                         d.r == GameManager::getInstance().getSelectedHex().y());
+
+        QColor color = getTileVisualColor(map.getTileAt(d.q, d.r), GameManager::getInstance().getGameTime());
+        if (selected)
+            color = color.lighter(150);
+        else if (hovered)
+            color = color.lighter(120);
+
+        drawHexagon(painter, d.pos, radius, color, d.h);
+    }
+}
+
+void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
+{
+    auto &cam = Camera::getInstance();
+    auto &gm = GameManager::getInstance();
+    auto &map = Map::getInstance();
     const float BASE_TILE = GameConfig::BASE_TILE_SIZE;
 
-    QPoint mouseLocal = mapFromGlobal(QCursor::pos());
-    QPoint currentHover = cam.screenToHex(mouseLocal);
-
-    QPointF topLeft = cam.screenToWorld(QPoint(0, 0));
-    QPointF bottomRight = cam.screenToWorld(QPoint(width(), height()));
+    QPointF topLeft = cam.screenToWorld(QPoint(0, 0), false);
+    QPointF bottomRight = cam.screenToWorld(QPoint(width(), height()), false);
 
     int minQ = static_cast<int>(floor((2.0f / 3.0f * topLeft.x()) / BASE_TILE)) - 2;
     int maxQ = static_cast<int>(ceil((2.0f / 3.0f * bottomRight.x()) / BASE_TILE)) + 2;
@@ -156,14 +296,10 @@ void GameScreen::drawMap(QPainter &painter)
         for (int r = minR; r <= maxR; ++r)
         {
             Tile &tile = map.getTileAt(q, r);
-
             if (!tile.discovered)
-            {
                 continue;
-            }
 
-            QPoint screenPos = cam.toScreen(q, r, BASE_TILE);
-
+            QPoint screenPos = cam.toScreen(q, r, BASE_TILE, false);
             if (screenPos.x() < -50 || screenPos.x() > width() + 50 ||
                 screenPos.y() < -50 || screenPos.y() > height() + 50)
                 continue;
@@ -192,8 +328,45 @@ void GameScreen::drawMap(QPainter &painter)
             drawHexagon(painter, screenPos, visualRadius);
         }
     }
+}
 
-    drawClouds(painter, cam, gm.getGameTime(), zoom);
+void GameScreen::drawHexagon(QPainter &painter, QPoint center, float radius, QColor color, float height)
+{
+    auto getPt = [&](int i, float z)
+    {
+        float ang = (M_PI / 3.0f) * i;
+
+        return QPointF(center.x() + radius * cos(ang),
+                       center.y() + (radius * sin(ang) * 0.5f) + z);
+    };
+
+    painter.setPen(Qt::NoPen);
+
+    for (int i = 1; i <= 3; ++i)
+    {
+        QPolygonF side;
+        side << getPt(i, -height) << getPt(i + 1, -height) << getPt(i + 1, 0) << getPt(i, 0);
+        painter.setBrush(color.darker(130 + (i * 10)));
+        painter.drawPolygon(side);
+    }
+
+    for (int i = 4; i <= 6; ++i)
+    {
+        QPolygonF side;
+        int nextIdx = (i + 1) % 6;
+        side << getPt(i % 6, -height) << getPt(nextIdx, -height)
+             << getPt(nextIdx, 0) << getPt(i % 6, 0);
+
+        painter.setBrush(color.darker(250));
+        painter.drawPolygon(side);
+    }
+
+    QPolygonF top;
+    for (int i = 0; i < 6; ++i)
+        top << getPt(i, -height);
+    painter.setBrush(color);
+    painter.setPen(QPen(QColor(0, 0, 0, 40), 1));
+    painter.drawPolygon(top);
 }
 
 void GameScreen::drawHexagon(QPainter &painter, QPoint center, float radius)
@@ -203,12 +376,11 @@ void GameScreen::drawHexagon(QPainter &painter, QPoint center, float radius)
         m_cachedHex.clear();
         for (int i = 0; i < 6; ++i)
         {
-            float angle_rad = (M_PI / 3.0f) * i;
-            m_cachedHex << QPointF(radius * cos(angle_rad), radius * sin(angle_rad));
+            float ang = (M_PI / 3.0f) * i;
+            m_cachedHex << QPointF(radius * cos(ang), radius * sin(ang));
         }
         m_lastRadius = radius;
     }
-
     painter.drawPolygon(m_cachedHex.translated(center));
 }
 

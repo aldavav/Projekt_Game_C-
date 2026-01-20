@@ -8,6 +8,8 @@
 #include <QApplication>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QKeyEvent>
+#include <QPainter>
 #include <QLabel>
 
 class GameOverScreen : public AbstractScreen
@@ -23,6 +25,10 @@ public:
 
 private:
     void setupUI(bool victory);
+
+    void keyPressEvent(QKeyEvent *event);
+
+    void paintEvent(QPaintEvent *event);
 
     QLabel *m_titleLabel;
 

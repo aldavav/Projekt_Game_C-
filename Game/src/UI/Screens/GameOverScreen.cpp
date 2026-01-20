@@ -7,7 +7,11 @@ GameOverScreen::GameOverScreen(bool victory, QWidget *parent)
     setupUI(victory);
 }
 
-void GameOverScreen::onEnter() { this->show(); }
+void GameOverScreen::onEnter()
+{
+    this->show();
+    this->setFocus();
+}
 
 void GameOverScreen::onExit() { this->hide(); }
 
@@ -40,9 +44,11 @@ void GameOverScreen::setupUI(bool victory)
     m_statsLabel->setText(statsText);
     m_statsLabel->setAlignment(Qt::AlignCenter);
 
-    QPushButton *exitBtn = new QPushButton(tr("RETURN TO MAIN MENU"), this);
+    QPushButton *exitBtn = new QPushButton(tr("RETURN TO HQ"), this);
     exitBtn->setObjectName("primaryButton");
     exitBtn->setFixedSize(Config::END_SCREEN_BTN_WIDTH, Config::END_SCREEN_BTN_HEIGHT);
+
+    exitBtn->setDefault(true);
 
     connect(exitBtn, &QPushButton::clicked, this, []()
             { GameEngine::getInstance().setState(STATE_MENU); });
@@ -50,6 +56,33 @@ void GameOverScreen::setupUI(bool victory)
     layout->addStretch();
     layout->addWidget(m_titleLabel);
     layout->addWidget(m_statsLabel);
-    layout->addWidget(exitBtn);
     layout->addStretch();
+    layout->addWidget(exitBtn, 0, Qt::AlignCenter);
+    layout->addStretch();
+}
+
+void GameOverScreen::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape ||
+        event->key() == Qt::Key_Return ||
+        event->key() == Qt::Key_Enter)
+    {
+        GameEngine::getInstance().setState(STATE_MENU);
+    }
+    else
+    {
+        AbstractScreen::keyPressEvent(event);
+    }
+}
+
+void GameOverScreen::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+    QPainter painter(this);
+
+    QColor overlayColor = m_titleLabel->objectName() == "victoryTitle"
+                              ? QColor(0, 20, 40, 200)
+                              : QColor(40, 0, 0, 200);
+
+    painter.fillRect(rect(), overlayColor);
 }

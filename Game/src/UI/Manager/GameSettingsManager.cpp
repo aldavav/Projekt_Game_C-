@@ -10,7 +10,7 @@ void GameSettingsManager::setLanguage(const QString &langCode)
 {
     qApp->removeTranslator(&m_translator);
 
-    QString fileName = QString(":/i18n/assets/i18n/game_%1.qm").arg(langCode);
+    QString fileName = Config::PATH_LANGUAGE.arg(langCode);
 
     if (m_translator.load(fileName))
     {

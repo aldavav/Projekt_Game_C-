@@ -15,5 +15,5 @@ void GraphicsSettingsManager::applyGraphicsSettings()
 float GraphicsSettingsManager::getGammaValue() const
 {
     auto &cfg = ConfigManager::getInstance().getSettings();
-    return cfg.gamma / 50.0f;
+    return cfg.gamma / GameConfig::GAMMA_DEFAULT;
 }

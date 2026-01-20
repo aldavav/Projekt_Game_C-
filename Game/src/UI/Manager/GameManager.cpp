@@ -18,10 +18,10 @@ void GameManager::update(float deltaTime)
 
     QPointF worldPos = cam.getCurrentPos();
 
-    float q = (2.0f / 3.0f * worldPos.x()) / 32.0f;
-    float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / 32.0f;
+    float q = (2.0f / 3.0f * worldPos.x()) / GameConfig::BASE_TILE_SIZE;
+    float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / GameConfig::BASE_TILE_SIZE;
 
-    Map::getInstance().revealRadius(std::round(q), std::round(r), 6);
+    Map::getInstance().revealRadius(std::round(q), std::round(r), GameConfig::REVEAL_RADIUS);
 
     m_hud->update(m_gameTime, m_isPaused, m_currentSpeed);
 }
@@ -52,13 +52,13 @@ void GameManager::setSpeed(GameSpeed speed)
     switch (m_currentSpeed)
     {
     case GameSpeed::SLOW:
-        m_timeScale = 0.5f;
+        m_timeScale = GameConfig::GAME_SPEED_MULT_SLOW;
         break;
     case GameSpeed::NORMAL:
-        m_timeScale = 1.0f;
+        m_timeScale = GameConfig::GAME_SPEED_MULT_NORMAL;
         break;
     case GameSpeed::FAST:
-        m_timeScale = 2.0f;
+        m_timeScale = GameConfig::GAME_SPEED_MULT_FAST;
         break;
     }
 }
@@ -79,7 +79,7 @@ void GameManager::handleMouseClick(QPoint screenPos)
 
     QPointF worldPos = cam.screenToWorld(screenPos);
 
-    const float size = 32.0f;
+    const float size = GameConfig::BASE_TILE_SIZE;
     float q = (2.0f / 3.0f * worldPos.x()) / size;
     float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size;
 

@@ -30,6 +30,10 @@ namespace GameConfig
     constexpr int FRAME_MS = 16;
     constexpr float DELTA_TIME = 0.016f;
 
+    constexpr float GAME_SPEED_MULT_SLOW = 0.5f;
+    constexpr float GAME_SPEED_MULT_NORMAL = 1.0f;
+    constexpr float GAME_SPEED_MULT_FAST = 2.0f;
+
     constexpr float CLOUD_MAX_RANGE = 4000.0f;
     constexpr float CLOUD_SPEED_BASE = 5.0f;
     constexpr float CLOUD_SPEED_MULT = 15.0f;
@@ -44,14 +48,32 @@ namespace GameConfig
 
     constexpr int WORLD_BOUNDS = 50;
     constexpr float BASE_TILE_SIZE = 32.0f;
+    constexpr int REVEAL_RADIUS = 6;
+    constexpr int HEIGHT_OFFSET = 15;
     constexpr int VIEW_RADIUS = 25;
     constexpr int CLOUD_COUNT = 50;
+
+    constexpr int MOUNTAIN_HEIGHT = 15;
+    constexpr int GRASS_HEIGHT = 10;
+    constexpr int DIRT_HEIGHT = 5;
+    constexpr int WATER_HEIGHT = 0;
 
     constexpr float DAY_CYCLE_DURATION = 60.0f;
 
     constexpr float WATER_WAVE_SPEED = 2.0f;
-    constexpr int   WATER_BRIGHTNESS_BASE = 100;
-    constexpr int   WATER_BRIGHTNESS_SWING = 20;
+    constexpr int WATER_BRIGHTNESS_BASE = 100;
+    constexpr int WATER_BRIGHTNESS_SWING = 20;
+
+    constexpr int MINIMAP_UPDATE_MS = 100;
+    constexpr int MINIMAP_RANGE = 40;
+
+    const QString COLOR_PHASE_NOON = "#FFD600";
+    const QString COLOR_PHASE_AFTERNOON = "#FFA000";
+    const QString COLOR_PHASE_EVENING = "#FF5722";
+    const QString COLOR_PHASE_NIGHT = "#3F51B5";
+    const QString COLOR_PHASE_MIDNIGHT = "#1A237E";
+
+    constexpr int SCANLINE_SPACING = 3;
 }
 
 #endif

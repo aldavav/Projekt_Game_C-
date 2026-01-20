@@ -11,6 +11,7 @@
 class KeyCaptureDialog : public QDialog
 {
     Q_OBJECT
+
 public:
     explicit KeyCaptureDialog(QWidget *parent = nullptr);
 

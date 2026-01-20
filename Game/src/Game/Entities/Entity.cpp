@@ -1,6 +1,6 @@
 #include "Entity.h"
 
-Entity::Entity(EntityType type, const std::string &name, const std::string &symbol, Player *owner)
+Entity::Entity(EntityTypes::EntityType type, const std::string &name, const std::string &symbol, Player *owner)
     : m_name(name), m_type(type), m_symbol(symbol), m_owner(owner),
       m_position(0, 0), m_targetPosition(0, 0)
 {
@@ -26,7 +26,7 @@ void Entity::update(float deltaTime)
 
 std::unique_ptr<Entity> Entity::createEntityFromFile(std::ifstream &file)
 {
-    EntityType type;
+    EntityTypes::EntityType type;
     if (!file.read(reinterpret_cast<char *>(&type), sizeof(type)))
     {
         LOG_ERROR("Failed to read EntityType from file.");
@@ -35,16 +35,16 @@ std::unique_ptr<Entity> Entity::createEntityFromFile(std::ifstream &file)
 
     switch (type)
     {
-        case EntityType::UNIT:
+        case EntityTypes::EntityType::UNIT:
             LOG_ERROR("Entity loading not yet implemented for UNIT type.");
             return nullptr;
-    case EntityType::BUILDING:
+    case EntityTypes::EntityType::BUILDING:
         LOG_ERROR("Entity loading not yet implemented for BUILDING type.");
         return nullptr;
-    case EntityType::RESOURCE:
+    case EntityTypes::EntityType::RESOURCE:
         LOG_ERROR("Entity loading not yet implemented for RESOURCE type.");
         return nullptr;
-    case EntityType::DEBRIS:
+    case EntityTypes::EntityType::DEBRIS:
         LOG_ERROR("Entity loading not yet implemented for DEBRIS type.");
         return nullptr;
     default:

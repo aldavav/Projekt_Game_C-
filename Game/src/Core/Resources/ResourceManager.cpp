@@ -16,7 +16,7 @@ TexturePtr ResourceManager::getTexture(const QString &resourceId)
 
     if (newTexture.isNull())
     {
-        const QString fallback = ":/images/assets/images/missing.png";
+        const QString fallback = Config::PATH_MISSING;
         if (resourceId == fallback)
             return TexturePtr();
 

@@ -54,7 +54,7 @@ void Camera::adjustZoom(float delta)
     m_zoom = std::clamp(m_zoom + delta, minZ, maxZ);
 }
 
-QPoint Camera::toScreen(int q, int r, int tileSize) const
+QPoint Camera::toScreen(int q, int r, int tileSize, bool is3D) const
 {
     float size = static_cast<float>(tileSize);
 
@@ -62,15 +62,34 @@ QPoint Camera::toScreen(int q, int r, int tileSize) const
     float worldY = size * (std::sqrt(3.0f) / 2.0f * q + std::sqrt(3.0f) * r);
 
     float screenX = (worldX - m_currentPos.x()) * m_zoom + (m_viewportWidth / 2.0f);
-    float screenY = (worldY - m_currentPos.y()) * m_zoom + (m_viewportHeight / 2.0f);
+
+    float screenY_Relative = (worldY - m_currentPos.y());
+
+    if (is3D)
+    {
+        screenY_Relative *= 0.5f;
+    }
+
+    float screenY = (screenY_Relative * m_zoom) + (m_viewportHeight / 2.0f);
 
     return QPoint(static_cast<int>(screenX), static_cast<int>(screenY));
 }
 
-QPointF Camera::screenToWorld(const QPoint &screenPos) const
+QPointF Camera::screenToWorld(const QPoint &screenPos, bool is3D) const
 {
     float worldX = (screenPos.x() - m_viewportWidth / 2.0f) / m_zoom + m_currentPos.x();
-    float worldY = (screenPos.y() - m_viewportHeight / 2.0f) / m_zoom + m_currentPos.y();
+
+    float screenY_Relative = (screenPos.y() - m_viewportHeight / 2.0f) / m_zoom;
+
+    float worldY;
+    if (is3D)
+    {
+        worldY = (screenY_Relative * 2.0f) + m_currentPos.y();
+    }
+    else
+    {
+        worldY = screenY_Relative + m_currentPos.y();
+    }
 
     return QPointF(worldX, worldY);
 }
@@ -152,14 +171,25 @@ QPointF Camera::getCurrentPos()
     return m_currentPos;
 }
 
-QPoint Camera::screenToHex(const QPoint &screenPos) const
+QPoint Camera::screenToHex(const QPoint &screenPos, bool is3D) const
 {
-    QPointF worldPos = screenToWorld(screenPos);
+    QPointF worldPos = screenToWorld(screenPos, is3D);
 
-    const float size = 32.0f;
+    const float size = GameConfig::BASE_TILE_SIZE;
+    float q, r;
 
-    float q = (2.0f / 3.0f * worldPos.x()) / size;
-    float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size;
+    if (is3D)
+    {
+        float correctedY = worldPos.y() + GameConfig::HEIGHT_OFFSET;
+
+        q = (2.0f / 3.0f * worldPos.x()) / size;
+        r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * correctedY) / size;
+    }
+    else
+    {
+        q = (2.0f / 3.0f * worldPos.x()) / size;
+        r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size;
+    }
 
     QPointF rounded = hexRound(q, r);
     return QPoint(static_cast<int>(rounded.x()), static_cast<int>(rounded.y()));
