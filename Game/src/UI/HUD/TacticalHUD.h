@@ -2,7 +2,7 @@
 #define TACTICALHUD_H
 
 #include <Core/Config/GameConfig.h>
-#include <Game/Engine/GameSpeed.h>
+#include <Core/Config/GameSpeed.h>
 #include <Game/Camera/Camera.h>
 #include <Core/Config/Config.h>
 #include <Game/Map/Map.h>

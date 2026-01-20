@@ -15,6 +15,7 @@ InputManager::~InputManager() {}
 
 void InputManager::setupDefaultBindings()
 {
+    ControlsSettingsManager::getInstance();
 }
 
 void InputManager::onKeyPress(int keyCode)
@@ -62,23 +63,33 @@ void InputManager::onMouseClick(Qt::MouseButton button, const QPoint &pos)
     }
 }
 
-void InputManager::onMouseMove(const QPoint &pos)
-{
-}
-
 CommandPtr InputManager::translateRawInput(const RawInputEvent &event)
 {
+    auto &settings = ControlsSettingsManager::getInstance();
+
     if (event.type == RawInputEvent::Type::Keyboard)
     {
-        switch (event.keyCode)
+        int keyCode = event.keyCode;
+
+        if (keyCode == static_cast<int>(settings.getKey(Controls::Action::STOP)))
         {
-        case Qt::Key_S:
             return QSharedPointer<StopAction>::create().staticCast<ICommand>();
-        case Qt::Key_Minus:
-            return QSharedPointer<ZoomAction>::create(-0.1f).staticCast<ICommand>();
-        case Qt::Key_Plus:
-        case Qt::Key_Equal:
-            return qSharedPointerCast<ICommand>(QSharedPointer<ZoomAction>::create(0.1f));
+        }
+
+        if (keyCode == static_cast<int>(settings.getKey(Controls::Action::GUARD)))
+        {
+            return QSharedPointer<GuardAction>::create().staticCast<ICommand>();
+        }
+
+        switch (keyCode)
+        {
+        case GameConfig::KEY_ZOOM_OUT:
+            return QSharedPointer<ZoomAction>::create(-GameConfig::ZOOM_STEP).staticCast<ICommand>();
+
+        case GameConfig::KEY_ZOOM_IN:
+        case GameConfig::KEY_ZOOM_IN_ALT:
+            return qSharedPointerCast<ICommand>(QSharedPointer<ZoomAction>::create(GameConfig::ZOOM_STEP));
+
         default:
             break;
         }
@@ -86,7 +97,7 @@ CommandPtr InputManager::translateRawInput(const RawInputEvent &event)
 
     if (event.type == RawInputEvent::Type::MouseClick)
     {
-        if (event.button == Qt::LeftButton)
+        if (event.button == GameConfig::BTN_MOVE)
         {
             return qSharedPointerCast<ICommand>(QSharedPointer<MoveUnitAction>::create(event.position));
         }

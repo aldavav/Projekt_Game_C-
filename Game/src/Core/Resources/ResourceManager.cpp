@@ -27,6 +27,18 @@ TexturePtr ResourceManager::getTexture(const QString &resourceId)
     return newTexture;
 }
 
+TexturePtr ResourceManager::loadTextureFromFile(const QString &filePath)
+{
+    QImage image;
+    if (!image.load(filePath))
+    {
+        qDebug() << "Failed to load texture from file:" << filePath;
+        return TexturePtr();
+    }
+
+    return TexturePtr(new QImage(image));
+}
+
 AudioPtr ResourceManager::getAudio(const QString &resourceId)
 {
     if (m_audioCache.contains(resourceId))
@@ -42,18 +54,14 @@ AudioPtr ResourceManager::getAudio(const QString &resourceId)
     return newAudio;
 }
 
-TexturePtr ResourceManager::loadTextureFromFile(const QString &filePath)
+AudioPtr ResourceManager::loadAudioFromFile(const QString &filePath)
 {
-    TexturePtr image = TexturePtr::create();
+    AudioPtr sound(new QSoundEffect());
+    sound->setSource(QUrl(filePath));
 
-    if (image->load(filePath))
-    {
-        return image;
-    }
-    else
-    {
-        return TexturePtr();
-    }
+    sound->setVolume(static_cast<float>(GameConfig::VOLUME_DEFAULT) / 100.0f);
+
+    return sound;
 }
 
 AudioPtr ResourceManager::loadAudioFromFile(const QString &filePath)

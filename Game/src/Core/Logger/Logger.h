@@ -1,8 +1,10 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <Core/Logger/LoggerTypes.h>
-#include <Core/Common/AnsiCodes.h>
+#include <Core/Config/LoggerMacros.h>
+#include <Core/Config/LoggerTypes.h>
+#include <Core/Config/AnsiCodes.h>
+#include <Core/Config/Config.h>
 #include <filesystem>
 #include <qlogging.h>
 #include <algorithm>
@@ -36,12 +38,10 @@ private:
 
     void archiveLogFile();
 
-    std::string stripPath(const std::string& path);
+    std::string stripPath(const std::string &path);
 
 public:
     static Logger &getInstance();
-
-    static void showLog();
 
     void log(LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function);
 

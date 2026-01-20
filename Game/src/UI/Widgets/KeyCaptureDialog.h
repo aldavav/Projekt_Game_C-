@@ -1,7 +1,7 @@
 #ifndef KEYCAPTUREDIALOG_H
 #define KEYCAPTUREDIALOG_H
 
-#include <Core/Common/KeyCodes.h>
+#include <Core/Config/KeyCodes.h>
 #include <Core/Config/Config.h>
 #include <QVBoxLayout>
 #include <QKeyEvent>

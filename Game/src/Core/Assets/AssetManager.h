@@ -1,7 +1,8 @@
 #ifndef ASSETMANAGER_H
 #define ASSETMANAGER_H
 
-#include <Core/Assets/CursorTypes.h>
+#include <Core/Config/CursorTypes.h>
+#include <Core/Config/Config.h>
 #include <QFontDatabase>
 #include <QString>
 #include <QCursor>

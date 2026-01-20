@@ -1,22 +1,24 @@
 #ifndef GAMEENGINE_H
 #define GAMEENGINE_H
 
-#include <Core/Logger/LoggerMacros.h>
 #include <Core/Input/InputManager.h>
+#include <Core/Config/GameConfig.h>
+#include <Core/Config/GameState.h>
 #include <Game/Entities/Entity.h>
+#include <Core/Config/Config.h>
 #include <Game/Camera/Camera.h>
+#include <qcoreapplication.h>
 #include <Game/Map/Map.h>
+#include <QSettings>
 #include <QObject>
+#include <QString>
 #include <QTimer>
 #include <chrono>
+#include <memory>
+#include <vector>
+#include <QDir>
 
-enum State
-{
-    STATE_MENU = 0,
-    STATE_LOADING = 1,
-    STATE_RUNNING = 2,
-    STATE_GAMEOVER = 3
-};
+class Entity;
 
 class GameEngine : public QObject
 {
@@ -25,27 +27,27 @@ class GameEngine : public QObject
 public:
     static GameEngine &getInstance();
 
+    GameEngine(const GameEngine &) = delete;
+
+    GameEngine &operator=(const GameEngine &) = delete;
+
     void startGame();
+
+    void stopGame();
+
+    void triggerEndGame(bool victory);
+
+    void setupMatch(QString mapName, uint32_t seed);
 
     void saveCurrentMatch();
 
     void loadMatch(const QString &mapName);
 
-    void stopGame();
+    void setState(GameState::State newState);
 
-    void setupMatch(QString mapName, uint32_t seed);
-
-    GameEngine(const GameEngine &) = delete;
-
-    void operator=(const GameEngine &) = delete;
-
-    void setState(State newState);
-
-    State getState() const { return m_currentState; }
+    GameState::State getState() const { return m_currentState; }
 
     bool didPlayerWin() const { return m_playerWon; }
-
-    void triggerEndGame(bool victory);
 
 signals:
     void gameLoopUpdate(float deltaTime);
@@ -61,7 +63,7 @@ private slots:
 private:
     explicit GameEngine(QObject *parent = nullptr);
 
-    ~GameEngine() override = default;
+    virtual ~GameEngine() override = default;
 
     void initializeSystems();
 
@@ -69,30 +71,23 @@ private:
 
     void updateCameraMovement(float fixedStep);
 
+    GameState::State m_currentState = GameState::STATE_MENU;
+
+    bool m_isRunning = false;
+
+    bool m_playerWon = false;
+
+    QString m_currentMapName = GameConfig::World::DEFAULT_MAP_NAME;
+
+    uint32_t m_currentSeed = GameConfig::World::DEFAULT_SEED;
+
     QTimer m_gameTimer;
 
     std::chrono::steady_clock::time_point m_lastTime;
 
     float m_accumulator = 0.0f;
 
-    bool m_isRunning = false;
-
-    State m_currentState;
-
-    bool m_playerWon;
-
-    QString m_currentMapName;
-
-    uint32_t m_currentSeed;
-
     std::vector<std::unique_ptr<Entity>> m_entities;
-
-    enum GameStates
-    {
-        GAME_MENU,
-        GAME_RUNNING,
-        GAME_OVER
-    };
 };
 
 #endif

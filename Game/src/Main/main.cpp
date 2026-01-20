@@ -1,4 +1,4 @@
-#include <Core/Logger/LoggerMacros.h>
+#include <Core/Config/LoggerMacros.h>
 #include <Main/MainWindow.h>
 #include <QApplication>
 

@@ -1,11 +1,11 @@
 #ifndef INPUTMANAGER_H
 #define INPUTMANAGER_H
 
+#include <UI/Manager/ControlsSettingsManager.h>
 #include <Game/Actions/CameraActions.h>
-#include <Game/Actions/GameCommands.h>
-#include <Game/Actions/UnitActions.h>
-#include <Core/Input/RawInputEvent.h>
-#include <Core/Common/KeyCodes.h>
+#include <Core/Config/RawInputEvent.h>
+#include <Core/Config/GameConfig.h>
+#include <Core/Config/ICommand.h>
 #include <qmutex.h>
 #include <QObject>
 #include <QQueue>

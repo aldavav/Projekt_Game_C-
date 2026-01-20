@@ -11,7 +11,7 @@
 #include <UI/Widgets/TacticalDialog.h>
 #include <UI/Manager/ConfigManager.h>
 #include <UI/Manager/MenuManager.h>
-#include <Core/Common/KeyCodes.h>
+#include <Core/Config/KeyCodes.h>
 #include <Core/Config/Config.h>
 #include <qpushbutton.h>
 #include <qformlayout.h>

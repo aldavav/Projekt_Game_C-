@@ -2,8 +2,10 @@
 #define CAMERA_H
 
 #include <Core/Config/GameConfig.h>
+#include <Core/Config/Config.h>
 #include <algorithm>
 #include <QPointF>
+#include <QPoint>
 #include <QRect>
 
 class Camera
@@ -11,72 +13,64 @@ class Camera
 public:
     static Camera &getInstance();
 
-    QPointF screenToWorld(const QPoint& screenPos, bool is3D = false) const;
-
-    QPointF hexRound(float q, float r) const;
+    void update(float deltaTime);
 
     void handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHeight, float deltaTime);
 
-    void setTargetPos(QPointF worldPos);
+    QPointF screenToWorld(const QPoint &screenPos, bool is3D = Config::DEFAULT_3D_VIEW) const;
 
-    void setTargetRawPos(QPointF worldPos);
+    QPoint screenToHex(const QPoint &screenPos, bool is3D = Config::DEFAULT_3D_VIEW) const;
 
-    QPointF getCurrentPos();
+    QPoint toScreen(int q, int r, int tileSize = GameConfig::World::BASE_TILE_SIZE, bool is3D = Config::DEFAULT_3D_VIEW) const;
 
-    static constexpr float MIN_ZOOM = 0.75f;
-
-    static constexpr float MAX_ZOOM = 3.0f;
-
-    void update(float deltaTime);
+    QPointF hexRound(float q, float r) const;
 
     void move(float dx, float dy);
 
+    void setTargetPos(QPointF hexCoords);
+
+    void setTargetRawPos(QPointF worldPos);
+
     void adjustZoom(float delta);
 
-    void setWorldBounds(const QRect &bounds) { m_worldBounds = bounds; }
+    void shake(float intensity) { m_shakeIntensity = intensity; }
 
-    void setViewportSize(int w, int h)
-    {
-        m_viewportWidth = w;
-        m_viewportHeight = h;
-    }
+    void setViewportSize(int w, int h);
+
+    void setWorldBounds(const QRect &bounds) { m_worldBounds = bounds; }
 
     QPointF pos() const { return m_currentPos; }
 
     float getZoom() const { return m_zoom; }
 
-    QPoint toScreen(int tileX, int tileY, int tileSize, bool is3D = false) const;
-
-    void shake(float intensity) { m_shakeIntensity = intensity; }
-    
-    QPoint screenToHex(const QPoint& screenPos, bool is3D = false) const;
-
     int getViewportWidth() const { return m_viewportWidth; }
 
+    int getViewportHeight() const { return m_viewportHeight; }
+
 private:
-    Camera();
+    Camera() = default;
+
+    ~Camera() = default;
+
+    Camera(const Camera &) = delete;
+
+    Camera &operator=(const Camera &) = delete;
 
     QPointF m_currentPos;
 
     QPointF m_targetPos;
 
-    float m_zoom = 1.5f;
-
     QRect m_worldBounds;
 
-    int m_viewportWidth = 800;
+    float m_zoom = Config::INITIAL_ZOOM;
 
-    int m_viewportHeight = 600;
+    float m_viewportWidth = Config::DEFAULT_WINDOW_WIDTH;
 
-    const float m_smoothing = 0.15f;
+    float m_viewportHeight = Config::DEFAULT_WINDOW_HEIGHT;
 
     float m_shakeIntensity = 0.0f;
 
     QPointF m_shakeOffset;
-
-    const int EDGE_MARGIN = 15;
-    
-    const float EDGE_MOVE_SPEED = 10.0f;
 };
 
 #endif

@@ -22,47 +22,34 @@ set(SRC_MAIN
 set(SRC_CORE
     src/Core/Assets/AssetManager.cpp
     src/Core/Assets/AssetManager.h
-    src/Core/Assets/CursorTypes.h
-    src/Core/Common/AnsiCodes.h
-    src/Core/Common/KeyCodes.h
-    src/Core/Config/Config.h
-    src/Core/Config/ConfigTypes.h
-    src/Core/Config/ControlTypes.h
-    src/Core/Config/GameConfig.h
-    src/Core/Config/GraphicsTypes.h
-    src/Core/Logger/Logger.cpp
-    src/Core/Logger/Logger.h
-    src/Core/Logger/LoggerMacros.h
-    src/Core/Logger/LoggerTypes.h
-    src/Core/Resources/ResourceManager.cpp
-    src/Core/Resources/ResourceManager.h
-    src/Core/Input/ICommand.h
+    src/Core/Config/Configuration.h
+    src/Core/Config/GameTypes.h
+    src/Core/Config/WorldData.h
     src/Core/Input/InputManager.cpp
     src/Core/Input/InputManager.h
-    src/Core/Input/RawInputEvent.h
+    src/Core/Logger/Logger.cpp
+    src/Core/Logger/Logger.h
+    src/Core/Resources/ResourceManager.cpp
+    src/Core/Resources/ResourceManager.h
 )
 
 set(SRC_GAME
     src/Game/Actions/CameraActions.cpp
     src/Game/Actions/CameraActions.h
-    src/Game/Actions/GameActions.h
-    src/Game/Actions/GameCommands.h
-    src/Game/Actions/UnitActions.cpp
-    src/Game/Actions/UnitActions.h
+    src/Game/Actions/GuardUnitAction.cpp
+    src/Game/Actions/GuardUnitAction.h
+    src/Game/Actions/MoveUnitAction.cpp
+    src/Game/Actions/MoveUnitAction.h
+    src/Game/Actions/StopUnitAction.cpp
+    src/Game/Actions/StopUnitAction.h
     src/Game/Camera/Camera.cpp
     src/Game/Camera/Camera.h
     src/Game/Engine/GameEngine.cpp
     src/Game/Engine/GameEngine.h
-    src/Game/Engine/GameSpeed.h
     src/Game/Entities/Entity.cpp
     src/Game/Entities/Entity.h
-    src/Game/Entities/EntityTypes.h
-    src/Game/Map/Chunk.h
-    src/Game/Map/Difficulty.h
     src/Game/Map/Map.cpp
     src/Game/Map/Map.h
-    src/Game/Map/MapStats.h
-    src/Game/Map/Tile.h
 )
 
 set(SRC_UI_MANAGERS

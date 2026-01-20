@@ -2,15 +2,7 @@
 
 void AssetManager::loadFonts()
 {
-    const QStringList fonts = {
-        ":/fonts/assets/fonts/Orbitron-Black.ttf",
-        ":/fonts/assets/fonts/Orbitron-Bold.ttf",
-        ":/fonts/assets/fonts/Orbitron-ExtraBold.ttf",
-        ":/fonts/assets/fonts/Orbitron-Medium.ttf",
-        ":/fonts/assets/fonts/Orbitron-Regular.ttf",
-        ":/fonts/assets/fonts/Orbitron-SemiBold.ttf"};
-
-    for (const QString &fontPath : fonts)
+    for (const QString &fontPath : Config::PATHS_FONTS)
     {
         QFontDatabase::addApplicationFont(fontPath);
     }
@@ -18,7 +10,7 @@ void AssetManager::loadFonts()
 
 QFont AssetManager::getFont(int size, bool bold)
 {
-    QFont font("Orbitron");
+    QFont font(Config::FONT_FAMILY);
     font.setPixelSize(size);
     font.setBold(bold);
     return font;
@@ -30,17 +22,17 @@ QCursor AssetManager::getCursor(Asset::CursorType type)
     switch (type)
     {
     case Asset::CursorType::Select:
-        path = ":/images/assets/images/cursor-pointer.png";
+        path = Config::PATH_CURSOR_SELECT;
         break;
     case Asset::CursorType::Attack:
-        path = ":/images/assets/images/cursor-attack.png";
+        path = Config::PATH_CURSOR_ATTACK;
         break;
     case Asset::CursorType::Wait:
-        path = ":/images/assets/images/cursor-wait.png";
+        path = Config::PATH_CURSOR_WAIT;
         break;
     case Asset::CursorType::Standard:
     default:
-        path = ":/images/assets/images/cursor.png";
+        path = Config::PATH_CURSOR_DEFAULT;
         break;
     }
 
@@ -48,5 +40,7 @@ QCursor AssetManager::getCursor(Asset::CursorType type)
     if (pix.isNull())
         return QCursor(Qt::ArrowCursor);
 
-    return QCursor(pix.scaled(32, 32, Qt::KeepAspectRatio, Qt::SmoothTransformation), 0, 0);
+    return QCursor(pix.scaled(Config::CURSOR_SIZE, Config::CURSOR_SIZE,
+                              Qt::KeepAspectRatio, Qt::SmoothTransformation),
+                   0, 0);
 }
