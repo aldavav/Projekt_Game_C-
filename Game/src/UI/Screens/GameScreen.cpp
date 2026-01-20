@@ -1,4 +1,6 @@
 #include "GameScreen.h"
+#include <UI/Widgets/TacticalDialog.h>
+#include <UI/Manager/MenuManager.h>
 
 GameScreen::GameScreen(QWidget *parent)
     : AbstractScreen(parent), m_updateTimer(new QTimer(this))
@@ -32,9 +34,15 @@ void GameScreen::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+
     drawMap(painter);
 
-    GameManager::getInstance().getHUD()->draw(painter, width(), height());
+    if (auto *hud = GameManager::getInstance().getHUD())
+    {
+        hud->draw(painter, width(), height());
+    }
 }
 
 void GameScreen::mousePressEvent(QMouseEvent *event)
@@ -93,7 +101,36 @@ void GameScreen::resizeEvent(QResizeEvent *event)
 
 void GameScreen::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_M)
+    if (event->key() == Qt::Key_Escape)
+    {
+        TacticalDialog pauseMenu(tr("UPLINK SUSPENDED"),
+                                 tr("PAUSE ACTIVE. DISCONNECT FROM THE CURRENT THEATER?"),
+                                 this);
+
+        if (pauseMenu.exec() == QDialog::Accepted)
+        {
+            auto *loading = new LoadingScreen(this->parentWidget());
+            MenuManager::getInstance().setScreen(loading);
+
+            QTimer::singleShot(100, loading, [loading]()
+                               {
+                loading->setStatus(tr("ARCHIVING MISSION DATA..."));
+                loading->setProgress(50);
+                
+                GameEngine::getInstance().saveCurrentMatch();
+
+                loading->setStatus(tr("UPLINK TERMINATED"));
+                loading->setProgress(100);
+                
+                QTimer::singleShot(Config::LOADING_FINAL_PAUSE, [loading]() {
+                    auto* mainMenu = new MenuScreen(loading->parentWidget());
+                    MenuManager::getInstance().setScreen(mainMenu);
+                });
+            });
+            return;
+        }
+    }
+    else if (event->key() == Qt::Key_M)
     {
         m_is3D = !m_is3D;
         update();
@@ -298,7 +335,9 @@ void GameScreen::drawHexagon(QPainter &painter, QPoint center, float radius, QCo
     auto getPt = [&](int i, float z)
     {
         float ang = (M_PI / 3.0f) * i;
-        return QPointF(center.x() + radius * cos(ang), center.y() + (radius * sin(ang) * 0.5f) + z);
+
+        return QPointF(center.x() + radius * cos(ang),
+                       center.y() + (radius * sin(ang) * 0.5f) + z);
     };
 
     painter.setPen(Qt::NoPen);
@@ -307,9 +346,10 @@ void GameScreen::drawHexagon(QPainter &painter, QPoint center, float radius, QCo
     {
         QPolygonF side;
         side << getPt(i, -height) << getPt(i + 1, -height) << getPt(i + 1, 0) << getPt(i, 0);
-        painter.setBrush(color.darker(150));
+        painter.setBrush(color.darker(130 + (i * 10)));
         painter.drawPolygon(side);
     }
+
     for (int i = 4; i <= 6; ++i)
     {
         QPolygonF side;

@@ -18,6 +18,7 @@
 class NewGameScreen : public AbstractScreen
 {
     Q_OBJECT
+
 public:
     explicit NewGameScreen(QWidget *parent = nullptr);
 
@@ -29,20 +30,22 @@ public:
 
 private:
     void setupUI();
-    
+
     void onLaunchClicked();
 
     void onBackClicked();
 
     QLineEdit *m_mapNameEdit;
-    
+
     QLineEdit *m_seedEdit;
-    
+
     QComboBox *m_difficultyCombo;
-    
+
     QComboBox *m_opponentCombo;
-    
+
     QSpinBox *m_aiLevelSpin;
+
+    void keyPressEvent(QKeyEvent *event) override;
 };
 
 #endif

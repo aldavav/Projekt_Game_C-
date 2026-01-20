@@ -9,11 +9,20 @@ InformationDialog::InformationDialog(const QString &header, const QString &body,
     setFixedSize(Config::INFO_DIALOG_WIDTH, Config::INFO_DIALOG_HEIGHT);
 
     setupUI(header, body);
+
+    QTimer::singleShot(100, this, [this]()
+                       {
+        QScrollBar *bar = m_scrollArea->verticalScrollBar();
+        if (!bar->isVisible() || bar->maximum() <= 0) {
+            handleScroll(0); 
+        } });
 }
 
 void InformationDialog::setupUI(const QString &header, const QString &body)
 {
     auto *mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+
     QFrame *backgroundFrame = new QFrame(this);
     backgroundFrame->setObjectName("infoBackgroundFrame");
     auto *frameLayout = new QVBoxLayout(backgroundFrame);
@@ -25,18 +34,16 @@ void InformationDialog::setupUI(const QString &header, const QString &body)
     m_scrollArea = new QScrollArea(this);
     m_scrollArea->setObjectName("infoScrollArea");
     m_scrollArea->setWidgetResizable(true);
+    m_scrollArea->setFrameShape(QFrame::NoFrame);
 
     QLabel *contentLabel = new QLabel(body);
     contentLabel->setObjectName("infoBody");
     contentLabel->setWordWrap(true);
-
     contentLabel->setTextFormat(Qt::RichText);
-
     contentLabel->setContentsMargins(10, 10, 15, 10);
     contentLabel->setOpenExternalLinks(true);
 
     m_scrollArea->setWidget(contentLabel);
-
     frameLayout->addWidget(m_scrollArea);
 
     m_acceptCheck = new QCheckBox(tr("I HAVE READ AND AGREE TO THE PROTOCOLS ABOVE"));
@@ -61,6 +68,7 @@ void InformationDialog::setupUI(const QString &header, const QString &body)
     btnLayout->addWidget(declineBtn);
     btnLayout->addStretch();
     btnLayout->addWidget(m_confirmBtn);
+
     frameLayout->addLayout(btnLayout);
     mainLayout->addWidget(backgroundFrame);
 }
@@ -68,7 +76,8 @@ void InformationDialog::setupUI(const QString &header, const QString &body)
 void InformationDialog::handleScroll(int value)
 {
     QScrollBar *bar = m_scrollArea->verticalScrollBar();
-    if (value >= (bar->maximum() * Config::LEGAL_SCROLL_THRESHOLD))
+
+    if (!bar->isVisible() || bar->maximum() <= 0 || value >= (bar->maximum() * Config::LEGAL_SCROLL_THRESHOLD))
     {
         m_scrolledToBottom = true;
         m_acceptCheck->setEnabled(true);
@@ -82,28 +91,36 @@ void InformationDialog::checkRequirements()
 
 void InformationDialog::onDecline()
 {
-    QMetaObject::invokeMethod(qApp, "quit", Qt::QueuedConnection);
+    QCoreApplication::quit();
 }
 
 void InformationDialog::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Down || event->key() == Qt::Key_PageDown)
+    QScrollBar *bar = m_scrollArea->verticalScrollBar();
+
+    switch (event->key())
     {
-        m_scrollArea->verticalScrollBar()->setValue(
-            m_scrollArea->verticalScrollBar()->value() + Config::KEYBOARD_SCROLL_STEP);
-        return;
-    }
-    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
-    {
+    case Qt::Key_Down:
+    case Qt::Key_PageDown:
+        bar->setValue(bar->value() + Config::KEYBOARD_SCROLL_STEP);
+        break;
+
+    case Qt::Key_Up:
+    case Qt::Key_PageUp:
+        bar->setValue(bar->value() - Config::KEYBOARD_SCROLL_STEP);
+        break;
+
+    case Qt::Key_Return:
+    case Qt::Key_Enter:
         if (m_confirmBtn->isEnabled())
             accept();
-    }
-    else if (event->key() == Qt::Key_Escape)
-    {
+        break;
+
+    case Qt::Key_Escape:
         onDecline();
-    }
-    else
-    {
+        break;
+
+    default:
         QDialog::keyPressEvent(event);
     }
 }

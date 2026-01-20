@@ -16,6 +16,7 @@ void TacticalDialog::setupUI(const QString &title, const QString &message)
 {
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(20, 15, 20, 15);
+    layout->setSpacing(10);
 
     auto *titleLabel = new QLabel(title.toUpper());
     titleLabel->setObjectName("dialogTitle");
@@ -29,17 +30,19 @@ void TacticalDialog::setupUI(const QString &title, const QString &message)
     auto *bodyLabel = new QLabel(message);
     bodyLabel->setObjectName("dialogBody");
     bodyLabel->setWordWrap(true);
+    bodyLabel->setAlignment(Qt::AlignCenter);
     layout->addWidget(bodyLabel);
 
     layout->addStretch();
 
     auto *btnLayout = new QHBoxLayout();
+    btnLayout->setSpacing(15);
 
     auto *cancelBtn = new QPushButton(Config::STR_ABORT);
+    cancelBtn->setObjectName("secondaryButton");
+
     auto *confirmBtn = new QPushButton(Config::STR_PROCEED);
     confirmBtn->setObjectName("confirmBtn");
-
-    confirmBtn->setFocus();
 
     connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
     connect(confirmBtn, &QPushButton::clicked, this, &QDialog::accept);
@@ -47,15 +50,13 @@ void TacticalDialog::setupUI(const QString &title, const QString &message)
     btnLayout->addWidget(cancelBtn);
     btnLayout->addWidget(confirmBtn);
     layout->addLayout(btnLayout);
+
+    cancelBtn->setFocus();
 }
 
 void TacticalDialog::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
-    {
-        accept();
-    }
-    else if (event->key() == Qt::Key_Escape)
+    if (event->key() == Qt::Key_Escape)
     {
         reject();
     }

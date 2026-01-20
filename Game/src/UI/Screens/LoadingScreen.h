@@ -5,11 +5,13 @@
 #include <Core/Config/Config.h>
 #include <QProgressBar>
 #include <QVBoxLayout>
+#include <QPainter>
 #include <QLabel>
 
 class LoadingScreen : public AbstractScreen
 {
     Q_OBJECT
+
 public:
     explicit LoadingScreen(QWidget *parent = nullptr);
 
@@ -20,6 +22,8 @@ public:
     void setProgress(int value);
 
     void setStatus(const QString &status);
+
+    void resizeEvent(QResizeEvent *event);
 
 private:
     QProgressBar *m_progressBar;

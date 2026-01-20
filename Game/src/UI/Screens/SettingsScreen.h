@@ -30,6 +30,7 @@ class QVBoxLayout;
 class SettingsScreen : public AbstractScreen
 {
     Q_OBJECT
+
 public:
     explicit SettingsScreen(QWidget *parent = nullptr);
 
@@ -70,8 +71,10 @@ private slots:
     void onResetClicked();
 
     void onBackClicked();
-    
+
     void onBindButtonClicked(const QString &actionName);
+
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif

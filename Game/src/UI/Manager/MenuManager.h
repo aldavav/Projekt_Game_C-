@@ -1,7 +1,10 @@
 #ifndef MENUMANAGER_H
 #define MENUMANAGER_H
 
+#include <UI/Screens/GameOverScreen.h>
 #include <Game/Engine/GameEngine.h>
+#include <UI/Screens/MenuScreen.h>
+#include <Main/MainWindow.h>
 #include <qstackedlayout.h>
 #include <QLayout>
 #include <QObject>

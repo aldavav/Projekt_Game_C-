@@ -30,6 +30,10 @@ namespace GameConfig
     constexpr int FRAME_MS = 16;
     constexpr float DELTA_TIME = 0.016f;
 
+    constexpr float GAME_SPEED_MULT_SLOW = 0.5f;
+    constexpr float GAME_SPEED_MULT_NORMAL = 1.0f;
+    constexpr float GAME_SPEED_MULT_FAST = 2.0f;
+
     constexpr float CLOUD_MAX_RANGE = 4000.0f;
     constexpr float CLOUD_SPEED_BASE = 5.0f;
     constexpr float CLOUD_SPEED_MULT = 15.0f;
@@ -44,6 +48,7 @@ namespace GameConfig
 
     constexpr int WORLD_BOUNDS = 50;
     constexpr float BASE_TILE_SIZE = 32.0f;
+    constexpr int REVEAL_RADIUS = 6;
     constexpr int HEIGHT_OFFSET = 15;
     constexpr int VIEW_RADIUS = 25;
     constexpr int CLOUD_COUNT = 50;

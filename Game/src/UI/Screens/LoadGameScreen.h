@@ -16,6 +16,7 @@
 class LoadGameScreen : public AbstractScreen
 {
     Q_OBJECT
+
 public:
     explicit LoadGameScreen(QWidget *parent = nullptr);
 
@@ -37,6 +38,8 @@ private:
     void onLoadClicked();
 
     void onEntrySelected(QListWidgetItem *item);
+
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif

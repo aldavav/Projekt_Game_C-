@@ -34,9 +34,16 @@ void LoadingScreen::onExit() { this->hide(); }
 void LoadingScreen::setProgress(int value)
 {
     m_progressBar->setValue(value);
+    m_progressBar->repaint();
 }
 
 void LoadingScreen::setStatus(const QString &status)
 {
     m_statusLabel->setText(status);
+}
+
+void LoadingScreen::resizeEvent(QResizeEvent *event)
+{
+    AbstractScreen::resizeEvent(event);
+    update();
 }

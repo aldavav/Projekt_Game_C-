@@ -5,8 +5,16 @@ LoadGameScreen::LoadGameScreen(QWidget *parent) : AbstractScreen(parent)
     setupUI();
     refreshSaveList();
 }
+void LoadGameScreen::onEnter()
+{
+    this->show();
+    m_saveList->setFocus();
 
-void LoadGameScreen::onEnter() { this->show(); }
+    if (m_saveList->count() > 0 && !m_saveList->currentItem())
+    {
+        m_saveList->setCurrentRow(0);
+    }
+}
 
 void LoadGameScreen::onExit() { this->hide(); }
 
@@ -41,7 +49,9 @@ void LoadGameScreen::setupUI()
     btnLayout->addWidget(m_loadBtn);
     layout->addLayout(btnLayout);
 
-    connect(m_saveList, &QListWidget::itemClicked, this, &LoadGameScreen::onEntrySelected);
+    connect(m_saveList, &QListWidget::currentItemChanged, this, [this](QListWidgetItem *current, QListWidgetItem *previous)
+            {
+        if (current) onEntrySelected(current); });
     connect(m_loadBtn, &QPushButton::clicked, this, &LoadGameScreen::onLoadClicked);
     connect(backBtn, &QPushButton::clicked, []()
             { MenuManager::getInstance().popScreen(); });
@@ -103,6 +113,29 @@ void LoadGameScreen::onLoadClicked()
 
 void LoadGameScreen::onEntrySelected(QListWidgetItem *item)
 {
+    if (!item)
+        return;
+
     m_loadBtn->setEnabled(true);
-    m_detailsLabel->setText(tr("Target Sector: ") + item->text());
+
+    m_detailsLabel->setText(tr("> SECTOR IDENTIFIED: ") + item->text().toUpper());
+}
+
+void LoadGameScreen::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
+        MenuManager::getInstance().popScreen();
+    }
+    else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    {
+        if (m_loadBtn->isEnabled())
+        {
+            onLoadClicked();
+        }
+    }
+    else
+    {
+        AbstractScreen::keyPressEvent(event);
+    }
 }

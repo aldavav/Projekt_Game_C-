@@ -27,6 +27,10 @@ namespace Config
     const QString PATH_EULA = ":/legal/assets/legal/EULA/EULA.html";
     const QString PATH_TOS = ":/legal/assets/legal/ToS/ToS.html";
 
+    const QString PATH_LANGUAGE = ":/i18n/assets/i18n/game_%1.qm";
+
+    const QString PATH_MISSING = ":/images/assets/images/missing.png";
+
     constexpr int LOADING_STEP_DELAY = 200;
     constexpr int LOADING_FINAL_PAUSE = 300;
 

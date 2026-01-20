@@ -1,7 +1,4 @@
-#include <UI/Screens/GameOverScreen.h>
-#include <UI/Screens/MenuScreen.h>
 #include "MenuManager.h"
-#include <Main/MainWindow.h>
 
 MenuManager &MenuManager::getInstance()
 {

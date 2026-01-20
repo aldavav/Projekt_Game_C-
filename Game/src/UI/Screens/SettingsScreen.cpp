@@ -285,24 +285,17 @@ void SettingsScreen::onApplyClicked()
 void SettingsScreen::onResetClicked()
 {
     TacticalDialog confirm(tr("FACTORY RESET"),
-                           tr("Restore all settings to default?"),
+                           tr("RESTORE ALL SYSTEM PARAMETERS TO FACTORY DEFAULTS?"),
                            this);
 
     if (confirm.exec() == QDialog::Accepted)
     {
-
         ConfigManager::getInstance().resetToDefaults();
 
-        markDirty();
+        m_isDirty = true;
 
-        QTimer::singleShot(0, this, [this]()
-                           {
-            
-            if (layout()) {
-                qDeleteAll(this->children());
-            }
-            
-            setupUI(); });
+        setupUI();
+        update();
     }
 }
 
@@ -310,11 +303,17 @@ void SettingsScreen::onBackClicked()
 {
     if (m_isDirty)
     {
-        TacticalDialog confirm(tr("Unsaved Changes"), tr("Discard changes and exit?"), this);
+        TacticalDialog confirm(tr("UNSAVED DATA"),
+                               tr("SYSTEM CONFIGURATION HAS BEEN MODIFIED. DISCARD CHANGES?"),
+                               this);
+
         if (confirm.exec() == QDialog::Rejected)
             return;
+
         ConfigManager::getInstance().loadConfiguration();
     }
+
+    m_isDirty = false;
     MenuManager::getInstance().popScreen();
 }
 
@@ -324,5 +323,24 @@ void SettingsScreen::onBindButtonClicked(const QString &actionName)
     if (dialog.exec() == QDialog::Accepted)
     {
         Input::KeyCode newKey = dialog.getCapturedKey();
+    }
+}
+
+void SettingsScreen::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
+        onBackClicked();
+    }
+    else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    {
+        if (!focusWidget() || !focusWidget()->inherits("QPushButton"))
+        {
+            onApplyClicked();
+        }
+    }
+    else
+    {
+        AbstractScreen::keyPressEvent(event);
     }
 }
