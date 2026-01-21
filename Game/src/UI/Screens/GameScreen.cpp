@@ -1,12 +1,10 @@
 #include "GameScreen.h"
-#include <UI/Widgets/TacticalDialog.h>
-#include <UI/Manager/MenuManager.h>
 
 GameScreen::GameScreen(QWidget *parent)
     : AbstractScreen(parent), m_updateTimer(new QTimer(this))
 {
     setObjectName("gameScreen");
-    m_cloudTexture.load(Config::PATH_CLOUD_TEXTURE);
+    m_cloudTexture.load(Config::Paths::CLOUD_TEXTURE);
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
@@ -16,13 +14,13 @@ GameScreen::GameScreen(QWidget *parent)
 void GameScreen::onEnter()
 {
     auto &cam = Camera::getInstance();
-    cam.setWorldBounds(Config::WORLD_BOUNDS);
+    cam.setWorldBounds(Config::World::WORLD_BOUNDS);
     cam.setViewportSize(this->width(), this->height());
 
     this->setFocusPolicy(Qt::StrongFocus);
     this->setFocus();
 
-    m_updateTimer->start(GameConfig::FRAME_MS);
+    m_updateTimer->start(Config::System::TIMER_INTERVAL_MS);
 }
 
 void GameScreen::onExit()
@@ -88,7 +86,7 @@ void GameScreen::mouseReleaseEvent(QMouseEvent *event)
 
 void GameScreen::wheelEvent(QWheelEvent *event)
 {
-    float zoomAmount = (event->angleDelta().y() > 0) ? GameConfig::ZOOM_STEP : -GameConfig::ZOOM_STEP;
+    float zoomAmount = (event->angleDelta().y() > 0) ? Config::Gameplay::ZOOM_STEP : -Config::Gameplay::ZOOM_STEP;
     Camera::getInstance().adjustZoom(zoomAmount);
     update();
 }
@@ -122,11 +120,10 @@ void GameScreen::keyPressEvent(QKeyEvent *event)
                 loading->setStatus(tr("UPLINK TERMINATED"));
                 loading->setProgress(100);
                 
-                QTimer::singleShot(Config::LOADING_FINAL_PAUSE, [loading]() {
+                QTimer::singleShot(Config::UI::LOADING_FINAL_PAUSE, [loading]() {
                     auto* mainMenu = new MenuScreen(loading->parentWidget());
                     MenuManager::getInstance().setScreen(mainMenu);
-                });
-            });
+                }); });
             return;
         }
     }
@@ -160,7 +157,7 @@ void GameScreen::updateGameDisplay()
     auto &cam = Camera::getInstance();
     float zoom = cam.getZoom();
 
-    float speed = GameConfig::CAMERA_BASE_SPEED / zoom;
+    float speed = Config::World::CAMERA_BASE_SPEED / zoom;
 
     static float lastZoom = -1.0f;
     if (std::abs(zoom - lastZoom) > 0.01f)
@@ -177,7 +174,7 @@ void GameScreen::updateGameDisplay()
     if (m_pressedKeys.contains(Qt::Key_D))
         cam.move(speed, 0);
 
-    GameManager::getInstance().update(GameConfig::DELTA_TIME);
+    GameManager::getInstance().update(Config::Simulation::DELTA_TIME);
     update();
 }
 
@@ -203,7 +200,7 @@ void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
 {
     auto &cam = Camera::getInstance();
     auto &map = Map::getInstance();
-    const float BASE_TILE = GameConfig::BASE_TILE_SIZE;
+    const float BASE_TILE = Config::World::BASE_TILE_SIZE;
     float zoom = cam.getZoom();
 
     QPointF tl = cam.screenToWorld(QPoint(0, 0), true);
@@ -227,7 +224,7 @@ void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
 
         for (int r = minR; r <= maxR; ++r)
         {
-            Tile &tile = map.getTileAt(q, r);
+            World::Tile &tile = map.getTileAt(q, r);
             if (!tile.discovered)
                 continue;
 
@@ -236,15 +233,15 @@ void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
                 screenPos.y() < -100 || screenPos.y() > height() + 100)
                 continue;
 
-            float h = GameConfig::HEIGHT_OFFSET;
-            if (tile.type == TileType::MOUNTAIN)
-                h = GameConfig::MOUNTAIN_HEIGHT;
-            else if (tile.type == TileType::GRASS)
-                h = GameConfig::GRASS_HEIGHT;
-            else if (tile.type == TileType::DIRT)
-                h = GameConfig::DIRT_HEIGHT;
-            else if (tile.type == TileType::WATER)
-                h = GameConfig::WATER_HEIGHT;
+            float h = Config::World::HEIGHT_OFFSET;
+            if (tile.type == World::TileType::MOUNTAIN)
+                h = Config::World::MOUNTAIN_HEIGHT;
+            else if (tile.type == World::TileType::GRASS)
+                h = Config::World::GRASS_HEIGHT;
+            else if (tile.type == World::TileType::DIRT)
+                h = Config::World::DIRT_HEIGHT;
+            else if (tile.type == World::TileType::WATER)
+                h = Config::World::WATER_HEIGHT;
 
             visibleTiles.push_back({q, r, screenPos, h * zoom});
         }
@@ -253,7 +250,7 @@ void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
     std::sort(visibleTiles.begin(), visibleTiles.end(), [](const TileData &a, const TileData &b)
               { return a.pos.y() < b.pos.y(); });
 
-    float radius = (BASE_TILE * zoom) * GameConfig::HEX_VISUAL_SCALE;
+    float radius = (BASE_TILE * zoom) * Config::World::HEX_VISUAL_SCALE;
     for (const auto &d : visibleTiles)
     {
         bool hovered = (d.q == currentHover.x() && d.r == currentHover.y());
@@ -276,7 +273,7 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
     auto &cam = Camera::getInstance();
     auto &gm = GameManager::getInstance();
     auto &map = Map::getInstance();
-    const float BASE_TILE = GameConfig::BASE_TILE_SIZE;
+    const float BASE_TILE = Config::World::BASE_TILE_SIZE;
 
     QPointF topLeft = cam.screenToWorld(QPoint(0, 0), false);
     QPointF bottomRight = cam.screenToWorld(QPoint(width(), height()), false);
@@ -285,7 +282,7 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
     int maxQ = static_cast<int>(ceil((2.0f / 3.0f * bottomRight.x()) / BASE_TILE)) + 2;
 
     float zoom = cam.getZoom();
-    float visualRadius = (BASE_TILE * zoom) * GameConfig::HEX_VISUAL_SCALE;
+    float visualRadius = (BASE_TILE * zoom) * Config::World::HEX_VISUAL_SCALE;
     QColor selectionColor = property("selectionColor").value<QColor>();
 
     for (int q = minQ; q <= maxQ; ++q)
@@ -295,7 +292,7 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
 
         for (int r = minR; r <= maxR; ++r)
         {
-            Tile &tile = map.getTileAt(q, r);
+            World::Tile &tile = map.getTileAt(q, r);
             if (!tile.discovered)
                 continue;
 
@@ -393,12 +390,12 @@ void GameScreen::drawClouds(QPainter &painter, Camera &cam, float gameTime, floa
     float centerY = height() / 2.0f;
     QPointF camPos = cam.getCurrentPos();
 
-    float range = GameConfig::CLOUD_MAX_RANGE;
+    float range = Config::World::CLOUD_MAX_RANGE;
     float halfRange = range / 2.0f;
 
     for (int i = 0; i < 50; ++i)
     {
-        float speedVar = GameConfig::CLOUD_SPEED_BASE + (std::abs(std::sin(i * 1.618f)) * GameConfig::CLOUD_SPEED_MULT);
+        float speedVar = Config::World::CLOUD_SPEED_BASE + (std::abs(std::sin(i * 1.618f)) * Config::World::CLOUD_SPEED_MULT);
 
         float xOffset = i * 937.0f;
         float yOffset = std::fmod(i * 563.0f, range) - halfRange;
@@ -426,20 +423,20 @@ void GameScreen::drawClouds(QPainter &painter, Camera &cam, float gameTime, floa
     painter.setOpacity(1.0f);
 }
 
-QColor GameScreen::getTileVisualColor(const Tile &tile, float gameTime)
+QColor GameScreen::getTileVisualColor(const World::Tile &tile, float gameTime)
 {
     switch (tile.type)
     {
-    case TileType::WATER:
+    case World::TileType::WATER:
     {
-        float wave = std::sin(gameTime * GameConfig::WATER_WAVE_SPEED) * 0.5f + 0.5f;
-        return m_waterColor.lighter(GameConfig::WATER_BRIGHTNESS_BASE + wave * GameConfig::WATER_BRIGHTNESS_SWING);
+        float wave = std::sin(gameTime * Config::World::WATER_WAVE_SPEED) * 0.5f + 0.5f;
+        return m_waterColor.lighter(Config::World::WATER_BRIGHTNESS_BASE + wave * Config::World::WATER_BRIGHTNESS_SWING);
     }
-    case TileType::GRASS:
+    case World::TileType::GRASS:
         return m_grassColor;
-    case TileType::MOUNTAIN:
+    case World::TileType::MOUNTAIN:
         return m_mountainColor;
-    case TileType::DIRT:
+    case World::TileType::DIRT:
         return m_dirtColor;
     default:
         return m_grassColor;

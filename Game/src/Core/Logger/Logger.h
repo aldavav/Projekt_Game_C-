@@ -1,10 +1,9 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#include <Core/Config/Configuration.h>
 #include <Core/Config/LoggerMacros.h>
-#include <Core/Config/LoggerTypes.h>
-#include <Core/Config/AnsiCodes.h>
-#include <Core/Config/Config.h>
+#include <Core/Common/GameTypes.h>
 #include <filesystem>
 #include <qlogging.h>
 #include <algorithm>
@@ -30,9 +29,9 @@ private:
 
     std::recursive_mutex logMutex_;
 
-    std::string formatLogMessage(LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function);
+    std::string formatLogMessage(Engine::LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function);
 
-    static std::string logLevelToString(LogLevel type);
+    static std::string logLevelToString(Engine::LogLevel type);
 
     std::string getCurrentTime();
 
@@ -43,7 +42,7 @@ private:
 public:
     static Logger &getInstance();
 
-    void log(LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function);
+    void log(Engine::LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function);
 
     Logger(const Logger &) = delete;
 

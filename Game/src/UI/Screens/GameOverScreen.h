@@ -1,10 +1,9 @@
 #ifndef GAMEOVERSCREEN_H
 #define GAMEOVERSCREEN_H
 
+#include <Core/Config/Configuration.h>
 #include <UI/Screens/AbstractScreen.h>
 #include <Game/Engine/GameEngine.h>
-#include <Core/Config/GameConfig.h>
-#include <Core/Config/Config.h>
 #include <QApplication>
 #include <QPushButton>
 #include <QVBoxLayout>

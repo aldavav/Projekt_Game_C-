@@ -1,20 +1,25 @@
 #ifndef UNITACTIONS_H
 #define UNITACTIONS_H
 
-#include <Core/Config/GameActions.h>
+#include <Core/Common/ICommand.h>
 #include <QPoint>
 
-class MoveUnitAction : public GameAction
+class MoveUnitAction : public ICommand
 {
 public:
-    MoveUnitAction(const QPoint& targetTile) : m_target(targetTile) {}
+    MoveUnitAction() : m_targetPos(0, 0) {}
 
-    bool execute(GameEngine& engine) override;
+    explicit MoveUnitAction(const QPoint &targetPos)
+        : m_targetPos(targetPos) {}
+
+    bool execute(GameEngine &engine) override;
 
     bool undo() override;
 
+    QString debugName() const override { return "MoveAction"; }
+
 private:
-    QPoint m_target;
+    QPoint m_targetPos;
 };
 
 #endif

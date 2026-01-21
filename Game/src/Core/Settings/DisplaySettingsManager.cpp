@@ -14,8 +14,8 @@ QStringList DisplaySettingsManager::getAvailableResolutions() const
     if (!screen)
     {
         return {QString("%1x%2")
-                    .arg(Config::DEFAULT_WIDTH)
-                    .arg(Config::DEFAULT_HEIGHT)};
+                    .arg(Config::Gameplay::DEFAULT_WINDOW_WIDTH)
+                    .arg(Config::Gameplay::DEFAULT_WINDOW_HEIGHT)};
     }
 
     QSize logicalSize = screen->size();

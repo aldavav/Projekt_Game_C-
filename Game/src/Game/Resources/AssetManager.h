@@ -1,8 +1,7 @@
 #ifndef ASSETMANAGER_H
 #define ASSETMANAGER_H
 
-#include <Core/Config/CursorTypes.h>
-#include <Core/Config/Config.h>
+#include <Core/Config/Configuration.h>
 #include <QFontDatabase>
 #include <QString>
 #include <QCursor>
@@ -15,7 +14,7 @@ public:
     
     static QFont getFont(int size = 12, bool bold = false);
     
-    static QCursor getCursor(Asset::CursorType type);
+    static QCursor getCursor(Engine::Graphics::CursorType type);
 };
 
 #endif

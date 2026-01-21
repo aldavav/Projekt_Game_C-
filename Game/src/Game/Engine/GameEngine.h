@@ -1,11 +1,9 @@
 #ifndef GAMEENGINE_H
 #define GAMEENGINE_H
 
+#include <Core/Config/Configuration.h>
 #include <Core/Input/InputManager.h>
-#include <Core/Config/GameConfig.h>
-#include <Core/Config/GameState.h>
 #include <Game/Entities/Entity.h>
-#include <Core/Config/Config.h>
 #include <Game/Camera/Camera.h>
 #include <qcoreapplication.h>
 #include <Game/Map/Map.h>
@@ -43,9 +41,9 @@ public:
 
     void loadMatch(const QString &mapName);
 
-    void setState(GameState::State newState);
+    void setState(Engine::State newState);
 
-    GameState::State getState() const { return m_currentState; }
+    Engine::State getState() const { return m_currentState; }
 
     bool didPlayerWin() const { return m_playerWon; }
 
@@ -71,15 +69,15 @@ private:
 
     void updateCameraMovement(float fixedStep);
 
-    GameState::State m_currentState = GameState::STATE_MENU;
+    Engine::State m_currentState = Engine::State::MENU;
 
     bool m_isRunning = false;
 
     bool m_playerWon = false;
 
-    QString m_currentMapName = GameConfig::World::DEFAULT_MAP_NAME;
+    QString m_currentMapName = Config::World::DEFAULT_MAP_NAME;
 
-    uint32_t m_currentSeed = GameConfig::World::DEFAULT_SEED;
+    uint32_t m_currentSeed = Config::World::DEFAULT_SEED;
 
     QTimer m_gameTimer;
 

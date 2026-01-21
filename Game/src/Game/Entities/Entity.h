@@ -1,8 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <Core/Config/EntityTypes.h>
-#include <Core/Config/GameConfig.h>
+#include <Core/Config/Configuration.h>
 #include <fstream>
 #include <QPointF>
 #include <string>
@@ -23,7 +22,7 @@ public:
 
     QPointF getTarget() const { return m_targetPosition; }
 
-    EntityTypes::EntityType getType() const { return m_type; }
+    Engine::Entity::Type getType() const { return m_type; }
 
     std::string getName() const { return m_name; }
 
@@ -46,7 +45,7 @@ protected:
 
     std::string m_symbol;
 
-    EntityTypes::EntityType m_type = EntityTypes::EntityType::UNIT;
+    Engine::Entity::Type m_type = Engine::Entity::Type::UNIT;
 
     Player *m_owner = nullptr;
 
@@ -54,7 +53,7 @@ protected:
 
     QPointF m_targetPosition = {0.0f, 0.0f};
 
-    float m_speed = GameConfig::Entities::DEFAULT_SPEED;
+    float m_speed = Config::Entities::DEFAULT_SPEED;
 };
 
 #endif

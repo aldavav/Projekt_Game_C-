@@ -1,8 +1,8 @@
 #ifndef DISPLAYSETTINGSMANAGER_H
 #define DISPLAYSETTINGSMANAGER_H
 
-#include <UI/Manager/ConfigManager.h>
-#include <Core/Config/Config.h>
+#include <Game/Resources/ConfigManager.h>
+#include <Core/Config/Configuration.h>
 #include <QGuiApplication>
 #include <QObject>
 #include <QScreen>

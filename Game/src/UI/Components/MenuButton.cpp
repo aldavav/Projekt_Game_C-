@@ -9,8 +9,8 @@ MenuButton::MenuButton(const QString &text, bool isQuit, QWidget *parent)
 
     m_btn = new QPushButton(text, this);
     m_btn->setObjectName(isQuit ? "quitButton" : "menuButton");
-    m_btn->setFixedSize(Config::BTN_WIDTH_NORMAL, Config::BTN_HEIGHT_NORMAL);
-    m_btn->move(Config::BTN_X_NORMAL, 5);
+    m_btn->setFixedSize(Config::UI::BTN_WIDTH_NORMAL, Config::UI::BTN_HEIGHT_NORMAL);
+    m_btn->move(Config::UI::BTN_X_NORMAL, 5);
 
     auto *glow = new QGraphicsDropShadowEffect(m_btn);
     glow->setBlurRadius(25);
@@ -29,8 +29,8 @@ bool MenuButton::eventFilter(QObject *obj, QEvent *event)
     {
         if (event->type() == QEvent::Enter || event->type() == QEvent::FocusIn)
         {
-            m_btn->setFixedSize(Config::BTN_WIDTH_HOVER, Config::BTN_HEIGHT_HOVER);
-            m_btn->move(Config::BTN_X_HOVER, 2);
+            m_btn->setFixedSize(Config::UI::BTN_WIDTH_HOVER, Config::UI::BTN_HEIGHT_HOVER);
+            m_btn->move(Config::UI::BTN_X_HOVER, 2);
 
             m_arrow->move(m_btn->x() + m_btn->width() + 10, (height() - m_arrow->height()) / 2);
             m_arrow->show();
@@ -40,8 +40,8 @@ bool MenuButton::eventFilter(QObject *obj, QEvent *event)
         }
         else if (event->type() == QEvent::Leave || event->type() == QEvent::FocusOut)
         {
-            m_btn->setFixedSize(Config::BTN_WIDTH_NORMAL, Config::BTN_HEIGHT_NORMAL);
-            m_btn->move(Config::BTN_X_NORMAL, 5);
+            m_btn->setFixedSize(Config::UI::BTN_WIDTH_NORMAL, Config::UI::BTN_HEIGHT_NORMAL);
+            m_btn->move(Config::UI::BTN_X_NORMAL, 5);
             m_arrow->hide();
 
             if (m_btn->objectName() != "quitButton")

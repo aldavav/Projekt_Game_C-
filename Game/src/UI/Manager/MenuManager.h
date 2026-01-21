@@ -4,6 +4,7 @@
 #include <UI/Screens/GameOverScreen.h>
 #include <Game/Engine/GameEngine.h>
 #include <UI/Screens/MenuScreen.h>
+#include <Core/Common/GameTypes.h>
 #include <Main/MainWindow.h>
 #include <qstackedlayout.h>
 #include <QLayout>

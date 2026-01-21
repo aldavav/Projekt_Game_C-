@@ -24,27 +24,6 @@ Logger::Logger()
     }
 }
 
-void Logger::log(const LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function)
-{
-    std::lock_guard<std::recursive_mutex> lock(logMutex_);
-    std::string formatted = formatLogMessage(type, message, file, line, function);
-
-    if (logFile_.is_open())
-    {
-        logFile_ << formatted << std::endl;
-    }
-
-    std::string color = Config::Log::RESET;
-    if (type == LogLevel::Error)
-        color = Config::Log::RED_BOLD;
-    else if (type == LogLevel::Warning)
-        color = Config::Log::YELLOW_BOLD;
-    else if (type == LogLevel::Info)
-        color = Config::Log::GREEN_NORMAL;
-
-    std::cout << color << formatted << Config::Log::RESET << std::endl;
-}
-
 void Logger::archiveLogFile()
 {
     std::lock_guard<std::recursive_mutex> lock(logMutex_);
@@ -67,7 +46,7 @@ void Logger::archiveLogFile()
         date_oss << std::put_time(&local_tm, "%Y-%m-%d");
         do
         {
-            newName = logsDir / (Config::Log::ARCHIVE_PREFIX + date_oss.str() + "-" + std::to_string(sequence++) + ".log");
+            newName = logsDir / (Config::Log::ARCHIVE_FILE_PREFIX + date_oss.str() + "-" + std::to_string(sequence++) + ".log");
         } while (std::filesystem::exists(newName));
 
         try
@@ -124,7 +103,7 @@ Logger &Logger::getInstance()
     return instance;
 }
 
-void Logger::log(const LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function)
+void Logger::log(const Engine::LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function)
 {
     std::lock_guard<std::recursive_mutex> lock(logMutex_);
     std::string formatted = formatLogMessage(type, message, file, line, function);
@@ -134,33 +113,33 @@ void Logger::log(const LogLevel type, const std::string &message, const std::str
         logFile_ << formatted << std::endl;
     }
 
-    std::string color = RESET_TEXT;
-    if (type == LogLevel::Error)
-        color = RED_BOLD_TEXT;
-    else if (type == LogLevel::Warning)
-        color = YELLOW_BOLD_TEXT;
-    else if (type == LogLevel::Info)
-        color = GREEN_NORMAL_TEXT;
+    std::string color = Engine::ANSIColors::RESET;
+    if (type == Engine::LogLevel::Error)
+        color = Engine::ANSIColors::RED_BOLD;
+    else if (type == Engine::LogLevel::Warning)
+        color = Engine::ANSIColors::YELLOW_BOLD;
+    else if (type == Engine::LogLevel::Info)
+        color = Engine::ANSIColors::GREEN_NORMAL;
 
-    std::cout << color << formatted << RESET_TEXT << std::endl;
+    std::cout << color << formatted << Engine::ANSIColors::RESET << std::endl;
 }
 
-std::string Logger::formatLogMessage(const LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function)
+std::string Logger::formatLogMessage(const Engine::LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function)
 {
     std::ostringstream oss;
     oss << "[" << logLevelToString(type) << ": " << getCurrentTime() << " | " << stripPath(file) << ":" << line << " | " << function << "] " << message;
     return oss.str();
 }
 
-std::string Logger::logLevelToString(const LogLevel type)
+std::string Logger::logLevelToString(const Engine::LogLevel type)
 {
     switch (type)
     {
-    case LogLevel::Info:
+    case Engine::LogLevel::Info:
         return "Info";
-    case LogLevel::Error:
+    case Engine::LogLevel::Error:
         return "Error";
-    case LogLevel::Warning:
+    case Engine::LogLevel::Warning:
         return "Warning";
     default:
         return "Unknown";
@@ -190,7 +169,7 @@ std::string Logger::stripPath(const std::string &path)
     return (pos == std::string::npos) ? path : path.substr(pos + 1);
 }
 
-void qtMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+/*void qtMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     switch (type)
     {
@@ -207,4 +186,4 @@ void qtMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
         LOG_ERROR("FATAL: " + msg.toStdString());
         abort();
     }
-}
+}*/

@@ -26,8 +26,8 @@ void InputManager::onKeyPress(int keyCode)
     if (isRepeat)
         return;
 
-    RawInputEvent event;
-    event.type = RawInputEvent::Type::Keyboard;
+    Engine::Input::RawEvent event;
+    event.type = Engine::Input::RawEvent::Type::Keyboard;
     event.keyCode = keyCode;
 
     CommandPtr command = translateRawInput(event);
@@ -48,10 +48,13 @@ bool InputManager::isKeyPressed(int keyCode) const
     return m_activeKeys.find(keyCode) != m_activeKeys.end();
 }
 
+void InputManager::onMouseMove(const QPoint &pos) {
+}
+
 void InputManager::onMouseClick(Qt::MouseButton button, const QPoint &pos)
 {
-    RawInputEvent event;
-    event.type = RawInputEvent::Type::MouseClick;
+    Engine::Input::RawEvent event;
+    event.type = Engine::Input::RawEvent::Type::MouseClick;
     event.button = button;
     event.position = pos;
 
@@ -63,43 +66,36 @@ void InputManager::onMouseClick(Qt::MouseButton button, const QPoint &pos)
     }
 }
 
-CommandPtr InputManager::translateRawInput(const RawInputEvent &event)
+CommandPtr InputManager::translateRawInput(const Engine::Input::RawEvent &event)
 {
     auto &settings = ControlsSettingsManager::getInstance();
 
-    if (event.type == RawInputEvent::Type::Keyboard)
+    if (event.type == Engine::Input::RawEvent::Type::Keyboard)
     {
         int keyCode = event.keyCode;
 
-        if (keyCode == static_cast<int>(settings.getKey(Controls::Action::STOP)))
+        if (keyCode == static_cast<int>(settings.getKey(Engine::Input::Action::STOP)))
+            return QSharedPointer<StopUnitAction>::create().staticCast<ICommand>();
+
+        if (keyCode == static_cast<int>(settings.getKey(Engine::Input::Action::GUARD)))
+            return QSharedPointer<GuardUnitAction>::create().staticCast<ICommand>();
+
+        if (keyCode == static_cast<int>(settings.getKey(Engine::Input::Action::ZOOM_OUT)))
+            return QSharedPointer<ZoomAction>::create(-Config::Gameplay::ZOOM_STEP).staticCast<ICommand>();
+
+        if (keyCode == static_cast<int>(settings.getKey(Engine::Input::Action::ZOOM_IN)) ||
+            keyCode == static_cast<int>(settings.getKey(Engine::Input::Action::ZOOM_IN_ALT)))
         {
-            return QSharedPointer<StopAction>::create().staticCast<ICommand>();
-        }
-
-        if (keyCode == static_cast<int>(settings.getKey(Controls::Action::GUARD)))
-        {
-            return QSharedPointer<GuardAction>::create().staticCast<ICommand>();
-        }
-
-        switch (keyCode)
-        {
-        case GameConfig::KEY_ZOOM_OUT:
-            return QSharedPointer<ZoomAction>::create(-GameConfig::ZOOM_STEP).staticCast<ICommand>();
-
-        case GameConfig::KEY_ZOOM_IN:
-        case GameConfig::KEY_ZOOM_IN_ALT:
-            return qSharedPointerCast<ICommand>(QSharedPointer<ZoomAction>::create(GameConfig::ZOOM_STEP));
-
-        default:
-            break;
+            return QSharedPointer<ZoomAction>::create(Config::Gameplay::ZOOM_STEP).staticCast<ICommand>();
         }
     }
 
-    if (event.type == RawInputEvent::Type::MouseClick)
+    if (event.type == Engine::Input::RawEvent::Type::MouseClick)
     {
-        if (event.button == GameConfig::BTN_MOVE)
+
+        if (event.button == Config::Input::BTN_MOVE)
         {
-            return qSharedPointerCast<ICommand>(QSharedPointer<MoveUnitAction>::create(event.position));
+            return QSharedPointer<MoveUnitAction>::create(event.position).staticCast<ICommand>();
         }
     }
 

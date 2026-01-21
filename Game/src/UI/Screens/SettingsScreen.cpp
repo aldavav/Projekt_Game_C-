@@ -13,13 +13,13 @@ void SettingsScreen::setupUI()
 {
     auto *rootLayout = new QHBoxLayout(this);
 
-    rootLayout->addStretch(Config::SETTINGS_SIDE_STRETCH);
+    rootLayout->addStretch(Config::UI::SETTINGS_SIDE_STRETCH);
 
     auto *contentContainer = new QWidget();
     contentContainer->setObjectName("settingsContent");
-    rootLayout->addWidget(contentContainer, Config::SETTINGS_CONTENT_STRETCH);
+    rootLayout->addWidget(contentContainer, Config::UI::SETTINGS_CONTENT_STRETCH);
 
-    rootLayout->addStretch(Config::SETTINGS_SIDE_STRETCH);
+    rootLayout->addStretch(Config::UI::SETTINGS_SIDE_STRETCH);
 
     auto *mainLayout = new QVBoxLayout(contentContainer);
 
@@ -92,7 +92,7 @@ QWidget *SettingsScreen::createGameTab()
     auto &cfg = ConfigManager::getInstance().getSettings();
 
     auto *langCombo = new QComboBox();
-    for (const auto &lang : Config::LANGUAGES)
+    for (const auto &lang : Config::System::LANGUAGES)
     {
         langCombo->addItem(lang.first, lang.second);
     }
@@ -186,7 +186,7 @@ QWidget *SettingsScreen::createGraphicsTab()
     texCombo->setCurrentIndex(cfg.textureQualityIndex);
 
     auto *gammaSlider = new QSlider(Qt::Horizontal);
-    gammaSlider->setRange(GameConfig::GAMMA_MIN, GameConfig::GAMMA_MAX);
+    gammaSlider->setRange(Config::Gameplay::GAMMA_MIN, Config::Gameplay::GAMMA_MAX);
     gammaSlider->setValue(cfg.gamma);
 
     layout->addRow(tr("TEXTURE QUALITY"), texCombo);
@@ -226,7 +226,7 @@ QWidget *SettingsScreen::createAudioTab()
     for (const auto &row : rows)
     {
         auto *slider = new QSlider(Qt::Horizontal);
-        slider->setRange(GameConfig::VOLUME_MIN, GameConfig::VOLUME_MAX);
+        slider->setRange(Config::Gameplay::VOLUME_MIN, Config::Gameplay::VOLUME_MAX);
         slider->setValue(*row.valuePtr);
 
         connect(slider, &QSlider::valueChanged, this, [this, row](int val)
@@ -246,7 +246,7 @@ QWidget *SettingsScreen::createInputTab()
 
     layout->addRow(new QLabel(tr("KEY BINDINGS")));
 
-    auto createBindRow = [this, layout](const QString &label, Controls::Action action)
+    auto createBindRow = [this, layout](const QString &label, Engine::Input::Action action)
     {
         auto *btn = new QPushButton(ControlsSettingsManager::getInstance().getKeyName(action));
         btn->setObjectName("bindButton");
@@ -256,17 +256,17 @@ QWidget *SettingsScreen::createInputTab()
             KeyCaptureDialog diag(this);
             if (diag.exec() == QDialog::Accepted) {
                 markDirty(); 
-                ControlsSettingsManager::getInstance().setKey(action, static_cast<Input::KeyCode>(diag.getCapturedKey()));
+                ControlsSettingsManager::getInstance().setKey(action, static_cast<Engine::Input::KeyCode>(diag.getCapturedKey()));
                 btn->setText(ControlsSettingsManager::getInstance().getKeyName(action));
             } });
         layout->addRow(label, btn);
     };
 
-    createBindRow(tr("MOVE UP"), Controls::Action::MOVE_UP);
-    createBindRow(tr("MOVE DOWN"), Controls::Action::MOVE_DOWN);
-    createBindRow(tr("UNIT: STOP"), Controls::Action::STOP);
-    createBindRow(tr("UNIT: GUARD"), Controls::Action::GUARD);
-    createBindRow(tr("UNIT: SCATTER"), Controls::Action::SCATTER);
+    createBindRow(tr("MOVE UP"), Engine::Input::Action::MOVE_UP);
+    createBindRow(tr("MOVE DOWN"), Engine::Input::Action::MOVE_DOWN);
+    createBindRow(tr("UNIT: STOP"), Engine::Input::Action::STOP);
+    createBindRow(tr("UNIT: GUARD"), Engine::Input::Action::GUARD);
+    createBindRow(tr("UNIT: SCATTER"), Engine::Input::Action::SCATTER);
 
     return w;
 }
@@ -322,7 +322,7 @@ void SettingsScreen::onBindButtonClicked(const QString &actionName)
     KeyCaptureDialog dialog(this);
     if (dialog.exec() == QDialog::Accepted)
     {
-        Input::KeyCode newKey = dialog.getCapturedKey();
+        Engine::Input::KeyCode newKey = dialog.getCapturedKey();
     }
 }
 

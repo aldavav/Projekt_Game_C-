@@ -1,7 +1,7 @@
 #ifndef CONTROLSSETTINGSMANAGER_H
 #define CONTROLSSETTINGSMANAGER_H
 
-#include <Core/Config/ControlTypes.h>
+#include <Core/Config/Configuration.h>
 #include <QKeySequence>
 #include <QString>
 #include <QMap>
@@ -11,11 +11,11 @@ class ControlsSettingsManager
 public:
     static ControlsSettingsManager &getInstance();
 
-    void setKey(Controls::Action action, Controls::Key key);
+    void setKey(Engine::Input::Action action, Engine::Input::KeyCode key);
 
-    Controls::Key getKey(Controls::Action action) const;
+    Engine::Input::KeyCode getKey(Engine::Input::Action action) const;
 
-    QString getKeyName(Controls::Action action) const;
+    QString getKeyName(Engine::Input::Action action) const;
 
 private:
     ControlsSettingsManager();
@@ -26,7 +26,7 @@ private:
     
     ControlsSettingsManager &operator=(const ControlsSettingsManager &) = delete;
 
-    QMap<Controls::Action, Controls::Key> m_bindings;
+    QMap<Engine::Input::Action, Engine::Input::KeyCode> m_bindings;
 };
 
 #endif

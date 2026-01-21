@@ -1,7 +1,7 @@
 #ifndef TACTICALDIALOG_H
 #define TACTICALDIALOG_H
 
-#include <Core/Config/Config.h>
+#include <Core/Config/Configuration.h>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>

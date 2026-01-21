@@ -104,14 +104,14 @@ void MenuManager::handleGameStateChange(int newState)
 {
     switch (newState)
     {
-    case STATE_MENU:
+    case static_cast<int>(Engine::State::MENU):
         setScreen(new MenuScreen(m_mainWindow));
         break;
 
-    case STATE_RUNNING:
+    case static_cast<int>(Engine::State::RUNNING):
         break;
 
-    case STATE_GAMEOVER:
+    case static_cast<int>(Engine::State::GAMEOVER):
     {
         bool winStatus = GameEngine::getInstance().didPlayerWin();
         setScreen(new GameOverScreen(winStatus, m_mainWindow));

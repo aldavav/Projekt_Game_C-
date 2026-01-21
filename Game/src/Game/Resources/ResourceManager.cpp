@@ -16,7 +16,7 @@ TexturePtr ResourceManager::getTexture(const QString &resourceId)
 
     if (newTexture.isNull())
     {
-        const QString fallback = Config::PATH_MISSING;
+        const QString fallback = Config::Paths::MISSING_TEXTURE;
         if (resourceId == fallback)
             return TexturePtr();
 
@@ -59,15 +59,7 @@ AudioPtr ResourceManager::loadAudioFromFile(const QString &filePath)
     AudioPtr sound(new QSoundEffect());
     sound->setSource(QUrl(filePath));
 
-    sound->setVolume(static_cast<float>(GameConfig::VOLUME_DEFAULT) / 100.0f);
-
-    return sound;
-}
-
-AudioPtr ResourceManager::loadAudioFromFile(const QString &filePath)
-{
-    AudioPtr sound(new QSoundEffect());
-    sound->setSource(QUrl(filePath));
+    sound->setVolume(static_cast<float>(Config::Audio::VOLUME_DEFAULT) / 100.0f);
 
     return sound;
 }

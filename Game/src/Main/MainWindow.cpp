@@ -9,8 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
     GameSettingsManager::getInstance().setLanguage(langCode);
 
     applyGlobalStyles();
-    setWindowTitle(Config::GAME_TITLE);
-    setWindowIcon(QIcon(Config::PATH_ICON));
+    setWindowTitle(Config::System::GAME_TITLE);
+    setWindowIcon(QIcon(Config::Paths::ICON));
 
     m_centralWidget = new QWidget(this);
     setCentralWidget(m_centralWidget);
@@ -24,21 +24,21 @@ MainWindow::MainWindow(QWidget *parent)
         loading->setStatus(tr("LOADING ASSETS..."));
         loading->setProgress(30);
         
-        setCursor(AssetManager::getCursor(Asset::CursorType::Standard));
+        setCursor(AssetManager::getCursor(Engine::Graphics::CursorType::Standard));
         setupBackgroundMusic();
 
-        QTimer::singleShot(Config::LOADING_STEP_DELAY, loading, [this, loading]() {
+        QTimer::singleShot(Config::UI::LOADING_STEP_DELAY, loading, [this, loading]() {
             loading->setStatus(tr("CONFIGURING DISPLAY..."));
             loading->setProgress(70);
             
             applyDisplaySettings();
             setupDisplayConnections();
 
-            QTimer::singleShot(Config::LOADING_STEP_DELAY, loading, [this, loading]() {
+            QTimer::singleShot(Config::UI::LOADING_STEP_DELAY, loading, [this, loading]() {
                 loading->setStatus(tr("SYSTEM READY"));
                 loading->setProgress(100);
 
-                QTimer::singleShot(Config::LOADING_FINAL_PAUSE, loading, [this]() {
+                QTimer::singleShot(Config::UI::LOADING_FINAL_PAUSE, loading, [this]() {
                     auto &config = ConfigManager::getInstance();
                     
                     if (!config.getSettings().legalAccepted) {
@@ -55,9 +55,9 @@ MainWindow::MainWindow(QWidget *parent)
                             "<br><hr><br>"
                             "<h3>%3</h3><p>%4</p>")
                             .arg(tr("END USER LICENSE AGREEMENT"), 
-                                 loadLegalDoc(Config::PATH_EULA), 
+                                 loadLegalDoc(Config::Paths::EULA), 
                                  tr("TERMS OF SERVICE"), 
-                                 loadLegalDoc(Config::PATH_TOS));
+                                 loadLegalDoc(Config::Paths::TOS));
                                 InformationDialog dialog(tr("LEGAL PROTOCOLS"), combinedLegal, this);
 
                                 if (dialog.exec() == QDialog::Accepted) {
@@ -160,12 +160,12 @@ void MainWindow::updateWindowMetadata()
     if (!map.getMapName().empty())
     {
         setWindowTitle(QString("%1 - %2")
-                           .arg(Config::GAME_TITLE)
+                           .arg(Config::System::GAME_TITLE)
                            .arg(QString::fromStdString(map.getMapName())));
     }
     else
     {
-        setWindowTitle(Config::GAME_TITLE);
+        setWindowTitle(Config::System::GAME_TITLE);
     }
 }
 
@@ -174,7 +174,7 @@ void MainWindow::setupBackgroundMusic()
     m_bgmPlayer = new QMediaPlayer(this);
     m_audioOutput = new QAudioOutput(this);
     m_bgmPlayer->setAudioOutput(m_audioOutput);
-    m_bgmPlayer->setSource(QUrl(Config::PATH_BGM));
+    m_bgmPlayer->setSource(QUrl(Config::Audio::PATH_BGM));
 
     updateMusicVolume();
 
@@ -197,7 +197,7 @@ void MainWindow::applyGlobalStyles()
         QApplication::setFont(orbitronFont);
     }
 
-    QFile styleFile(Config::PATH_STYLES);
+    QFile styleFile(Config::Paths::STYLE_SHEET);
     if (styleFile.open(QFile::ReadOnly))
     {
         QString styleSheet = QLatin1String(styleFile.readAll());

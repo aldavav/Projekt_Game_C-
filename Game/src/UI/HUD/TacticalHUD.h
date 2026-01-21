@@ -1,10 +1,9 @@
 #ifndef TACTICALHUD_H
 #define TACTICALHUD_H
 
-#include <Core/Config/GameConfig.h>
-#include <Core/Config/GameSpeed.h>
+#include <Core/Common/WorldData.h>
+#include <Core/Common/GameTypes.h>
 #include <Game/Camera/Camera.h>
-#include <Core/Config/Config.h>
 #include <Game/Map/Map.h>
 #include <QElapsedTimer>
 #include <qpainter.h>
@@ -23,7 +22,7 @@ class TacticalHUD : public QObject
 public:
     explicit TacticalHUD(QObject *parent = nullptr);
 
-    void update(float gameTime, bool isPaused, GameSpeed speed);
+    void update(float gameTime, bool isPaused, Engine::GameSpeed speed);
 
     void draw(QPainter &painter, int width, int height);
 
@@ -58,7 +57,7 @@ private:
 
     void drawMinimapCached(QPainter &painter, int width, int height);
 
-    QString getTileTypeName(TileType type);
+    QString getTileTypeName(World::TileType type);
 
     void drawScanlines(QPainter &painter, QRect rect);
 
@@ -68,7 +67,7 @@ private:
 
     bool m_isPaused = false;
 
-    GameSpeed m_currentSpeed = GameSpeed::NORMAL;
+    Engine::GameSpeed m_currentSpeed = Engine::GameSpeed::NORMAL;
 
     QPointF m_selectedHex;
 

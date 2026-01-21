@@ -1,7 +1,7 @@
 #ifndef AUDIOSETTINGSMANAGER_H
 #define AUDIOSETTINGSMANAGER_H
 
-#include <UI/Manager/ConfigManager.h>
+#include <Game/Resources/ConfigManager.h>
 #include <QObject>
 
 class AudioSettingsManager : public QObject

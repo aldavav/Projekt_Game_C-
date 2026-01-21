@@ -1,7 +1,7 @@
 #ifndef GAMESETTINGSMANAGER_H
 #define GAMESETTINGSMANAGER_H
 
-#include <Core/Config/Config.h>
+#include <Core/Config/Configuration.h>
 #include <QApplication>
 #include <QTranslator>
 #include <QObject>

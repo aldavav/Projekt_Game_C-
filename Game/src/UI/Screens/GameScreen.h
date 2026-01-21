@@ -2,9 +2,10 @@
 #define GAMESCREEN_H
 
 #include <UI/Screens/AbstractScreen.h>
-#include <UI/Manager/GameManager.h>
-#include <Core/Config/GameConfig.h>
-#include <Core/Config/Config.h>
+#include <Core/Config/Configuration.h>
+#include <Game/Engine/GameManager.h>
+#include <UI/Manager/MenuManager.h>
+#include <Core/Common/WorldData.h>
 #include <qpainter.h>
 #include <QPolygonF>
 #include <QPointF>
@@ -15,7 +16,6 @@ class QPainter;
 class QMouseEvent;
 class QWheelEvent;
 class QResizeEvent;
-class Tile;
 
 class GameScreen : public AbstractScreen
 {
@@ -73,7 +73,7 @@ private:
 
     void drawClouds(QPainter &painter, Camera &cam, float gameTime, float zoom);
 
-    QColor getTileVisualColor(const Tile &tile, float gameTime);
+    QColor getTileVisualColor(const World::Tile &tile, float gameTime);
 
     QTimer *m_updateTimer;
 

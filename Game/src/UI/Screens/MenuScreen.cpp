@@ -100,14 +100,14 @@ void MenuScreen::onSettingsClicked()
 
 void MenuScreen::onHelpClicked()
 {
-    updatePanelContent(Config::MANUAL_TITLE, Config::MANUAL_TEXT);
+    updatePanelContent(Config::UI::MANUAL_TITLE, Config::UI::MANUAL_TEXT);
 }
 
 void MenuScreen::onCreditsClicked()
 {
     QString content = "LEAD PROGRAMMER\nLEAD GAME DESIGNER\nTECHNICAL ARCHITECT\n"
                       "CORE SYSTEMS & GAMEPLAY\n- " +
-                      Config::LEAD_DEV + "\n\n";
+                      Config::Strings::LEAD_DEV + "\n\n";
 
     content += "PROGRAMMING SUPPORT\n- " + Config::Strings::PROGRAMMING_TEAM.join("\n- ") + "\n\n";
 
@@ -132,9 +132,9 @@ void MenuScreen::setupUI()
 {
     auto *mainLayout = new QVBoxLayout(this);
     mainLayout->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-    mainLayout->setContentsMargins(Config::MENU_LEFT_MARGIN, 20, 40, 40);
+    mainLayout->setContentsMargins(Config::UI::MENU_LEFT_MARGIN, 20, 40, 40);
 
-    auto *titleLabel = new QLabel(Config::GAME_TITLE, this);
+    auto *titleLabel = new QLabel(Config::System::GAME_TITLE, this);
     titleLabel->setObjectName("mainMenuTitle");
     titleLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(titleLabel);
@@ -210,7 +210,7 @@ void MenuScreen::setupUI()
     mainLayout->addLayout(contentLayout);
     mainLayout->addStretch();
 
-    auto *versionLabel = new QLabel("v" + Config::VERSION, this);
+    auto *versionLabel = new QLabel("v" + Config::System::VERSION, this);
     versionLabel->setObjectName("versionLabel");
 
     auto *footerLayout = new QHBoxLayout();
@@ -232,8 +232,8 @@ void MenuScreen::setupBackground()
     m_backgroundLabel = new QLabel(this);
     m_backgroundLabel->setScaledContents(true);
 
-    m_bgMovie = new QMovie(Config::PATH_MENU_BG);
-    m_bgMovie->setSpeed(Config::BG_ANIM_SPEED);
+    m_bgMovie = new QMovie(Config::UI::PATH_MENU_BG);
+    m_bgMovie->setSpeed(Config::UI::BG_ANIM_SPEED);
 
     m_backgroundLabel->setMovie(m_bgMovie);
 

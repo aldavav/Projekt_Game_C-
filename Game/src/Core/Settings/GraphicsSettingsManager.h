@@ -1,8 +1,8 @@
 #ifndef GRAPHICSSETTINGSMANAGER_H
 #define GRAPHICSSETTINGSMANAGER_H
 
-#include <UI/Manager/ConfigManager.h>
-#include <Core/Config/GraphicsTypes.h>
+#include <Game/Resources/ConfigManager.h>
+#include <Core/Common/GameTypes.h>
 #include <QObject>
 
 class GraphicsSettingsManager : public QObject

@@ -1,8 +1,7 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 
-#include <Core/Config/GameConfig.h>
-#include <Core/Config/Config.h>
+#include <Core/Config/Configuration.h>
 #include <QSharedPointer>
 #include <QSoundEffect>
 #include <qmutex.h>

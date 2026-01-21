@@ -1,11 +1,8 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include <Core/Config/GameConfig.h>
-#include <Core/Config/Difficulty.h>
-#include <Core/Config/MapStats.h>
-#include <Core/Config/Chunk.h>
-#include <Core/Config/Tile.h>
+#include <Core/Common/GameTypes.h>
+#include <Core/Common/WorldData.h>
 #include <unordered_map>
 #include <cstdint>
 #include <string>
@@ -21,11 +18,11 @@ public:
 
     Map &operator=(const Map &) = delete;
 
-    void initializeNewMap(const std::string &name = GameConfig::World::DEFAULT_MAP_NAME.toStdString(), Difficulty difficulty = GameConfig::DEFAULT_DIFFICULTY);
+    void initializeNewMap(const std::string &name = Config::World::DEFAULT_MAP_NAME.toStdString(), Engine::Difficulty difficulty = Config::Gameplay::DEFAULT_DIFFICULTY);
 
     void clear();
 
-    Tile &getTileAt(int x, int y);
+    World::Tile &getTileAt(int x, int y);
 
     bool isAreaWalkable(int x, int y, int w, int h);
 
@@ -35,7 +32,7 @@ public:
 
     uint32_t getSeed() const { return m_seed; }
 
-    const MapStats &getStats() const { return m_stats; }
+    const World::MapStats &getStats() const { return m_stats; }
 
     void debugRevealAll();
 
@@ -46,17 +43,17 @@ private:
 
     uint64_t getChunkKey(int cx, int cy) const;
 
-    void generateChunk(Chunk *chunk);
+    void generateChunk(World::Chunk *chunk);
 
-    std::string m_mapName = GameConfig::World::DEFAULT_MAP_NAME.toStdString();
+    std::string m_mapName = Config::World::DEFAULT_MAP_NAME.toStdString();
 
-    uint32_t m_seed = GameConfig::World::DEFAULT_SEED;
+    uint32_t m_seed = Config::World::DEFAULT_SEED;
 
-    Difficulty m_difficulty = GameConfig::World::DEFAULT_DIFFICULTY;
+    Engine::Difficulty m_difficulty = Config::Gameplay::DEFAULT_DIFFICULTY;
 
-    MapStats m_stats;
+    World::MapStats m_stats;
 
-    std::unordered_map<uint64_t, Chunk *> m_chunks;
+    std::unordered_map<uint64_t, World::Chunk *> m_chunks;
 };
 
 #endif

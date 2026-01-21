@@ -3,9 +3,9 @@
 
 #include <UI/Screens/SettingsScreen.h>
 #include <UI/Screens/AbstractScreen.h>
+#include <Core/Config/Configuration.h>
 #include <UI/Components/MenuButton.h>
 #include <UI/Screens/NewGameScreen.h>
-#include <Core/Config/Config.h>
 #include <QCoreApplication>
 #include <QResizeEvent>
 #include <QPushButton>

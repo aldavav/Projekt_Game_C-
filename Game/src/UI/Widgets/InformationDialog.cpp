@@ -6,7 +6,7 @@ InformationDialog::InformationDialog(const QString &header, const QString &body,
     setModal(true);
     setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
     setAttribute(Qt::WA_TranslucentBackground);
-    setFixedSize(Config::INFO_DIALOG_WIDTH, Config::INFO_DIALOG_HEIGHT);
+    setFixedSize(Config::UI::INFO_DIALOG_WIDTH, Config::UI::INFO_DIALOG_HEIGHT);
 
     setupUI(header, body);
 
@@ -77,7 +77,7 @@ void InformationDialog::handleScroll(int value)
 {
     QScrollBar *bar = m_scrollArea->verticalScrollBar();
 
-    if (!bar->isVisible() || bar->maximum() <= 0 || value >= (bar->maximum() * Config::LEGAL_SCROLL_THRESHOLD))
+    if (!bar->isVisible() || bar->maximum() <= 0 || value >= (bar->maximum() * Config::UI::LEGAL_SCROLL_THRESHOLD))
     {
         m_scrolledToBottom = true;
         m_acceptCheck->setEnabled(true);
@@ -102,12 +102,12 @@ void InformationDialog::keyPressEvent(QKeyEvent *event)
     {
     case Qt::Key_Down:
     case Qt::Key_PageDown:
-        bar->setValue(bar->value() + Config::KEYBOARD_SCROLL_STEP);
+        bar->setValue(bar->value() + Config::Input::KEYBOARD_SCROLL_STEP);
         break;
 
     case Qt::Key_Up:
     case Qt::Key_PageUp:
-        bar->setValue(bar->value() - Config::KEYBOARD_SCROLL_STEP);
+        bar->setValue(bar->value() - Config::Input::KEYBOARD_SCROLL_STEP);
         break;
 
     case Qt::Key_Return:

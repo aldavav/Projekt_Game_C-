@@ -1,11 +1,13 @@
 #ifndef INPUTMANAGER_H
 #define INPUTMANAGER_H
 
-#include <UI/Manager/ControlsSettingsManager.h>
+#include <Core/Settings/ControlsSettingsManager.h>
+#include <Game/Actions/GuardUnitAction.h>
+#include <Game/Actions/StopUnitAction.h>
+#include <Game/Actions/MoveUnitAction.h>
 #include <Game/Actions/CameraActions.h>
-#include <Core/Config/RawInputEvent.h>
-#include <Core/Config/GameConfig.h>
-#include <Core/Config/ICommand.h>
+#include <Core/Config/Configuration.h>
+#include <Core/Common/ICommand.h>
 #include <qmutex.h>
 #include <QObject>
 #include <QQueue>
@@ -47,7 +49,7 @@ private:
 
     ~InputManager() override;
 
-    CommandPtr translateRawInput(const RawInputEvent &event);
+    CommandPtr translateRawInput(const Engine::Input::RawEvent &event);
 
     QQueue<CommandPtr> m_commandQueue;
 

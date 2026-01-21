@@ -9,10 +9,10 @@ namespace World
 {
     enum class TileType : uint8_t
     {
-        GRASS,
-        DIRT,
-        WATER,
-        MOUNTAIN
+        GRASS = 0,
+        DIRT = 1,
+        WATER = 2,
+        MOUNTAIN = 3
     };
 
     struct Tile

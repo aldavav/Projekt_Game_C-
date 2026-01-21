@@ -18,10 +18,10 @@ void GameManager::update(float deltaTime)
 
     QPointF worldPos = cam.getCurrentPos();
 
-    float q = (2.0f / 3.0f * worldPos.x()) / GameConfig::BASE_TILE_SIZE;
-    float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / GameConfig::BASE_TILE_SIZE;
+    float q = (2.0f / 3.0f * worldPos.x()) / Config::World::BASE_TILE_SIZE;
+    float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / Config::World::BASE_TILE_SIZE;
 
-    Map::getInstance().revealRadius(std::round(q), std::round(r), GameConfig::REVEAL_RADIUS);
+    Map::getInstance().revealRadius(std::round(q), std::round(r), Config::World::REVEAL_RADIUS);
 
     m_hud->update(m_gameTime, m_isPaused, m_currentSpeed);
 }
@@ -36,7 +36,7 @@ bool GameManager::isPaused() const
     return m_isPaused;
 }
 
-GameSpeed GameManager::getSpeed() const
+Engine::GameSpeed GameManager::getSpeed() const
 {
     return m_currentSpeed;
 }
@@ -46,19 +46,19 @@ TacticalHUD *GameManager::getHUD() const
     return m_hud;
 }
 
-void GameManager::setSpeed(GameSpeed speed)
+void GameManager::setSpeed(Engine::GameSpeed speed)
 {
     m_currentSpeed = speed;
     switch (m_currentSpeed)
     {
-    case GameSpeed::SLOW:
-        m_timeScale = GameConfig::GAME_SPEED_MULT_SLOW;
+    case Engine::GameSpeed::SLOW:
+        m_timeScale = Config::Simulation::SPEED_SLOW;
         break;
-    case GameSpeed::NORMAL:
-        m_timeScale = GameConfig::GAME_SPEED_MULT_NORMAL;
+    case Engine::GameSpeed::NORMAL:
+        m_timeScale = Config::Simulation::SPEED_NORMAL;
         break;
-    case GameSpeed::FAST:
-        m_timeScale = GameConfig::GAME_SPEED_MULT_FAST;
+    case Engine::GameSpeed::FAST:
+        m_timeScale = Config::Simulation::SPEED_FAST;
         break;
     }
 }
@@ -79,7 +79,7 @@ void GameManager::handleMouseClick(QPoint screenPos)
 
     QPointF worldPos = cam.screenToWorld(screenPos);
 
-    const float size = GameConfig::BASE_TILE_SIZE;
+    const float size = Config::World::BASE_TILE_SIZE;
     float q = (2.0f / 3.0f * worldPos.x()) / size;
     float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size;
 
@@ -111,11 +111,11 @@ void GameManager::handleHudButton(int index)
     {
         m_isPaused = false;
         if (index == 1)
-            setSpeed(GameSpeed::SLOW);
+            setSpeed(Engine::GameSpeed::SLOW);
         else if (index == 2)
-            setSpeed(GameSpeed::NORMAL);
+            setSpeed(Engine::GameSpeed::NORMAL);
         else if (index == 3)
-            setSpeed(GameSpeed::FAST);
+            setSpeed(Engine::GameSpeed::FAST);
     }
 }
 
@@ -129,7 +129,7 @@ GameManager::GameManager(QObject *parent)
       m_gameTime(0.0f),
       m_timeScale(1.0f),
       m_isPaused(false),
-      m_currentSpeed(GameSpeed::NORMAL)
+      m_currentSpeed(Engine::GameSpeed::NORMAL)
 {
     m_hud = new TacticalHUD(this);
 

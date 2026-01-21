@@ -13,13 +13,13 @@ void NewGameScreen::setupUI()
 {
     auto *rootLayout = new QHBoxLayout(this);
 
-    rootLayout->addStretch(Config::UI_SIDE_STRETCH);
+    rootLayout->addStretch(Config::UI::SIDE_STRETCH);
 
     auto *contentContainer = new QWidget();
     contentContainer->setObjectName("newGameContent");
-    rootLayout->addWidget(contentContainer, Config::UI_CONTENT_STRETCH);
+    rootLayout->addWidget(contentContainer, Config::UI::CONTENT_STRETCH);
 
-    rootLayout->addStretch(Config::UI_SIDE_STRETCH);
+    rootLayout->addStretch(Config::UI::SIDE_STRETCH);
 
     auto *layout = new QVBoxLayout(contentContainer);
     auto *form = new QFormLayout();
@@ -28,7 +28,7 @@ void NewGameScreen::setupUI()
     header->setObjectName("settingsTitle");
     layout->addWidget(header);
 
-    m_mapNameEdit = new QLineEdit(Config::DEFAULT_MISSION_NAME);
+    m_mapNameEdit = new QLineEdit(Config::Gameplay::DEFAULT_MISSION_NAME);
     m_mapNameEdit->setObjectName("missionInput");
     form->addRow(tr("MAP IDENTIFIER:"), m_mapNameEdit);
 
@@ -47,11 +47,11 @@ void NewGameScreen::setupUI()
     form->addRow(tr("TERRAIN SEED:"), seedLayout);
 
     m_difficultyCombo = new QComboBox();
-    m_difficultyCombo->addItems(GameConfig::DIFFICULTIES);
+    m_difficultyCombo->addItems(Config::UI::DIFFICULTIES);
     form->addRow(tr("COMBAT DIFFICULTY:"), m_difficultyCombo);
 
     m_opponentCombo = new QComboBox();
-    m_opponentCombo->addItems(GameConfig::OPPONENTS);
+    m_opponentCombo->addItems(Config::UI::OPPONENTS);
     form->addRow(tr("OPPONENT TYPE:"), m_opponentCombo);
 
     layout->addLayout(form);
@@ -79,21 +79,21 @@ void NewGameScreen::onLaunchClicked()
     auto *loading = new LoadingScreen();
     MenuManager::getInstance().setScreen(loading);
 
-    QTimer::singleShot(Config::GENERATION_DELAY, loading, [loading, mapName, seed]()
+    QTimer::singleShot(Config::UI::GENERATION_DELAY, loading, [loading, mapName, seed]()
                        {
         loading->setStatus(tr("GENERATING TERRAIN PROTOCOLS..."));
         loading->setProgress(30);
         
         GameEngine::getInstance().setupMatch(mapName, seed);
 
-        QTimer::singleShot(Config::LOADING_STEP_DELAY, loading, [loading]() {
+        QTimer::singleShot(Config::UI::LOADING_STEP_DELAY, loading, [loading]() {
             loading->setStatus(tr("ESTABLISHING NEURAL LINK..."));
             loading->setProgress(70);
             
             GameEngine::getInstance().startGame();
             MenuManager::getInstance().updateMetadata();
 
-            QTimer::singleShot(Config::LOADING_FINAL_PAUSE, loading, []() {
+            QTimer::singleShot(Config::UI::LOADING_FINAL_PAUSE, loading, []() {
                 auto* game = new GameScreen();
                 MenuManager::getInstance().setScreen(game);
                 game->setFocus();

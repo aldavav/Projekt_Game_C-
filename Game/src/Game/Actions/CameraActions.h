@@ -1,9 +1,9 @@
 #ifndef CAMERAACTIONS_H
 #define CAMERAACTIONS_H
 
-#include <Core/Config/GameActions.h>
+#include <Core/Common/ICommand.h>
 
-class ZoomAction : public GameAction
+class ZoomAction : public ICommand
 {
 public:
     explicit ZoomAction(float delta) : m_delta(delta) {}

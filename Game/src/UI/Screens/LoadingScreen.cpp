@@ -5,7 +5,7 @@ LoadingScreen::LoadingScreen(QWidget *parent) : AbstractScreen(parent)
     auto *layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    QLabel *title = new QLabel(tr(Config::DEFAULT_UPLINK_TEXT.toUtf8()), this);
+    QLabel *title = new QLabel(tr(Config::Strings::DEFAULT_UPLINK_TEXT.toUtf8()), this);
     title->setObjectName("loadingTitle");
     title->setAlignment(Qt::AlignCenter);
 
@@ -13,10 +13,10 @@ LoadingScreen::LoadingScreen(QWidget *parent) : AbstractScreen(parent)
     m_progressBar->setRange(0, 100);
     m_progressBar->setValue(0);
 
-    m_progressBar->setFixedSize(Config::LOADING_BAR_WIDTH, Config::LOADING_BAR_HEIGHT);
+    m_progressBar->setFixedSize(Config::UI::LOADING_BAR_WIDTH, Config::UI::LOADING_BAR_HEIGHT);
     m_progressBar->setTextVisible(false);
 
-    m_statusLabel = new QLabel(tr(Config::DEFAULT_STATUS_TEXT.toUtf8()), this);
+    m_statusLabel = new QLabel(tr(Config::Strings::DEFAULT_STATUS_TEXT.toUtf8()), this);
     m_statusLabel->setObjectName("statusLabel");
     m_statusLabel->setAlignment(Qt::AlignCenter);
 

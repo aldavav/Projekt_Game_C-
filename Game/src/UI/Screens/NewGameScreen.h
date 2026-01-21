@@ -3,11 +3,11 @@
 
 #include <UI/Screens/AbstractScreen.h>
 #include <UI/Screens/LoadGameScreen.h>
+#include <Core/Config/Configuration.h>
 #include <UI/Screens/LoadingScreen.h>
 #include <UI/Manager/MenuManager.h>
 #include <Game/Engine/GameEngine.h>
 #include <UI/Screens/GameScreen.h>
-#include <Core/Config/Config.h>
 #include <QRandomGenerator>
 #include <QFormLayout>
 #include <QLineEdit>

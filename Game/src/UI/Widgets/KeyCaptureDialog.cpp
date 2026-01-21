@@ -7,10 +7,10 @@ KeyCaptureDialog::KeyCaptureDialog(QWidget *parent)
     setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
     setObjectName("keyCaptureDialog");
 
-    setFixedSize(Config::KEY_DIALOG_WIDTH, Config::KEY_DIALOG_HEIGHT);
+    setFixedSize(Config::UI::KEY_DIALOG_WIDTH, Config::UI::KEY_DIALOG_HEIGHT);
 
     auto *layout = new QVBoxLayout(this);
-    int margin = Config::KEY_DIALOG_MARGINS;
+    int margin = Config::UI::KEY_DIALOG_MARGINS;
     layout->setContentsMargins(margin, margin, margin, margin);
 
     auto *infoLabel = new QLabel(tr("AWAITING INPUT...\n\nPRESS ANY KEY TO BIND\n[ESC] TO CANCEL"));
@@ -30,14 +30,13 @@ void KeyCaptureDialog::keyPressEvent(QKeyEvent *event)
     {
         return;
     }
-
     if (event->key() == Qt::Key_Escape)
     {
         reject();
     }
     else
     {
-        capturedKey = static_cast<Input::KeyCode>(event->key());
+        capturedKey = static_cast<Engine::Input::KeyCode>(event->key());
         accept();
     }
 }

@@ -6,7 +6,7 @@ void Entity::update(float deltaTime)
 
     float distSq = diff.x() * diff.x() + diff.y() * diff.y();
 
-    if (distSq > GameConfig::Entities::MIN_MOVE_DISTANCE_SQ)
+    if (distSq > Config::Entities::MIN_MOVE_DIST_SQ)
     {
         float dist = std::sqrt(distSq);
         QPointF direction = diff / dist;
@@ -28,7 +28,7 @@ void Entity::setPosition(const QPointF &pos)
 
 std::unique_ptr<Entity> Entity::createEntityFromFile(std::ifstream &file)
 {
-    EntityTypes::EntityType type;
+    Engine::Entity::Type type;
     if (!file.read(reinterpret_cast<char *>(&type), sizeof(type)))
     {
         return nullptr;
@@ -36,13 +36,13 @@ std::unique_ptr<Entity> Entity::createEntityFromFile(std::ifstream &file)
 
     switch (type)
     {
-    case EntityTypes::EntityType::UNIT:
+    case Engine::Entity::Type::UNIT:
         return nullptr;
-    case EntityTypes::EntityType::BUILDING:
+    case Engine::Entity::Type::BUILDING:
         return nullptr;
-    case EntityTypes::EntityType::RESOURCE:
+    case Engine::Entity::Type::RESOURCE:
         return nullptr;
-    case EntityTypes::EntityType::DEBRIS:
+    case Engine::Entity::Type::DEBRIS:
         return nullptr;
     default:
         return nullptr;

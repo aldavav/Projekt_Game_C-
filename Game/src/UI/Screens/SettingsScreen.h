@@ -1,18 +1,17 @@
 #ifndef SETTINGSSCREEN_H
 #define SETTINGSSCREEN_H
 
-#include <UI/Manager/GraphicsSettingsManager.h>
-#include <UI/Manager/ControlsSettingsManager.h>
-#include <UI/Manager/DisplaySettingsManager.h>
-#include <UI/Manager/AudioSettingsManager.h>
-#include <UI/Manager/GameSettingsManager.h>
+#include <Core/Settings/GraphicsSettingsManager.h>
+#include <Core/Settings/ControlsSettingsManager.h>
+#include <Core/Settings/DisplaySettingsManager.h>
+#include <Core/Settings/AudioSettingsManager.h>
+#include <Core/Settings/GameSettingsManager.h>
 #include <UI/Widgets/KeyCaptureDialog.h>
+#include <Game/Resources/ConfigManager.h>
+#include <Core/Config/Configuration.h>
 #include <UI/Screens/AbstractScreen.h>
 #include <UI/Widgets/TacticalDialog.h>
-#include <UI/Manager/ConfigManager.h>
 #include <UI/Manager/MenuManager.h>
-#include <Core/Config/KeyCodes.h>
-#include <Core/Config/Config.h>
 #include <qpushbutton.h>
 #include <qformlayout.h>
 #include <qtabwidget.h>

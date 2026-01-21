@@ -19,11 +19,11 @@ public:
 
     bool isPaused() const;
 
-    GameSpeed getSpeed() const;
+    Engine::GameSpeed getSpeed() const;
 
     TacticalHUD *getHUD() const;
 
-    void setSpeed(GameSpeed speed);
+    void setSpeed(Engine::GameSpeed speed);
 
     void togglePause();
 
@@ -55,7 +55,7 @@ private:
 
     bool m_isPaused = false;
 
-    GameSpeed m_currentSpeed = GameSpeed::NORMAL;
+    Engine::GameSpeed m_currentSpeed = Engine::GameSpeed::NORMAL;
 
     QPointF m_selectedHex;
 

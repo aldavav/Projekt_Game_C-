@@ -2,12 +2,12 @@
 
 TacticalHUD::TacticalHUD(QObject *parent)
     : QObject(parent), m_fps(0), m_frameCount(0), m_isPaused(false),
-      m_hasSelection(false), m_currentSpeed(GameSpeed::NORMAL)
+      m_hasSelection(false), m_currentSpeed(Engine::GameSpeed::NORMAL)
 {
     m_fpsTimer.start();
 }
 
-void TacticalHUD::update(float gameTime, bool isPaused, GameSpeed speed)
+void TacticalHUD::update(float gameTime, bool isPaused, Engine::GameSpeed speed)
 {
     m_gameTime = gameTime;
     m_isPaused = isPaused;
@@ -32,13 +32,13 @@ void TacticalHUD::draw(QPainter &painter, int width, int height)
     }
     drawResourceStats(painter, width, height);
 
-    int mmSize = Config::HUD_MINIMAP_SIZE, mmMargin = Config::HUD_MARGIN;
+    int mmSize = Config::UI::HUD_MINIMAP_SIZE, mmMargin = Config::UI::HUD_MARGIN;
     int mmX = width - mmSize - mmMargin;
     int mmY = mmMargin;
 
     if (m_minimapNeedsUpdate || m_minimapCache.isNull())
     {
-        if (!m_minimapThrottleTimer.isValid() || m_minimapThrottleTimer.elapsed() > GameConfig::MINIMAP_UPDATE_MS)
+        if (!m_minimapThrottleTimer.isValid() || m_minimapThrottleTimer.elapsed() > Config::World::MINIMAP_UPDATE_MS)
         {
             updateMinimapCache(mmSize, width, height);
             m_minimapNeedsUpdate = false;
@@ -48,7 +48,7 @@ void TacticalHUD::draw(QPainter &painter, int width, int height)
 
     painter.drawPixmap(mmX, mmY, m_minimapCache);
 
-    painter.setPen(QPen(QColor(Config::COLOR_TACTICAL_BLUE), 2));
+    painter.setPen(QPen(QColor(Config::UI::COLOR_TACTICAL_BLUE), 2));
     painter.setBrush(Qt::NoBrush);
     painter.drawRect(mmX, mmY, mmSize, mmSize);
 
@@ -59,7 +59,7 @@ void TacticalHUD::draw(QPainter &painter, int width, int height)
 
 void TacticalHUD::drawMinimapCached(QPainter &painter, int width, int height)
 {
-    int mmSize = Config::HUD_MINIMAP_SIZE, mmMargin = Config::HUD_MARGIN;
+    int mmSize = Config::UI::HUD_MINIMAP_SIZE, mmMargin = Config::UI::HUD_MARGIN;
     int mmX = width - mmSize - mmMargin;
     int mmY = mmMargin;
 
@@ -94,7 +94,7 @@ bool TacticalHUD::handleMousePress(QMouseEvent *event, int width, int height)
         }
     }
 
-    int mmSize = Config::HUD_MINIMAP_SIZE, mmMargin = Config::HUD_MARGIN;
+    int mmSize = Config::UI::HUD_MINIMAP_SIZE, mmMargin = Config::UI::HUD_MARGIN;
     int mmX = width - mmSize - mmMargin;
     int mmY = mmMargin;
     QRect minimapRect(mmX, mmY, mmSize, mmSize);
@@ -129,13 +129,13 @@ void TacticalHUD::setSelection(QPointF hexCoords, bool hasSelection)
 
 void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
 {
-    int rightBoxW = Config::HUD_STATS_WIDTH * 2;
+    int rightBoxW = Config::UI::HUD_STATS_WIDTH * 2;
     int rightBoxH = 110;
     int padding = 15;
     QRect statsBox(width - rightBoxW - padding, height - rightBoxH - padding, rightBoxW, rightBoxH);
 
     painter.setBrush(QColor(0, 5, 10, 190));
-    painter.setPen(QPen(QColor(Config::COLOR_TACTICAL_BLUE), 1));
+    painter.setPen(QPen(QColor(Config::UI::COLOR_TACTICAL_BLUE), 1));
     painter.drawRoundedRect(statsBox, 2, 2);
     drawScanlines(painter, statsBox);
 
@@ -148,9 +148,9 @@ void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
     {
         int sq = static_cast<int>(m_selectedHex.x());
         int sr = static_cast<int>(m_selectedHex.y());
-        Tile &tile = Map::getInstance().getTileAt(sq, sr);
+        World::Tile &tile = Map::getInstance().getTileAt(sq, sr);
 
-        painter.setPen(QColor(Config::COLOR_TACTICAL_BLUE));
+        painter.setPen(QColor(Config::UI::COLOR_TACTICAL_BLUE));
         painter.drawText(textX, textY, ">> TACTICAL INTEL");
 
         painter.setPen(Qt::white);
@@ -159,19 +159,19 @@ void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
 
         painter.setPen(QColor(200, 200, 200, 200));
         QString statusLine;
-        if (tile.type == TileType::WATER)
+        if (tile.type == World::TileType::WATER)
         {
-            painter.setPen(QColor(Config::COLOR_WATER_INFO));
+            painter.setPen(QColor(Config::UI::COLOR_WATER_INFO));
             statusLine = "ANALYSIS: H2O Sourced - Cooling Available";
         }
-        else if (tile.type == TileType::MOUNTAIN)
+        else if (tile.type == World::TileType::MOUNTAIN)
         {
             painter.setPen(QColor(200, 100, 50));
             statusLine = "ANALYSIS: High Mineral Density Detected";
         }
-        else if (tile.type == TileType::GRASS)
+        else if (tile.type == World::TileType::GRASS)
         {
-            painter.setPen(QColor(Config::COLOR_HABITABLE));
+            painter.setPen(QColor(Config::UI::COLOR_HABITABLE));
             statusLine = "ANALYSIS: Bio-Habitable Terrain";
         }
         else
@@ -181,7 +181,7 @@ void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
 
         painter.drawText(textX, textY + (spacing * 2), statusLine);
 
-        painter.setPen(QColor(Config::COLOR_TACTICAL_BLUE));
+        painter.setPen(QColor(Config::UI::COLOR_TACTICAL_BLUE));
         painter.drawText(textX, textY + (spacing * 3.2), "STATUS: SECURE");
     }
     else
@@ -199,7 +199,7 @@ void TacticalHUD::drawMinimap(QPainter &painter, int width, int height)
     auto &map = Map::getInstance();
     auto &cam = Camera::getInstance();
 
-    int mmSize = Config::HUD_MINIMAP_SIZE, mmMargin = Config::HUD_MARGIN;
+    int mmSize = Config::UI::HUD_MINIMAP_SIZE, mmMargin = Config::UI::HUD_MARGIN;
     int mmX = width - mmSize - mmMargin;
     int mmY = mmMargin;
 
@@ -210,7 +210,7 @@ void TacticalHUD::drawMinimap(QPainter &painter, int width, int height)
     painter.save();
     painter.setClipRect(mmX, mmY, mmSize, mmSize);
 
-    const int MM_RANGE = GameConfig::MINIMAP_RANGE;
+    const int MM_RANGE = Config::World::MINIMAP_RANGE;
     float dotSize = static_cast<float>(mmSize) / (MM_RANGE * 2);
 
     QPointF camCenter = cam.screenToWorld(QPoint(width / 2, height / 2));
@@ -222,20 +222,20 @@ void TacticalHUD::drawMinimap(QPainter &painter, int width, int height)
     {
         for (int r = cr - MM_RANGE; r <= cr + MM_RANGE; ++r)
         {
-            Tile &tile = map.getTileAt(q, r);
+            World::Tile &tile = map.getTileAt(q, r);
             if (!tile.discovered)
                 continue;
 
             QColor dotColor;
             switch (tile.type)
             {
-            case TileType::WATER:
+            case World::TileType::WATER:
                 dotColor = QColor("#1976D2");
                 break;
-            case TileType::GRASS:
+            case World::TileType::GRASS:
                 dotColor = QColor("#388E3C");
                 break;
-            case TileType::MOUNTAIN:
+            case World::TileType::MOUNTAIN:
                 dotColor = QColor("#757575");
                 break;
             default:
@@ -274,27 +274,27 @@ void TacticalHUD::drawDayNightCycle(QPainter &painter, int width, int height)
     if (cycleVal < 0.2f)
     {
         phaseText = "NOON";
-        phaseColor = QColor(GameConfig::COLOR_PHASE_NOON);
+        phaseColor = QColor(Config::World::COLOR_PHASE_NOON);
     }
     else if (cycleVal < 0.4f)
     {
         phaseText = "AFTERNOON";
-        phaseColor = QColor(GameConfig::COLOR_PHASE_AFTERNOON);
+        phaseColor = QColor(Config::World::COLOR_PHASE_AFTERNOON);
     }
     else if (cycleVal < 0.6f)
     {
         phaseText = "EVENING";
-        phaseColor = QColor(GameConfig::COLOR_PHASE_EVENING);
+        phaseColor = QColor(Config::World::COLOR_PHASE_EVENING);
     }
     else if (cycleVal < 0.8f)
     {
         phaseText = "NIGHT";
-        phaseColor = QColor(GameConfig::COLOR_PHASE_NIGHT);
+        phaseColor = QColor(Config::World::COLOR_PHASE_NIGHT);
     }
     else
     {
         phaseText = "MIDNIGHT";
-        phaseColor = QColor(GameConfig::COLOR_PHASE_MIDNIGHT);
+        phaseColor = QColor(Config::World::COLOR_PHASE_MIDNIGHT);
     }
 
     int margin = 20;
@@ -322,9 +322,9 @@ void TacticalHUD::drawDayNightCycle(QPainter &painter, int width, int height)
     {
         QRect btnRect(rectX + 15 + (i * (btnW + btnSpacing)), rectY + 38, btnW, btnH);
         bool isActive = (i == 0 && m_isPaused) ||
-                        (i == 1 && !m_isPaused && m_currentSpeed == GameSpeed::SLOW) ||
-                        (i == 2 && !m_isPaused && m_currentSpeed == GameSpeed::NORMAL) ||
-                        (i == 3 && !m_isPaused && m_currentSpeed == GameSpeed::FAST);
+                        (i == 1 && !m_isPaused && m_currentSpeed == Engine::GameSpeed::SLOW) ||
+                        (i == 2 && !m_isPaused && m_currentSpeed == Engine::GameSpeed::NORMAL) ||
+                        (i == 3 && !m_isPaused && m_currentSpeed == Engine::GameSpeed::FAST);
 
         painter.setBrush(isActive ? phaseColor.darker(150) : QColor(50, 50, 50));
         painter.setPen(QPen(isActive ? Qt::white : Qt::gray, isActive ? 2 : 1));
@@ -344,12 +344,12 @@ void TacticalHUD::drawDiagnostics(QPainter &painter, int width, int height)
 {
     int boxW = 250;
     int boxH = 100;
-    int padding = Config::HUD_MARGIN;
+    int padding = Config::UI::HUD_MARGIN;
 
     QRect diagRect(padding, padding, boxW, boxH);
 
     painter.setBrush(QColor(0, 0, 0, 160));
-    painter.setPen(QPen(QColor(Config::COLOR_TACTICAL_BLUE), 1));
+    painter.setPen(QPen(QColor(Config::UI::COLOR_TACTICAL_BLUE), 1));
     painter.drawRoundedRect(diagRect, 2, 2);
     drawScanlines(painter, diagRect);
 
@@ -360,7 +360,7 @@ void TacticalHUD::drawDiagnostics(QPainter &painter, int width, int height)
     int y = diagRect.y() + 20;
     int step = 18;
 
-    painter.setPen(m_fps < 30 ? Qt::red : QColor(Config::COLOR_TACTICAL_BLUE));
+    painter.setPen(m_fps < 30 ? Qt::red : QColor(Config::UI::COLOR_TACTICAL_BLUE));
     painter.drawText(x, y, QString("FPS: %1").arg(m_fps));
 
     painter.setPen(Qt::white);
@@ -368,21 +368,21 @@ void TacticalHUD::drawDiagnostics(QPainter &painter, int width, int height)
 
     painter.drawText(x, y + step * 2, QString("WORLD  XY: [%1, %2]").arg(static_cast<int>(m_mouseWorldPos.x())).arg(static_cast<int>(m_mouseWorldPos.y())));
 
-    painter.setPen(QColor(Config::COLOR_HABITABLE));
+    painter.setPen(QColor(Config::UI::COLOR_HABITABLE));
     painter.drawText(x, y + step * 3, QString("TILE   QR: %1, %2").arg(m_hoveredHex.x()).arg(m_hoveredHex.y()));
 }
 
-QString TacticalHUD::getTileTypeName(TileType type)
+QString TacticalHUD::getTileTypeName(World::TileType type)
 {
     switch (type)
     {
-    case TileType::WATER:
+    case World::TileType::WATER:
         return "Water";
-    case TileType::DIRT:
+    case World::TileType::DIRT:
         return "Dirt";
-    case TileType::GRASS:
+    case World::TileType::GRASS:
         return "Grass";
-    case TileType::MOUNTAIN:
+    case World::TileType::MOUNTAIN:
         return "Mountain";
     default:
         return "Unknown";
@@ -408,13 +408,13 @@ void TacticalHUD::updateMinimapCache(int size, int width, int height)
 
     auto &map = Map::getInstance();
 
-    const int WORLD_BOUNDS = GameConfig::WORLD_BOUNDS;
-    const float tileS = GameConfig::BASE_TILE_SIZE;
+    const int WORLD_BOUNDS = Config::World::WORLD_BOUNDS_INT;
+    const float tileS = Config::World::BASE_TILE_SIZE;
 
     auto &cam = Camera::getInstance();
     QPointF camPos = cam.getCurrentPos();
 
-    int viewPortWidth = cam.getViewportWidth() * GameConfig::SCANLINE_SPACING;
+    int viewPortWidth = cam.getViewportWidth() * Config::World::SCANLINE_SPACING;
 
     for (int q = -WORLD_BOUNDS * 2; q <= WORLD_BOUNDS * 2; ++q)
     {
@@ -423,16 +423,16 @@ void TacticalHUD::updateMinimapCache(int size, int width, int height)
 
         for (int r = rStart; r <= rEnd; ++r)
         {
-            Tile &tile = map.getTileAt(q, r);
+            World::Tile &tile = map.getTileAt(q, r);
 
             QColor dotColor;
-            if (tile.type == TileType::WATER)
+            if (tile.type == World::TileType::WATER)
                 dotColor = QColor("#1976D2");
-            else if (tile.type == TileType::GRASS)
+            else if (tile.type == World::TileType::GRASS)
                 dotColor = QColor("#388E3C");
-            else if (tile.type == TileType::MOUNTAIN)
+            else if (tile.type == World::TileType::MOUNTAIN)
                 dotColor = QColor("#757575");
-            else if (tile.type == TileType::DIRT)
+            else if (tile.type == World::TileType::DIRT)
                 dotColor = QColor("#795548");
             else
                 continue;

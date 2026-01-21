@@ -22,8 +22,8 @@ void LoadGameScreen::setupUI()
 {
     auto *layout = new QVBoxLayout(this);
 
-    layout->setContentsMargins(Config::LIST_SCREEN_MARGIN_H, Config::LIST_SCREEN_MARGIN_V,
-                               Config::LIST_SCREEN_MARGIN_H, Config::LIST_SCREEN_MARGIN_V);
+    layout->setContentsMargins(Config::UI::LIST_SCREEN_MARGIN_H, Config::UI::LIST_SCREEN_MARGIN_V,
+                               Config::UI::LIST_SCREEN_MARGIN_H, Config::UI::LIST_SCREEN_MARGIN_V);
 
     QLabel *header = new QLabel(tr("RE-ESTABLISH COMMAND UPLINK"), this);
     header->setObjectName("settingsTitle");
@@ -61,7 +61,7 @@ void LoadGameScreen::refreshSaveList()
 {
     m_saveList->clear();
 
-    QString saveRoot = QCoreApplication::applicationDirPath() + Config::SAVE_DIR_NAME;
+    QString saveRoot = QCoreApplication::applicationDirPath() + Config::Paths::SAVE_DIR_NAME;
     QDir dir(saveRoot);
 
     if (!dir.exists())
@@ -83,22 +83,22 @@ void LoadGameScreen::onLoadClicked()
     auto *loading = new LoadingScreen();
     MenuManager::getInstance().setScreen(loading);
 
-    QTimer::singleShot(GameConfig::LOAD_STEP_RETRIEVE, loading, [selectedMap, loading]()
+    QTimer::singleShot(Config::UI::LOAD_STEP_RETRIEVE, loading, [selectedMap, loading]()
                        {
         loading->setStatus(tr("RETRIEVING SECTOR DATA..."));
         loading->setProgress(25);
 
-        QTimer::singleShot(GameConfig::LOAD_STEP_RECONSTRUCT, loading, [selectedMap, loading]() {
+        QTimer::singleShot(Config::UI::LOAD_STEP_RECONSTRUCT, loading, [selectedMap, loading]() {
             loading->setStatus(tr("RECONSTRUCTING TERRAIN..."));
             loading->setProgress(60);
             
             GameEngine::getInstance().loadMatch(selectedMap);
 
-            QTimer::singleShot(Config::LOADING_STEP_DELAY, loading, [loading]() {
+            QTimer::singleShot(Config::UI::LOADING_STEP_DELAY, loading, [loading]() {
                 loading->setStatus(tr("SYNCHRONIZING UPLINK..."));
                 loading->setProgress(100);
                 
-                QTimer::singleShot(Config::LOADING_FINAL_PAUSE, loading, []() {
+                QTimer::singleShot(Config::UI::LOADING_FINAL_PAUSE, loading, []() {
                     auto* game = new GameScreen();
                     MenuManager::getInstance().setScreen(game);
                     

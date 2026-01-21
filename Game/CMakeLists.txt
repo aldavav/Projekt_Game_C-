@@ -20,17 +20,26 @@ set(SRC_MAIN
 )
 
 set(SRC_CORE
-    src/Core/Assets/AssetManager.cpp
-    src/Core/Assets/AssetManager.h
+    src/Core/Common/GameCommands.h
+    src/Core/Common/GameTypes.h
+    src/Core/Common/ICommand.h
+    src/Core/Common/WorldData.h
     src/Core/Config/Configuration.h
-    src/Core/Config/GameTypes.h
-    src/Core/Config/WorldData.h
+    src/Core/Config/LoggerMacros.h
     src/Core/Input/InputManager.cpp
     src/Core/Input/InputManager.h
     src/Core/Logger/Logger.cpp
     src/Core/Logger/Logger.h
-    src/Core/Resources/ResourceManager.cpp
-    src/Core/Resources/ResourceManager.h
+    src/Core/Settings/AudioSettingsManager.cpp
+    src/Core/Settings/AudioSettingsManager.h
+    src/Core/Settings/ControlsSettingsManager.cpp
+    src/Core/Settings/ControlsSettingsManager.h
+    src/Core/Settings/DisplaySettingsManager.cpp
+    src/Core/Settings/DisplaySettingsManager.h
+    src/Core/Settings/GameSettingsManager.cpp
+    src/Core/Settings/GameSettingsManager.h
+    src/Core/Settings/GraphicsSettingsManager.cpp
+    src/Core/Settings/GraphicsSettingsManager.h
 )
 
 set(SRC_GAME
@@ -46,61 +55,61 @@ set(SRC_GAME
     src/Game/Camera/Camera.h
     src/Game/Engine/GameEngine.cpp
     src/Game/Engine/GameEngine.h
+    src/Game/Engine/GameManager.cpp
+    src/Game/Engine/GameManager.h
     src/Game/Entities/Entity.cpp
     src/Game/Entities/Entity.h
     src/Game/Map/Map.cpp
     src/Game/Map/Map.h
+    src/Game/Resources/AssetManager.cpp
+    src/Game/Resources/AssetManager.h
+    src/Game/Resources/ConfigManager.cpp
+    src/Game/Resources/ConfigManager.h
+    src/Game/Resources/ResourceManager.cpp
+    src/Game/Resources/ResourceManager.h
+)
+
+set(SRC_UI_COMPONENTS
+    src/UI/Components/MenuButton.cpp
+    src/UI/Components/MenuButton.h
+)
+
+set(SRC_UI_HUD
+    src/UI/HUD/TacticalHUD.cpp
+    src/UI/HUD/TacticalHUD.h
 )
 
 set(SRC_UI_MANAGERS
     src/UI/Manager/MenuManager.cpp
     src/UI/Manager/MenuManager.h
-    src/UI/Manager/ControlsSettingsManager.cpp
-    src/UI/Manager/ControlsSettingsManager.h
-    src/UI/Manager/ConfigManager.cpp
-    src/UI/Manager/ConfigManager.h
-    src/UI/Manager/GameSettingsManager.cpp
-    src/UI/Manager/GameSettingsManager.h
-    src/UI/Manager/AudioSettingsManager.cpp
-    src/UI/Manager/AudioSettingsManager.h
-    src/UI/Manager/DisplaySettingsManager.cpp
-    src/UI/Manager/DisplaySettingsManager.h
-    src/UI/Manager/GraphicsSettingsManager.cpp
-    src/UI/Manager/GraphicsSettingsManager.h
-    src/UI/Manager/GameManager.cpp
-    src/UI/Manager/GameManager.h
 )
 
 set(SRC_UI_SCREENS
     src/UI/Screens/AbstractScreen.cpp
     src/UI/Screens/AbstractScreen.h
-    src/UI/Screens/MenuScreen.cpp
-    src/UI/Screens/MenuScreen.h
-    src/UI/Screens/GameScreen.cpp
-    src/UI/Screens/GameScreen.h
-    src/UI/Screens/SettingsScreen.cpp
-    src/UI/Screens/SettingsScreen.h
-    src/UI/Screens/NewGameScreen.cpp
-    src/UI/Screens/NewGameScreen.h
-    src/UI/Screens/LoadingScreen.cpp
-    src/UI/Screens/LoadingScreen.h
-    src/UI/Screens/LoadGameScreen.cpp
-    src/UI/Screens/LoadGameScreen.h
     src/UI/Screens/GameOverScreen.cpp
     src/UI/Screens/GameOverScreen.h
+    src/UI/Screens/GameScreen.cpp
+    src/UI/Screens/GameScreen.h
+    src/UI/Screens/LoadGameScreen.cpp
+    src/UI/Screens/LoadGameScreen.h
+    src/UI/Screens/LoadingScreen.cpp
+    src/UI/Screens/LoadingScreen.h
+    src/UI/Screens/MenuScreen.cpp
+    src/UI/Screens/MenuScreen.h
+    src/UI/Screens/NewGameScreen.cpp
+    src/UI/Screens/NewGameScreen.h
+    src/UI/Screens/SettingsScreen.cpp
+    src/UI/Screens/SettingsScreen.h
 )
 
 set(SRC_UI_WIDGETS
-    src/UI/Components/MenuButton.cpp
-    src/UI/Components/MenuButton.h
+    src/UI/Widgets/InformationDialog.cpp
+    src/UI/Widgets/InformationDialog.h
     src/UI/Widgets/KeyCaptureDialog.cpp
     src/UI/Widgets/KeyCaptureDialog.h
     src/UI/Widgets/TacticalDialog.cpp
     src/UI/Widgets/TacticalDialog.h
-    src/UI/Widgets/InformationDialog.cpp
-    src/UI/Widgets/InformationDialog.h
-    src/UI/HUD/TacticalHUD.cpp
-    src/UI/HUD/TacticalHUD.h
 )
 
 add_executable(Game 
@@ -110,6 +119,8 @@ add_executable(Game
     ${SRC_UI_MANAGERS}
     ${SRC_UI_SCREENS}
     ${SRC_UI_WIDGETS}
+    ${SRC_UI_COMPONENTS}
+    ${SRC_UI_HUD}
 )
 
 target_include_directories(Game PRIVATE 

@@ -1,14 +1,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <UI/Manager/DisplaySettingsManager.h>
+#include <Core/Settings/DisplaySettingsManager.h>
 #include <UI/Widgets/InformationDialog.h>
+#include <Game/Resources/AssetManager.h>
 #include <UI/Widgets/TacticalDialog.h>
-#include <Core/Assets/AssetManager.h>
-#include <Core/Config/GameConfig.h>
+#include <Core/Config/Configuration.h>
+#include <Core/Config/Configuration.h>
 #include <UI/Manager/MenuManager.h>
 #include <UI/Screens/MenuScreen.h>
-#include <Core/Config/Config.h>
 #include <qguiapplication.h>
 #include <qfontdatabase.h>
 #include <QFontDatabase>
