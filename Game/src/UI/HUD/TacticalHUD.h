@@ -13,12 +13,13 @@
 #include <QPointF>
 #include <QString>
 
-class QPainter;
 class QMouseEvent;
+class QPainter;
 
 class TacticalHUD : public QObject
 {
     Q_OBJECT
+
 public:
     explicit TacticalHUD(QObject *parent = nullptr);
 
@@ -30,14 +31,9 @@ public:
 
     void setSelection(QPointF hexCoords, bool hasSelection);
 
-    void setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos)
-    {
-        m_hoveredHex = hoveredHex;
-        m_mouseWorldPos = mouseWorldPos;
-        m_mouseScreenPos = mouseScreenPos;
-    }
-
     void toggleDiagnostics() { m_showDiagnostics = !m_showDiagnostics; }
+
+    void setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos);
 
 signals:
     void hudButtonClicked(int buttonIndex);
@@ -45,8 +41,6 @@ signals:
     void minimapClicked(QPointF worldPos);
 
 private:
-    void drawSelectionBox(QPainter &painter, int width, int height);
-
     void drawResourceStats(QPainter &painter, int width, int height);
 
     void drawMinimap(QPainter &painter, int width, int height);
@@ -55,13 +49,11 @@ private:
 
     void drawDiagnostics(QPainter &painter, int width, int height);
 
-    void drawMinimapCached(QPainter &painter, int width, int height);
-
-    QString getTileTypeName(World::TileType type);
-
     void drawScanlines(QPainter &painter, QRect rect);
 
     void updateMinimapCache(int size, int width, int height);
+
+    QString getTileTypeName(World::TileType type) const;
 
     float m_gameTime = 0.0f;
 
@@ -73,29 +65,29 @@ private:
 
     bool m_hasSelection = false;
 
-    QElapsedTimer m_fpsTimer;
-
-    int m_frameCount = 0;
-
-    int m_fps = 0;
-
-    const int HUD_BOX_H = 75;
-
     QPixmap m_minimapCache;
-
-    bool m_minimapNeedsUpdate = true;
 
     QRect m_minimapBox;
 
     QElapsedTimer m_minimapThrottleTimer;
 
+    bool m_minimapNeedsUpdate = true;
+
+    QElapsedTimer m_fpsTimer;
+
     QPoint m_hoveredHex;
-    
+
     QPointF m_mouseWorldPos;
-    
+
     QPoint m_mouseScreenPos;
 
+    int m_frameCount = 0;
+
+    int m_fps = 0;
+
     bool m_showDiagnostics = false;
+
+    static constexpr int HUD_BOX_H = 75;
 };
 
 #endif

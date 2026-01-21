@@ -57,24 +57,6 @@ void TacticalHUD::draw(QPainter &painter, int width, int height)
     m_minimapNeedsUpdate = true;
 }
 
-void TacticalHUD::drawMinimapCached(QPainter &painter, int width, int height)
-{
-    int mmSize = Config::UI::HUD_MINIMAP_SIZE, mmMargin = Config::UI::HUD_MARGIN;
-    int mmX = width - mmSize - mmMargin;
-    int mmY = mmMargin;
-
-    if (m_minimapNeedsUpdate || m_minimapCache.isNull())
-    {
-        updateMinimapCache(mmSize, width, height);
-    }
-
-    painter.drawPixmap(mmX, mmY, m_minimapCache);
-
-    painter.setPen(QPen(Qt::white, 1));
-    int viSize = 20;
-    painter.drawRect(mmX + (mmSize / 2) - (viSize / 2), mmY + (mmSize / 2) - (viSize / 2), viSize, viSize);
-}
-
 bool TacticalHUD::handleMousePress(QMouseEvent *event, int width, int height)
 {
     int boxH = 75;
@@ -125,6 +107,13 @@ void TacticalHUD::setSelection(QPointF hexCoords, bool hasSelection)
 {
     m_selectedHex = hexCoords;
     m_hasSelection = hasSelection;
+}
+
+void TacticalHUD::setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos)
+{
+    m_hoveredHex = hoveredHex;
+    m_mouseWorldPos = mouseWorldPos;
+    m_mouseScreenPos = mouseScreenPos;
 }
 
 void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
@@ -372,23 +361,6 @@ void TacticalHUD::drawDiagnostics(QPainter &painter, int width, int height)
     painter.drawText(x, y + step * 3, QString("TILE   QR: %1, %2").arg(m_hoveredHex.x()).arg(m_hoveredHex.y()));
 }
 
-QString TacticalHUD::getTileTypeName(World::TileType type)
-{
-    switch (type)
-    {
-    case World::TileType::WATER:
-        return "Water";
-    case World::TileType::DIRT:
-        return "Dirt";
-    case World::TileType::GRASS:
-        return "Grass";
-    case World::TileType::MOUNTAIN:
-        return "Mountain";
-    default:
-        return "Unknown";
-    }
-}
-
 void TacticalHUD::drawScanlines(QPainter &painter, QRect rect)
 {
     painter.setPen(QColor(255, 255, 255, 15));
@@ -456,4 +428,21 @@ void TacticalHUD::updateMinimapCache(int size, int width, int height)
 
     cachePainter.setPen(QPen(Qt::white, 1));
     cachePainter.drawRect(QRectF((size - viewW) / 2.0f, (size - viewH) / 2.0f, viewW, viewH));
+}
+
+QString TacticalHUD::getTileTypeName(World::TileType type) const
+{
+    switch (type)
+    {
+    case World::TileType::WATER:
+        return "Water";
+    case World::TileType::DIRT:
+        return "Dirt";
+    case World::TileType::GRASS:
+        return "Grass";
+    case World::TileType::MOUNTAIN:
+        return "Mountain";
+    default:
+        return "Unknown";
+    }
 }

@@ -2,6 +2,7 @@
 
 LoadGameScreen::LoadGameScreen(QWidget *parent) : AbstractScreen(parent)
 {
+    setObjectName("loadGameScreen");
     setupUI();
     refreshSaveList();
 }

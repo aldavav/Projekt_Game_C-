@@ -25,13 +25,6 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *event) override;
 
-private slots:
-    void onDecline();
-
-    void checkRequirements();
-
-    void handleScroll(int value);
-
 private:
     void setupUI(const QString &header, const QString &body);
 
@@ -42,6 +35,13 @@ private:
     QScrollArea *m_scrollArea;
 
     bool m_scrolledToBottom = false;
+    
+private slots:
+    void onDecline();
+
+    void checkRequirements();
+
+    void handleScroll(int value);
 };
 
 #endif

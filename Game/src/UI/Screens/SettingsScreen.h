@@ -21,10 +21,10 @@
 #include <qslider.h>
 #include <qlabel.h>
 
-class QTabWidget;
-class QSlider;
-class QCheckBox;
 class QVBoxLayout;
+class QTabWidget;
+class QCheckBox;
+class QSlider;
 
 class SettingsScreen : public AbstractScreen
 {
@@ -34,10 +34,6 @@ public:
     explicit SettingsScreen(QWidget *parent = nullptr);
 
     virtual ~SettingsScreen() = default;
-
-    void onEnter() override;
-
-    void onExit() override;
 
 private:
     bool m_isDirty = false;

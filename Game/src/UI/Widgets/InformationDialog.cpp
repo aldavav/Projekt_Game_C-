@@ -3,11 +3,6 @@
 InformationDialog::InformationDialog(const QString &header, const QString &body, QWidget *parent)
     : QDialog(parent)
 {
-    setModal(true);
-    setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
-    setAttribute(Qt::WA_TranslucentBackground);
-    setFixedSize(Config::UI::INFO_DIALOG_WIDTH, Config::UI::INFO_DIALOG_HEIGHT);
-
     setupUI(header, body);
 
     QTimer::singleShot(100, this, [this]()
@@ -20,6 +15,12 @@ InformationDialog::InformationDialog(const QString &header, const QString &body,
 
 void InformationDialog::setupUI(const QString &header, const QString &body)
 {
+    setModal(true);
+    setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+    setAttribute(Qt::WA_TranslucentBackground);
+    setObjectName("informationDialog");
+    setFixedSize(Config::UI::INFO_DIALOG_WIDTH, Config::UI::INFO_DIALOG_HEIGHT);
+
     auto *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -27,16 +28,16 @@ void InformationDialog::setupUI(const QString &header, const QString &body)
     backgroundFrame->setObjectName("infoBackgroundFrame");
     auto *frameLayout = new QVBoxLayout(backgroundFrame);
 
-    QLabel *titleLabel = new QLabel(header.toUpper());
+    QLabel *titleLabel = new QLabel(header.toUpper(), backgroundFrame);
     titleLabel->setObjectName("infoTitle");
     frameLayout->addWidget(titleLabel);
 
-    m_scrollArea = new QScrollArea(this);
+    m_scrollArea = new QScrollArea(backgroundFrame);
     m_scrollArea->setObjectName("infoScrollArea");
     m_scrollArea->setWidgetResizable(true);
     m_scrollArea->setFrameShape(QFrame::NoFrame);
 
-    QLabel *contentLabel = new QLabel(body);
+    QLabel *contentLabel = new QLabel(body, m_scrollArea);
     contentLabel->setObjectName("infoBody");
     contentLabel->setWordWrap(true);
     contentLabel->setTextFormat(Qt::RichText);
@@ -46,23 +47,22 @@ void InformationDialog::setupUI(const QString &header, const QString &body)
     m_scrollArea->setWidget(contentLabel);
     frameLayout->addWidget(m_scrollArea);
 
-    m_acceptCheck = new QCheckBox(tr("I HAVE READ AND AGREE TO THE PROTOCOLS ABOVE"));
+    m_acceptCheck = new QCheckBox(tr("I HAVE READ AND AGREE TO THE PROTOCOLS ABOVE"), backgroundFrame);
     m_acceptCheck->setObjectName("infoCheckBox");
     m_acceptCheck->setEnabled(false);
     frameLayout->addWidget(m_acceptCheck);
 
     auto *btnLayout = new QHBoxLayout();
-    QPushButton *declineBtn = new QPushButton(tr("TERMINATE"));
+    QPushButton *declineBtn = new QPushButton(tr("TERMINATE"), backgroundFrame);
     declineBtn->setObjectName("infoDeclineBtn");
 
-    m_confirmBtn = new QPushButton(tr("PROCEED"));
+    m_confirmBtn = new QPushButton(tr("PROCEED"), backgroundFrame);
     m_confirmBtn->setObjectName("infoConfirmBtn");
     m_confirmBtn->setEnabled(false);
 
     connect(declineBtn, &QPushButton::clicked, this, &InformationDialog::onDecline);
     connect(m_confirmBtn, &QPushButton::clicked, this, &QDialog::accept);
     connect(m_acceptCheck, &QCheckBox::checkStateChanged, this, &InformationDialog::checkRequirements);
-
     connect(m_scrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, &InformationDialog::handleScroll);
 
     btnLayout->addWidget(declineBtn);

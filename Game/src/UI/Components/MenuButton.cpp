@@ -3,6 +3,11 @@
 MenuButton::MenuButton(const QString &text, bool isQuit, QWidget *parent)
     : QWidget(parent)
 {
+    setupUI(text, isQuit);
+}
+
+void MenuButton::setupUI(const QString &text, bool isQuit)
+{
     m_arrow = new QLabel(this);
     m_arrow->setObjectName("buttonArrow");
     m_arrow->hide();
@@ -15,7 +20,6 @@ MenuButton::MenuButton(const QString &text, bool isQuit, QWidget *parent)
     auto *glow = new QGraphicsDropShadowEffect(m_btn);
     glow->setBlurRadius(25);
     glow->setOffset(0, 0);
-
     glow->setEnabled(isQuit);
     m_btn->setGraphicsEffect(glow);
 

@@ -26,6 +26,24 @@ void MenuManager::setMainWindow(QWidget *window)
     }
 }
 
+void MenuManager::setScreen(AbstractScreen *screen)
+{
+    while (!m_screenStack.isEmpty())
+    {
+        AbstractScreen *oldScreen = m_screenStack.pop();
+
+        if (m_mainWindow && m_mainWindow->layout())
+        {
+            m_mainWindow->layout()->removeWidget(oldScreen);
+        }
+
+        oldScreen->hide();
+        oldScreen->deleteLater();
+    }
+
+    pushScreen(screen);
+}
+
 void MenuManager::pushScreen(AbstractScreen *screen)
 {
     if (!m_mainWindow || !screen)
@@ -62,24 +80,6 @@ void MenuManager::popScreen()
         layout->setCurrentWidget(nextScreen);
         nextScreen->onEnter();
     }
-}
-
-void MenuManager::setScreen(AbstractScreen *screen)
-{
-    while (!m_screenStack.isEmpty())
-    {
-        AbstractScreen *oldScreen = m_screenStack.pop();
-
-        if (m_mainWindow && m_mainWindow->layout())
-        {
-            m_mainWindow->layout()->removeWidget(oldScreen);
-        }
-
-        oldScreen->hide();
-        oldScreen->deleteLater();
-    }
-
-    pushScreen(screen);
 }
 
 void MenuManager::updateMetadata()

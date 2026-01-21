@@ -11,9 +11,15 @@ public:
 
     virtual ~AbstractScreen() = default;
 
-    virtual void onEnter() = 0;
+    virtual void onEnter()
+    {
+        this->show();
+    }
 
-    virtual void onExit() = 0;
+    virtual void onExit()
+    {
+        this->hide();
+    }
 };
 
 #endif

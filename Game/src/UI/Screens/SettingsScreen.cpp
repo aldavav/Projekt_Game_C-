@@ -5,10 +5,6 @@ SettingsScreen::SettingsScreen(QWidget *parent) : AbstractScreen(parent)
     setupUI();
 }
 
-void SettingsScreen::onEnter() { this->show(); }
-
-void SettingsScreen::onExit() { this->hide(); }
-
 void SettingsScreen::setupUI()
 {
     auto *rootLayout = new QHBoxLayout(this);

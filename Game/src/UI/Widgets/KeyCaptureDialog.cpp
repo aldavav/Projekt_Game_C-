@@ -3,17 +3,21 @@
 KeyCaptureDialog::KeyCaptureDialog(QWidget *parent)
     : QDialog(parent)
 {
+    setupUI();
+}
+
+void KeyCaptureDialog::setupUI()
+{
     setModal(true);
     setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
     setObjectName("keyCaptureDialog");
-
     setFixedSize(Config::UI::KEY_DIALOG_WIDTH, Config::UI::KEY_DIALOG_HEIGHT);
 
     auto *layout = new QVBoxLayout(this);
     int margin = Config::UI::KEY_DIALOG_MARGINS;
     layout->setContentsMargins(margin, margin, margin, margin);
 
-    auto *infoLabel = new QLabel(tr("AWAITING INPUT...\n\nPRESS ANY KEY TO BIND\n[ESC] TO CANCEL"));
+    auto *infoLabel = new QLabel(tr("AWAITING INPUT...\n\nPRESS ANY KEY TO BIND\n[ESC] TO CANCEL"), this);
     infoLabel->setObjectName("keyCaptureInfo");
     infoLabel->setAlignment(Qt::AlignCenter);
     infoLabel->setWordWrap(true);

@@ -22,38 +22,30 @@ class MenuManager : public QObject
 {
     Q_OBJECT
 
-private:
-    explicit MenuManager(QObject *parent = nullptr);
-
-    QStack<AbstractScreen *> m_screenStack;
-
-    QWidget *m_mainWindow;
-
-    void updateScreenVisibility();
-
 public:
     static MenuManager &getInstance();
 
-    MenuManager(const MenuManager &) = delete;
-
-    void operator=(const MenuManager &) = delete;
-
-    MenuManager(MenuManager &&) = delete;
-
-    MenuManager &operator=(MenuManager &&) = delete;
-
     void setMainWindow(QWidget *window);
+    
+    void setScreen(AbstractScreen *screen);
 
     void pushScreen(AbstractScreen *screen);
 
     void popScreen();
 
-    void setScreen(AbstractScreen *screen);
-
     void updateMetadata();
 
 public slots:
     void handleGameStateChange(int newState);
+
+private:
+    explicit MenuManager(QObject *parent = nullptr);
+
+    void updateScreenVisibility();
+
+    QStack<AbstractScreen *> m_screenStack;
+
+    QWidget *m_mainWindow;
 };
 
 #endif

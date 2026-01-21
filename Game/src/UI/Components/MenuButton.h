@@ -14,6 +14,7 @@ class QLabel;
 class MenuButton : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit MenuButton(const QString &text, bool isQuit = false, QWidget *parent = nullptr);
 
@@ -24,6 +25,8 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
+    void setupUI(const QString &header, bool isQuit);
+
     QPushButton *m_btn;
 
     QLabel *m_arrow;

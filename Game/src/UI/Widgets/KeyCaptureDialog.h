@@ -21,6 +21,8 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
 
 private:
+    void setupUI();
+
     Engine::Input::KeyCode capturedKey = Engine::Input::KeyCode::ESC;
 };
 

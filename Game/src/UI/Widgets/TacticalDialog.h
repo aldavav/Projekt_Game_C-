@@ -17,10 +17,11 @@ class TacticalDialog : public QDialog
 public:
     explicit TacticalDialog(const QString &title, const QString &message, QWidget *parent = nullptr);
 
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
 private:
     void setupUI(const QString &title, const QString &message);
-
-    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif
