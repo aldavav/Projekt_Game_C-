@@ -2,10 +2,9 @@
 #include <UI/Widgets/TacticalDialog.h>
 #include <UI/Manager/MenuManager.h>
 
-//diagnostika
+// diagnostika
 #include <QElapsedTimer>
 #include <QDebug>
-
 
 GameScreen::GameScreen(QWidget *parent)
     : AbstractScreen(parent), m_updateTimer(new QTimer(this))
@@ -40,14 +39,16 @@ void GameScreen::onExit()
 
 void GameScreen::paintEvent(QPaintEvent *event)
 {
-    QElapsedTimer total; total.start();
+    QElapsedTimer total;
+    total.start();
 
     QPainter painter(this);
 
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    QElapsedTimer t; t.start();
+    QElapsedTimer t;
+    t.start();
     drawMap(painter);
     qint64 mapMs = t.elapsed();
 
@@ -114,8 +115,6 @@ void GameScreen::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-
-
 void GameScreen::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
@@ -151,19 +150,19 @@ void GameScreen::keyPressEvent(QKeyEvent *event)
 
             QTimer::singleShot(100, loading, [loading]()
                                {
-                loading->setStatus(tr("ARCHIVING MISSION DATA..."));
-                loading->setProgress(50);
-                
-                GameEngine::getInstance().saveCurrentMatch();
+                                   loading->setStatus(tr("ARCHIVING MISSION DATA..."));
+                                   loading->setProgress(50);
 
-                loading->setStatus(tr("UPLINK TERMINATED"));
-                loading->setProgress(100);
-                
-                QTimer::singleShot(Config::LOADING_FINAL_PAUSE, [loading]() {
-                    auto* mainMenu = new MenuScreen(loading->parentWidget());
-                    MenuManager::getInstance().setScreen(mainMenu);
-                });
-            });
+                                   GameEngine::getInstance().saveCurrentMatch();
+
+                                   loading->setStatus(tr("UPLINK TERMINATED"));
+                                   loading->setProgress(100);
+
+                                   QTimer::singleShot(Config::LOADING_FINAL_PAUSE, [loading]() {
+                                       auto* mainMenu = new MenuScreen(loading->parentWidget());
+                                       MenuManager::getInstance().setScreen(mainMenu);
+                                   });
+                               });
             return;
         }
     }
@@ -172,6 +171,7 @@ void GameScreen::keyPressEvent(QKeyEvent *event)
         m_is3D = !m_is3D;
         update();
     }
+
     if (event->key() == Qt::Key_F3)
     {
         auto &gm = GameManager::getInstance();
@@ -212,14 +212,13 @@ void GameScreen::updateGameDisplay()
     update();
 }
 
-
 void GameScreen::drawMap(QPainter &painter)
 {
     QElapsedTimer t;
     t.start();
 
     auto &cam = Camera::getInstance();
-    auto &gm  = GameManager::getInstance();
+    auto &gm = GameManager::getInstance();
 
     // --- prep (hover/world/diagnostics) ---
     if (m_hoverDirty)
@@ -257,14 +256,17 @@ void GameScreen::drawMap(QPainter &painter)
                  << "clouds:" << cloudsMs << "ms";
 }
 
-
-
 void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
 {
     auto &cam = Camera::getInstance();
     auto &map = Map::getInstance();
     const float BASE_TILE = GameConfig::BASE_TILE_SIZE;
     float zoom = cam.getZoom();
+
+    // (nechávám, neškodí)
+    int stride = 1;
+    if (zoom < 0.75f) stride = 2;
+    if (zoom < 0.5f)  stride = 3;
 
     QPointF tl = cam.screenToWorld(QPoint(0, 0), true);
     QPointF br = cam.screenToWorld(QPoint(width(), height()), true);
@@ -280,12 +282,12 @@ void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
     int minQ = static_cast<int>(floor((2.0f / 3.0f * tl.x()) / BASE_TILE)) - 2;
     int maxQ = static_cast<int>(ceil((2.0f / 3.0f * br.x()) / BASE_TILE)) + 2;
 
-    for (int q = minQ; q <= maxQ; ++q)
+    for (int q = minQ; q <= maxQ; q += stride)
     {
         int minR = static_cast<int>(floor((-1.0f / 3.0f * q * 1.5f * BASE_TILE + 0.577f * tl.y()) / BASE_TILE)) - 2;
         int maxR = static_cast<int>(ceil((-1.0f / 3.0f * q * 1.5f * BASE_TILE + 0.577f * br.y()) / BASE_TILE)) + 2;
 
-        for (int r = minR; r <= maxR; ++r)
+        for (int r = minR; r <= maxR; r += stride)
         {
             Tile &tile = map.getTileAt(q, r);
             if (!tile.discovered)
@@ -348,12 +350,32 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
     float visualRadius = (BASE_TILE * zoom) * GameConfig::HEX_VISUAL_SCALE;
     QColor selectionColor = property("selectionColor").value<QColor>();
 
-    for (int q = minQ; q <= maxQ; ++q)
+    int qSpan = (maxQ - minQ + 1);
+
+    int qMid = (minQ + maxQ) / 2;
+    int minRmid = static_cast<int>(floor((-1.0f / 3.0f * qMid * 1.5f * BASE_TILE + 0.577f * topLeft.y()) / BASE_TILE)) - 2;
+    int maxRmid = static_cast<int>(ceil((-1.0f / 3.0f * qMid * 1.5f * BASE_TILE + 0.577f * bottomRight.y()) / BASE_TILE)) + 2;
+    int rSpan = (maxRmid - minRmid + 1);
+
+    int estimatedTiles = qSpan * rSpan;
+
+    const int target = 1200;
+
+    int stride = 1;
+    while ((estimatedTiles / (stride * stride)) > target && stride < 8)
+        ++stride;
+
+    static int k = 0;
+    if (++k % 60 == 0)
+        qDebug() << "[LOD]" << "qSpan" << qSpan << "rSpan" << rSpan
+                 << "tiles" << estimatedTiles << "stride" << stride;
+
+    for (int q = minQ; q <= maxQ; q += stride)
     {
         int minR = static_cast<int>(floor((-1.0f / 3.0f * q * 1.5f * BASE_TILE + 0.577f * topLeft.y()) / BASE_TILE)) - 2;
         int maxR = static_cast<int>(ceil((-1.0f / 3.0f * q * 1.5f * BASE_TILE + 0.577f * bottomRight.y()) / BASE_TILE)) + 2;
 
-        for (int r = minR; r <= maxR; ++r)
+        for (int r = minR; r <= maxR; r += stride)
         {
             Tile &tile = map.getTileAt(q, r);
             if (!tile.discovered)
@@ -389,6 +411,7 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
         }
     }
 }
+
 
 void GameScreen::drawHexagon(QPainter &painter, QPoint center, float radius, QColor color, float height)
 {

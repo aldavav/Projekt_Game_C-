@@ -104,6 +104,13 @@ private:
     QColor m_fogColor;
 
     bool m_is3D = false;
+
+    // Hover/diagnostics cache (perf)
+    QPoint  m_cachedMousePos;
+    QPoint  m_cachedHoverHex;
+    QPointF m_cachedWorldPos;
+    bool    m_hoverDirty = true;
+
 };
 
 #endif
