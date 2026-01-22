@@ -2,6 +2,11 @@
 #include <UI/Widgets/TacticalDialog.h>
 #include <UI/Manager/MenuManager.h>
 
+//diagnostika
+#include <QElapsedTimer>
+#include <QDebug>
+
+
 GameScreen::GameScreen(QWidget *parent)
     : AbstractScreen(parent), m_updateTimer(new QTimer(this))
 {
@@ -23,6 +28,9 @@ void GameScreen::onEnter()
     this->setFocus();
 
     m_updateTimer->start(GameConfig::FRAME_MS);
+
+    m_cachedMousePos = mapFromGlobal(QCursor::pos());
+    m_hoverDirty = true;
 }
 
 void GameScreen::onExit()
@@ -32,17 +40,29 @@ void GameScreen::onExit()
 
 void GameScreen::paintEvent(QPaintEvent *event)
 {
+    QElapsedTimer total; total.start();
+
     QPainter painter(this);
 
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
+    QElapsedTimer t; t.start();
     drawMap(painter);
+    qint64 mapMs = t.elapsed();
 
+    t.restart();
     if (auto *hud = GameManager::getInstance().getHUD())
-    {
         hud->draw(painter, width(), height());
-    }
+    qint64 hudMs = t.elapsed();
+
+    qint64 totalMs = total.elapsed();
+
+    static int frame = 0;
+    if (++frame % 30 == 0) // log jednou za ~30 framů
+        qDebug() << "[FRAME]" << "map:" << mapMs << "ms"
+                 << "hud:" << hudMs << "ms"
+                 << "total:" << totalMs << "ms";
 }
 
 void GameScreen::mousePressEvent(QMouseEvent *event)
@@ -60,6 +80,10 @@ void GameScreen::mousePressEvent(QMouseEvent *event)
     {
         m_isDragging = true;
         m_lastMousePos = event->pos();
+
+        m_cachedMousePos = event->pos();
+        m_hoverDirty = true;
+
         gm.handleMouseClick(event->pos());
     }
 
@@ -68,18 +92,28 @@ void GameScreen::mousePressEvent(QMouseEvent *event)
 
 void GameScreen::mouseMoveEvent(QMouseEvent *event)
 {
+    if (event->pos() != m_cachedMousePos)
+    {
+        m_cachedMousePos = event->pos();
+        m_hoverDirty = true;
+    }
+
     if (m_isDragging)
     {
         QPoint delta = event->pos() - m_lastMousePos;
-        float zoom = Camera::getInstance().getZoom();
+        if (!delta.isNull())
+        {
+            float zoom = Camera::getInstance().getZoom();
+            Camera::getInstance().move(-delta.x() / zoom, -delta.y() / zoom);
+            m_hoverDirty = true;
+        }
 
-        Camera::getInstance().move(-delta.x() / zoom, -delta.y() / zoom);
         m_lastMousePos = event->pos();
-
         update();
         return;
     }
 }
+
 
 
 void GameScreen::mouseReleaseEvent(QMouseEvent *event)
@@ -92,6 +126,7 @@ void GameScreen::wheelEvent(QWheelEvent *event)
 {
     float zoomAmount = (event->angleDelta().y() > 0) ? GameConfig::ZOOM_STEP : -GameConfig::ZOOM_STEP;
     Camera::getInstance().adjustZoom(zoomAmount);
+    m_hoverDirty = true;
     update();
 }
 
@@ -161,45 +196,68 @@ void GameScreen::updateGameDisplay()
 {
     auto &cam = Camera::getInstance();
     float zoom = cam.getZoom();
-
     float speed = GameConfig::CAMERA_BASE_SPEED / zoom;
 
-    static float lastZoom = -1.0f;
-    if (std::abs(zoom - lastZoom) > 0.01f)
-    {
-        lastZoom = zoom;
-    }
+    bool moved = false;
 
-    if (m_pressedKeys.contains(Qt::Key_W))
-        cam.move(0, -speed);
-    if (m_pressedKeys.contains(Qt::Key_S))
-        cam.move(0, speed);
-    if (m_pressedKeys.contains(Qt::Key_A))
-        cam.move(-speed, 0);
-    if (m_pressedKeys.contains(Qt::Key_D))
-        cam.move(speed, 0);
+    if (m_pressedKeys.contains(Qt::Key_W)) { cam.move(0, -speed); moved = true; }
+    if (m_pressedKeys.contains(Qt::Key_S)) { cam.move(0,  speed); moved = true; }
+    if (m_pressedKeys.contains(Qt::Key_A)) { cam.move(-speed, 0); moved = true; }
+    if (m_pressedKeys.contains(Qt::Key_D)) { cam.move( speed, 0); moved = true; }
+
+    if (moved)
+        m_hoverDirty = true;
 
     GameManager::getInstance().update(GameConfig::DELTA_TIME);
     update();
 }
 
+
 void GameScreen::drawMap(QPainter &painter)
 {
-    auto &cam = Camera::getInstance();
-    auto &gm = GameManager::getInstance();
+    QElapsedTimer t;
+    t.start();
 
-    QPoint mousePos = mapFromGlobal(QCursor::pos());
-    QPoint currentHover = cam.screenToHex(mousePos, m_is3D);
+    auto &cam = Camera::getInstance();
+    auto &gm  = GameManager::getInstance();
+
+    // --- prep (hover/world/diagnostics) ---
+    if (m_hoverDirty)
+    {
+        QPoint mousePos = m_cachedMousePos;
+        m_cachedHoverHex = cam.screenToHex(mousePos, m_is3D);
+        m_cachedWorldPos = cam.screenToWorld(mousePos, m_is3D);
+        m_hoverDirty = false;
+    }
 
     if (auto *hud = gm.getHUD())
     {
-        hud->setDiagnosticsData(mousePos, cam.screenToWorld(mousePos, m_is3D), currentHover);
+        hud->setDiagnosticsData(m_cachedMousePos, m_cachedWorldPos, m_cachedHoverHex);
     }
 
-    m_is3D ? drawMap3D(painter, currentHover) : drawMap2D(painter, currentHover);
+    qint64 prepMs = t.elapsed();
+    t.restart();
 
+    // --- map tiles ---
+    if (m_is3D) drawMap3D(painter, m_cachedHoverHex);
+    else       drawMap2D(painter, m_cachedHoverHex);
+
+    qint64 tilesMs = t.elapsed();
+    t.restart();
+
+    // --- clouds ---
     drawClouds(painter, cam, gm.getGameTime(), cam.getZoom());
+
+    qint64 cloudsMs = t.elapsed();
+
+    static int n = 0;
+    if (++n % 30 == 0)
+        qDebug() << "[MAP]" << "prep:" << prepMs << "ms"
+                 << "tiles:" << tilesMs << "ms"
+                 << "clouds:" << cloudsMs << "ms";
 }
+
+
 
 void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
 {
