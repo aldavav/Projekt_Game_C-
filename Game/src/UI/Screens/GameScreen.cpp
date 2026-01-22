@@ -2,6 +2,8 @@
 #include <UI/Widgets/TacticalDialog.h>
 #include <UI/Manager/MenuManager.h>
 
+#include <algorithm> // std::clamp, std::swap
+
 // diagnostika
 #include <QElapsedTimer>
 #include <QDebug>
@@ -60,7 +62,7 @@ void GameScreen::paintEvent(QPaintEvent *event)
     qint64 totalMs = total.elapsed();
 
     static int frame = 0;
-    if (++frame % 30 == 0) // log jednou za ~30 framů
+    if (++frame % 30 == 0)
         qDebug() << "[FRAME]" << "map:" << mapMs << "ms"
                  << "hud:" << hudMs << "ms"
                  << "total:" << totalMs << "ms";
@@ -263,13 +265,24 @@ void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
     const float BASE_TILE = GameConfig::BASE_TILE_SIZE;
     float zoom = cam.getZoom();
 
-    // (nechávám, neškodí)
     int stride = 1;
     if (zoom < 0.75f) stride = 2;
     if (zoom < 0.5f)  stride = 3;
 
     QPointF tl = cam.screenToWorld(QPoint(0, 0), true);
     QPointF br = cam.screenToWorld(QPoint(width(), height()), true);
+
+    const QRectF wb = Config::WORLD_BOUNDS;
+    auto clampPoint = [&](QPointF p) -> QPointF {
+        p.setX(std::clamp(p.x(), wb.left(), wb.right()));
+        p.setY(std::clamp(p.y(), wb.top(), wb.bottom()));
+        return p;
+    };
+    tl = clampPoint(tl);
+    br = clampPoint(br);
+
+    if (tl.x() > br.x()) std::swap(tl.rx(), br.rx());
+    if (tl.y() > br.y()) std::swap(tl.ry(), br.ry());
 
     struct TileData
     {
@@ -343,11 +356,24 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
     QPointF topLeft = cam.screenToWorld(QPoint(0, 0), false);
     QPointF bottomRight = cam.screenToWorld(QPoint(width(), height()), false);
 
+    const QRectF wb = Config::WORLD_BOUNDS;
+    auto clampPoint = [&](QPointF p) -> QPointF {
+        p.setX(std::clamp(p.x(), wb.left(), wb.right()));
+        p.setY(std::clamp(p.y(), wb.top(), wb.bottom()));
+        return p;
+    };
+    topLeft = clampPoint(topLeft);
+    bottomRight = clampPoint(bottomRight);
+
+    if (topLeft.x() > bottomRight.x()) std::swap(topLeft.rx(), bottomRight.rx());
+    if (topLeft.y() > bottomRight.y()) std::swap(topLeft.ry(), bottomRight.ry());
+
     int minQ = static_cast<int>(floor((2.0f / 3.0f * topLeft.x()) / BASE_TILE)) - 2;
     int maxQ = static_cast<int>(ceil((2.0f / 3.0f * bottomRight.x()) / BASE_TILE)) + 2;
 
     float zoom = cam.getZoom();
     float visualRadius = (BASE_TILE * zoom) * GameConfig::HEX_VISUAL_SCALE;
+
     QColor selectionColor = property("selectionColor").value<QColor>();
 
     int qSpan = (maxQ - minQ + 1);
@@ -370,6 +396,15 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
         qDebug() << "[LOD]" << "qSpan" << qSpan << "rSpan" << rSpan
                  << "tiles" << estimatedTiles << "stride" << stride;
 
+    const QPen normalPen(QColor(0, 0, 0, 40), 1);
+    const QPen hoverPen(QColor(255, 255, 255, 180), 1);
+    const QPen selectedPen(selectionColor, 2);
+
+    painter.setPen(normalPen);
+
+    QColor lastBrushColor;        // cache poslední barvy
+    bool hasLastBrush = false;
+
     for (int q = minQ; q <= maxQ; q += stride)
     {
         int minR = static_cast<int>(floor((-1.0f / 3.0f * q * 1.5f * BASE_TILE + 0.577f * topLeft.y()) / BASE_TILE)) - 2;
@@ -387,31 +422,31 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
                 continue;
 
             bool isSelected = (gm.hasSelection() && q == gm.getSelectedHex().x() && r == gm.getSelectedHex().y());
-            bool isHovered = (q == currentHover.x() && r == currentHover.y());
+            bool isHovered  = (q == currentHover.x() && r == currentHover.y());
 
             QColor tileColor = getTileVisualColor(tile, gm.getGameTime());
 
-            if (isSelected)
-            {
-                painter.setBrush(tileColor.lighter(150));
-                painter.setPen(QPen(selectionColor, 2));
-            }
-            else if (isHovered)
-            {
-                painter.setBrush(tileColor.lighter(120));
-                painter.setPen(QPen(QColor(255, 255, 255, 180), 1));
-            }
-            else
+            if (isSelected) tileColor = tileColor.lighter(150);
+            else if (isHovered) tileColor = tileColor.lighter(120);
+
+            if (!hasLastBrush || tileColor != lastBrushColor)
             {
                 painter.setBrush(tileColor);
-                painter.setPen(QPen(QColor(0, 0, 0, 40), 1));
+                lastBrushColor = tileColor;
+                hasLastBrush = true;
             }
+
+            if (isSelected)
+                painter.setPen(selectedPen);
+            else if (isHovered)
+                painter.setPen(hoverPen);
+            else
+                painter.setPen(normalPen);
 
             drawHexagon(painter, screenPos, visualRadius);
         }
     }
 }
-
 
 void GameScreen::drawHexagon(QPainter &painter, QPoint center, float radius, QColor color, float height)
 {
