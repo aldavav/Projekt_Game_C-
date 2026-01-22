@@ -34,8 +34,8 @@ void GameScreen::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
 
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
 
     drawMap(painter);
 
@@ -75,10 +75,12 @@ void GameScreen::mouseMoveEvent(QMouseEvent *event)
 
         Camera::getInstance().move(-delta.x() / zoom, -delta.y() / zoom);
         m_lastMousePos = event->pos();
-    }
 
-    update();
+        update();
+        return;
+    }
 }
+
 
 void GameScreen::mouseReleaseEvent(QMouseEvent *event)
 {
@@ -396,7 +398,7 @@ void GameScreen::drawClouds(QPainter &painter, Camera &cam, float gameTime, floa
     float range = GameConfig::CLOUD_MAX_RANGE;
     float halfRange = range / 2.0f;
 
-    for (int i = 0; i < 50; ++i)
+    for (int i = 0; i < 20; ++i)
     {
         float speedVar = GameConfig::CLOUD_SPEED_BASE + (std::abs(std::sin(i * 1.618f)) * GameConfig::CLOUD_SPEED_MULT);
 
