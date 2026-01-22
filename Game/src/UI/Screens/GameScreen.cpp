@@ -514,7 +514,7 @@ void GameScreen::drawClouds(QPainter &painter, Camera &cam, float gameTime, floa
     float range = GameConfig::CLOUD_MAX_RANGE;
     float halfRange = range / 2.0f;
 
-    for (int i = 0; i < 20; ++i)
+    for (int i = 0; i < 50; ++i)
     {
         float speedVar = GameConfig::CLOUD_SPEED_BASE + (std::abs(std::sin(i * 1.618f)) * GameConfig::CLOUD_SPEED_MULT);
 
