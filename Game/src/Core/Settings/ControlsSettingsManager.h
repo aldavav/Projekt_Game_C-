@@ -3,6 +3,7 @@
 
 #include <Core/Config/Configuration.h>
 #include <QKeySequence>
+#include <QObject>
 #include <QString>
 #include <QMap>
 
