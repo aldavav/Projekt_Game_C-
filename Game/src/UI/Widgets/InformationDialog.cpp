@@ -13,6 +13,58 @@ InformationDialog::InformationDialog(const QString &header, const QString &body,
         } });
 }
 
+void InformationDialog::keyPressEvent(QKeyEvent *event)
+{
+    QScrollBar *bar = m_scrollArea->verticalScrollBar();
+
+    switch (event->key())
+    {
+    case Qt::Key_Down:
+    case Qt::Key_PageDown:
+        bar->setValue(bar->value() + Config::Input::KEYBOARD_SCROLL_STEP);
+        break;
+
+    case Qt::Key_Up:
+    case Qt::Key_PageUp:
+        bar->setValue(bar->value() - Config::Input::KEYBOARD_SCROLL_STEP);
+        break;
+
+    case Qt::Key_Return:
+    case Qt::Key_Enter:
+        if (m_confirmBtn->isEnabled())
+            accept();
+        break;
+
+    case Qt::Key_Escape:
+        onDecline();
+        break;
+
+    default:
+        QDialog::keyPressEvent(event);
+    }
+}
+
+void InformationDialog::onDecline()
+{
+    QCoreApplication::quit();
+}
+
+void InformationDialog::checkRequirements()
+{
+    m_confirmBtn->setEnabled(m_scrolledToBottom && m_acceptCheck->isChecked());
+}
+
+void InformationDialog::handleScroll(int value)
+{
+    QScrollBar *bar = m_scrollArea->verticalScrollBar();
+
+    if (!bar->isVisible() || bar->maximum() <= 0 || value >= (bar->maximum() * Config::UI::LEGAL_SCROLL_THRESHOLD))
+    {
+        m_scrolledToBottom = true;
+        m_acceptCheck->setEnabled(true);
+    }
+}
+
 void InformationDialog::setupUI(const QString &header, const QString &body)
 {
     setModal(true);
@@ -71,56 +123,4 @@ void InformationDialog::setupUI(const QString &header, const QString &body)
 
     frameLayout->addLayout(btnLayout);
     mainLayout->addWidget(backgroundFrame);
-}
-
-void InformationDialog::handleScroll(int value)
-{
-    QScrollBar *bar = m_scrollArea->verticalScrollBar();
-
-    if (!bar->isVisible() || bar->maximum() <= 0 || value >= (bar->maximum() * Config::UI::LEGAL_SCROLL_THRESHOLD))
-    {
-        m_scrolledToBottom = true;
-        m_acceptCheck->setEnabled(true);
-    }
-}
-
-void InformationDialog::checkRequirements()
-{
-    m_confirmBtn->setEnabled(m_scrolledToBottom && m_acceptCheck->isChecked());
-}
-
-void InformationDialog::onDecline()
-{
-    QCoreApplication::quit();
-}
-
-void InformationDialog::keyPressEvent(QKeyEvent *event)
-{
-    QScrollBar *bar = m_scrollArea->verticalScrollBar();
-
-    switch (event->key())
-    {
-    case Qt::Key_Down:
-    case Qt::Key_PageDown:
-        bar->setValue(bar->value() + Config::Input::KEYBOARD_SCROLL_STEP);
-        break;
-
-    case Qt::Key_Up:
-    case Qt::Key_PageUp:
-        bar->setValue(bar->value() - Config::Input::KEYBOARD_SCROLL_STEP);
-        break;
-
-    case Qt::Key_Return:
-    case Qt::Key_Enter:
-        if (m_confirmBtn->isEnabled())
-            accept();
-        break;
-
-    case Qt::Key_Escape:
-        onDecline();
-        break;
-
-    default:
-        QDialog::keyPressEvent(event);
-    }
 }

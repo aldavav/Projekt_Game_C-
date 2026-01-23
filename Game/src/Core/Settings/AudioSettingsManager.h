@@ -7,6 +7,7 @@
 class AudioSettingsManager : public QObject
 {
     Q_OBJECT
+    
 public:
     static AudioSettingsManager &getInstance();
 

@@ -6,27 +6,6 @@ MenuButton::MenuButton(const QString &text, bool isQuit, QWidget *parent)
     setupUI(text, isQuit);
 }
 
-void MenuButton::setupUI(const QString &text, bool isQuit)
-{
-    m_arrow = new QLabel(this);
-    m_arrow->setObjectName("buttonArrow");
-    m_arrow->hide();
-
-    m_btn = new QPushButton(text, this);
-    m_btn->setObjectName(isQuit ? "quitButton" : "menuButton");
-    m_btn->setFixedSize(Config::UI::BTN_WIDTH_NORMAL, Config::UI::BTN_HEIGHT_NORMAL);
-    m_btn->move(Config::UI::BTN_X_NORMAL, 5);
-
-    auto *glow = new QGraphicsDropShadowEffect(m_btn);
-    glow->setBlurRadius(25);
-    glow->setOffset(0, 0);
-    glow->setEnabled(isQuit);
-    m_btn->setGraphicsEffect(glow);
-
-    m_btn->installEventFilter(this);
-    connect(m_btn, &QPushButton::clicked, this, &MenuButton::clicked);
-}
-
 bool MenuButton::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj == m_btn)
@@ -56,4 +35,25 @@ bool MenuButton::eventFilter(QObject *obj, QEvent *event)
         }
     }
     return QWidget::eventFilter(obj, event);
+}
+
+void MenuButton::setupUI(const QString &text, bool isQuit)
+{
+    m_arrow = new QLabel(this);
+    m_arrow->setObjectName("buttonArrow");
+    m_arrow->hide();
+
+    m_btn = new QPushButton(text, this);
+    m_btn->setObjectName(isQuit ? "quitButton" : "menuButton");
+    m_btn->setFixedSize(Config::UI::BTN_WIDTH_NORMAL, Config::UI::BTN_HEIGHT_NORMAL);
+    m_btn->move(Config::UI::BTN_X_NORMAL, 5);
+
+    auto *glow = new QGraphicsDropShadowEffect(m_btn);
+    glow->setBlurRadius(25);
+    glow->setOffset(0, 0);
+    glow->setEnabled(isQuit);
+    m_btn->setGraphicsEffect(glow);
+
+    m_btn->installEventFilter(this);
+    connect(m_btn, &QPushButton::clicked, this, &MenuButton::clicked);
 }

@@ -5,6 +5,89 @@ SettingsScreen::SettingsScreen(QWidget *parent) : AbstractScreen(parent)
     setupUI();
 }
 
+void SettingsScreen::changeEvent(QEvent *event)
+{
+    if (event->type() == QEvent::LanguageChange)
+    {
+        retranslateUi();
+    }
+    AbstractScreen::changeEvent(event);
+}
+
+void SettingsScreen::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
+        onBackClicked();
+    }
+    else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    {
+        if (!focusWidget() || !focusWidget()->inherits("QPushButton"))
+        {
+            onApplyClicked();
+        }
+    }
+    else
+    {
+        AbstractScreen::keyPressEvent(event);
+    }
+}
+
+void SettingsScreen::onApplyClicked()
+{
+    ConfigManager::getInstance().saveConfiguration();
+
+    DisplaySettingsManager::getInstance().applySettings();
+    GraphicsSettingsManager::getInstance().applyGraphicsSettings();
+
+    m_isDirty = false;
+    MenuManager::getInstance().popScreen();
+}
+
+void SettingsScreen::onResetClicked()
+{
+    TacticalDialog confirm(tr("FACTORY RESET"),
+                           tr("RESTORE ALL SYSTEM PARAMETERS TO FACTORY DEFAULTS?"),
+                           this);
+
+    if (confirm.exec() == QDialog::Accepted)
+    {
+        ConfigManager::getInstance().resetToDefaults();
+
+        m_isDirty = true;
+
+        setupUI();
+        update();
+    }
+}
+
+void SettingsScreen::onBackClicked()
+{
+    if (m_isDirty)
+    {
+        TacticalDialog confirm(tr("UNSAVED DATA"),
+                               tr("SYSTEM CONFIGURATION HAS BEEN MODIFIED. DISCARD CHANGES?"),
+                               this);
+
+        if (confirm.exec() == QDialog::Rejected)
+            return;
+
+        ConfigManager::getInstance().loadConfiguration();
+    }
+
+    m_isDirty = false;
+    MenuManager::getInstance().popScreen();
+}
+
+void SettingsScreen::onBindButtonClicked(const QString &actionName)
+{
+    KeyCaptureDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        Engine::Input::KeyCode newKey = dialog.getCapturedKey();
+    }
+}
+
 void SettingsScreen::setupUI()
 {
     auto *rootLayout = new QHBoxLayout(this);
@@ -65,20 +148,6 @@ void SettingsScreen::retranslateUi()
     m_tabs->setTabText(2, tr("DISPLAY"));
     m_tabs->setTabText(3, tr("GRAPHICS"));
     m_tabs->setTabText(4, tr("AUDIO"));
-}
-
-void SettingsScreen::changeEvent(QEvent *event)
-{
-    if (event->type() == QEvent::LanguageChange)
-    {
-        retranslateUi();
-    }
-    AbstractScreen::changeEvent(event);
-}
-
-void SettingsScreen::markDirty()
-{
-    m_isDirty = true;
 }
 
 QWidget *SettingsScreen::createGameTab()
@@ -267,76 +336,7 @@ QWidget *SettingsScreen::createInputTab()
     return w;
 }
 
-void SettingsScreen::onApplyClicked()
+void SettingsScreen::markDirty()
 {
-    ConfigManager::getInstance().saveConfiguration();
-
-    DisplaySettingsManager::getInstance().applySettings();
-    GraphicsSettingsManager::getInstance().applyGraphicsSettings();
-
-    m_isDirty = false;
-    MenuManager::getInstance().popScreen();
-}
-
-void SettingsScreen::onResetClicked()
-{
-    TacticalDialog confirm(tr("FACTORY RESET"),
-                           tr("RESTORE ALL SYSTEM PARAMETERS TO FACTORY DEFAULTS?"),
-                           this);
-
-    if (confirm.exec() == QDialog::Accepted)
-    {
-        ConfigManager::getInstance().resetToDefaults();
-
-        m_isDirty = true;
-
-        setupUI();
-        update();
-    }
-}
-
-void SettingsScreen::onBackClicked()
-{
-    if (m_isDirty)
-    {
-        TacticalDialog confirm(tr("UNSAVED DATA"),
-                               tr("SYSTEM CONFIGURATION HAS BEEN MODIFIED. DISCARD CHANGES?"),
-                               this);
-
-        if (confirm.exec() == QDialog::Rejected)
-            return;
-
-        ConfigManager::getInstance().loadConfiguration();
-    }
-
-    m_isDirty = false;
-    MenuManager::getInstance().popScreen();
-}
-
-void SettingsScreen::onBindButtonClicked(const QString &actionName)
-{
-    KeyCaptureDialog dialog(this);
-    if (dialog.exec() == QDialog::Accepted)
-    {
-        Engine::Input::KeyCode newKey = dialog.getCapturedKey();
-    }
-}
-
-void SettingsScreen::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Escape)
-    {
-        onBackClicked();
-    }
-    else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
-    {
-        if (!focusWidget() || !focusWidget()->inherits("QPushButton"))
-        {
-            onApplyClicked();
-        }
-    }
-    else
-    {
-        AbstractScreen::keyPressEvent(event);
-    }
+    m_isDirty = true;
 }

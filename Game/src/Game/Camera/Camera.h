@@ -14,8 +14,6 @@ public:
 
     void update(float deltaTime);
 
-    void handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHeight, float deltaTime);
-
     QPointF screenToWorld(const QPoint &screenPos, bool is3D = Config::World::DEFAULT_3D_VIEW) const;
 
     QPoint screenToHex(const QPoint &screenPos, bool is3D = Config::World::DEFAULT_3D_VIEW) const;
@@ -26,42 +24,32 @@ public:
 
     void move(float dx, float dy);
 
-    void setTargetPos(QPointF hexCoords);
-
-    void setTargetRawPos(QPointF worldPos);
+    void handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHeight, float deltaTime);
 
     void adjustZoom(float delta);
 
     void shake(float intensity) { m_shakeIntensity = intensity; }
 
+    void setTargetPos(QPointF hexCoords);
+
+    void setTargetRawPos(QPointF worldPos);
+
     void setViewportSize(int w, int h);
 
-    void setWorldBounds(const QRect &bounds) { m_worldBounds = bounds; }
-
-    QPointF pos() const { return m_currentPos; }
-
-    QPointF getCurrentPos() { return m_currentPos; }
+    QPointF getCurrentPos() const { return m_currentPos; }
 
     float getZoom() const { return m_zoom; }
 
-    int getViewportWidth() const { return m_viewportWidth; }
-
-    int getViewportHeight() const { return m_viewportHeight; }
+    int getViewportWidth() const { return static_cast<int>(m_viewportWidth); }
 
 private:
     Camera() = default;
-
-    ~Camera() = default;
-
-    Camera(const Camera &) = delete;
-
-    Camera &operator=(const Camera &) = delete;
 
     QPointF m_currentPos;
 
     QPointF m_targetPos;
 
-    QRect m_worldBounds;
+    QRect m_worldBounds = Config::World::WORLD_BOUNDS;
 
     float m_zoom = Config::Gameplay::INITIAL_ZOOM;
 

@@ -14,18 +14,11 @@ GameScreen::GameScreen(QWidget *parent)
 void GameScreen::onEnter()
 {
     auto &cam = Camera::getInstance();
-    cam.setWorldBounds(Config::World::WORLD_BOUNDS);
-    cam.setViewportSize(this->width(), this->height());
 
     this->setFocusPolicy(Qt::StrongFocus);
     this->setFocus();
 
     m_updateTimer->start(Config::System::TIMER_INTERVAL_MS);
-}
-
-void GameScreen::onExit()
-{
-    m_updateTimer->stop();
 }
 
 void GameScreen::paintEvent(QPaintEvent *event)
@@ -35,7 +28,7 @@ void GameScreen::paintEvent(QPaintEvent *event)
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    drawMap(painter);
+    setupUI(painter);
 
     if (auto *hud = GameManager::getInstance().getHUD())
     {
@@ -91,12 +84,6 @@ void GameScreen::wheelEvent(QWheelEvent *event)
     update();
 }
 
-void GameScreen::resizeEvent(QResizeEvent *event)
-{
-    Camera::getInstance().setViewportSize(this->width(), this->height());
-    AbstractScreen::resizeEvent(event);
-}
-
 void GameScreen::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Escape)
@@ -147,6 +134,12 @@ void GameScreen::keyPressEvent(QKeyEvent *event)
     }
 }
 
+void GameScreen::resizeEvent(QResizeEvent *event)
+{
+    Camera::getInstance().setViewportSize(this->width(), this->height());
+    AbstractScreen::resizeEvent(event);
+}
+
 void GameScreen::keyReleaseEvent(QKeyEvent *event)
 {
     m_pressedKeys.remove(event->key());
@@ -178,17 +171,18 @@ void GameScreen::updateGameDisplay()
     update();
 }
 
-void GameScreen::drawMap(QPainter &painter)
+void GameScreen::setupUI(QPainter &painter)
 {
     auto &cam = Camera::getInstance();
     auto &gm = GameManager::getInstance();
+    auto &map = Map::getInstance();
 
     QPoint mousePos = mapFromGlobal(QCursor::pos());
     QPoint currentHover = cam.screenToHex(mousePos, m_is3D);
 
     if (auto *hud = gm.getHUD())
     {
-        hud->setDiagnosticsData(mousePos, cam.screenToWorld(mousePos, m_is3D), currentHover);
+        hud->setDiagnosticsData(mousePos, cam.screenToWorld(mousePos, m_is3D), currentHover, map.getSeed());
     }
 
     m_is3D ? drawMap3D(painter, currentHover) : drawMap2D(painter, currentHover);

@@ -25,23 +25,23 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *event) override;
 
-private:
-    void setupUI(const QString &header, const QString &body);
-
-    QCheckBox *m_acceptCheck;
-
-    QPushButton *m_confirmBtn;
-
-    QScrollArea *m_scrollArea;
-
-    bool m_scrolledToBottom = false;
-    
 private slots:
     void onDecline();
 
     void checkRequirements();
 
     void handleScroll(int value);
+
+private:
+    void setupUI(const QString &header, const QString &body);
+
+    QCheckBox *m_acceptCheck = nullptr;
+
+    QPushButton *m_confirmBtn = nullptr;
+
+    QScrollArea *m_scrollArea = nullptr;
+
+    bool m_scrolledToBottom = false;
 };
 
 #endif

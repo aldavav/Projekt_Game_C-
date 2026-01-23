@@ -10,6 +10,7 @@
 class GameManager : public QObject
 {
     Q_OBJECT
+
 public:
     static GameManager &getInstance();
 
@@ -42,12 +43,6 @@ public slots:
 
 private:
     GameManager(QObject *parent = nullptr);
-
-    ~GameManager() = default;
-
-    GameManager(const GameManager &) = delete;
-
-    GameManager &operator=(const GameManager &) = delete;
 
     float m_gameTime = 0.0f;
 

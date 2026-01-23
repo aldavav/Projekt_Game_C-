@@ -15,9 +15,9 @@ Logger::Logger()
     archiveLogFile();
 
     std::string path = Config::Log::DIRECTORY + "/" + Config::Log::LATEST_FILE;
-    logFile_.open(path, std::ios_base::app);
+    m_logFile.open(path, std::ios_base::app);
 
-    if (!logFile_.is_open())
+    if (!m_logFile.is_open())
     {
         std::cerr << Config::Log::RED_NORMAL << "Unable to open log file!"
                   << Config::Log::RESET << "\n";
@@ -26,7 +26,7 @@ Logger::Logger()
 
 void Logger::archiveLogFile()
 {
-    std::lock_guard<std::recursive_mutex> lock(logMutex_);
+    std::lock_guard<std::recursive_mutex> lock(m_logMutex);
     const std::filesystem::path logsDir = Config::Log::DIRECTORY;
     const std::filesystem::path logFilePath = logsDir / Config::Log::LATEST_FILE;
 
@@ -91,9 +91,9 @@ void Logger::archiveLogFile()
 
 Logger::~Logger()
 {
-    if (logFile_.is_open())
+    if (m_logFile.is_open())
     {
-        logFile_.close();
+        m_logFile.close();
     }
 }
 
@@ -105,12 +105,12 @@ Logger &Logger::getInstance()
 
 void Logger::log(const Engine::LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function)
 {
-    std::lock_guard<std::recursive_mutex> lock(logMutex_);
+    std::lock_guard<std::recursive_mutex> lock(m_logMutex);
     std::string formatted = formatLogMessage(type, message, file, line, function);
 
-    if (logFile_.is_open())
+    if (m_logFile.is_open())
     {
-        logFile_ << formatted << std::endl;
+        m_logFile << formatted << std::endl;
     }
 
     std::string color = Engine::ANSIColors::RESET;
@@ -168,22 +168,3 @@ std::string Logger::stripPath(const std::string &path)
     size_t pos = path.find_last_of("\\/");
     return (pos == std::string::npos) ? path : path.substr(pos + 1);
 }
-
-/*void qtMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
-{
-    switch (type)
-    {
-    case QtDebugMsg:
-        LOG_INFO(msg);
-        break;
-    case QtWarningMsg:
-        LOG_WARNING(msg);
-        break;
-    case QtCriticalMsg:
-        LOG_ERROR(msg);
-        break;
-    case QtFatalMsg:
-        LOG_ERROR("FATAL: " + msg.toStdString());
-        abort();
-    }
-}*/

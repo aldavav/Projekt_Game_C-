@@ -29,15 +29,6 @@ namespace World
         int x, y;
     };
 
-    struct MapStats
-    {
-        int grassCount = 0;
-        int waterCount = 0;
-        int mountainCount = 0;
-        int oreCount = 0;
-        int dirtCount = 0;
-    };
-
     struct TileProperties
     {
         std::string name;

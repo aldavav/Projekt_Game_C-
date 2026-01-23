@@ -32,8 +32,6 @@ public:
 
     uint32_t getSeed() const { return m_seed; }
 
-    const World::MapStats &getStats() const { return m_stats; }
-
     void debugRevealAll();
 
 private:
@@ -50,8 +48,6 @@ private:
     uint32_t m_seed = Config::World::DEFAULT_SEED;
 
     Engine::Difficulty m_difficulty = Config::Gameplay::DEFAULT_DIFFICULTY;
-
-    World::MapStats m_stats;
 
     std::unordered_map<uint64_t, World::Chunk *> m_chunks;
 };

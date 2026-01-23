@@ -7,13 +7,31 @@ GameOverScreen::GameOverScreen(bool victory, QWidget *parent)
     setupUI(victory);
 }
 
-void GameOverScreen::onEnter()
+void GameOverScreen::keyPressEvent(QKeyEvent *event)
 {
-    this->show();
-    this->setFocus();
+    if (event->key() == Qt::Key_Escape ||
+        event->key() == Qt::Key_Return ||
+        event->key() == Qt::Key_Enter)
+    {
+        GameEngine::getInstance().setState(Engine::State::MENU);
+    }
+    else
+    {
+        AbstractScreen::keyPressEvent(event);
+    }
 }
 
-void GameOverScreen::onExit() { this->hide(); }
+void GameOverScreen::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+    QPainter painter(this);
+
+    QColor overlayColor = m_titleLabel->objectName() == "victoryTitle"
+                              ? QColor(0, 20, 40, 200)
+                              : QColor(40, 0, 0, 200);
+
+    painter.fillRect(rect(), overlayColor);
+}
 
 void GameOverScreen::setupUI(bool victory)
 {
@@ -59,30 +77,4 @@ void GameOverScreen::setupUI(bool victory)
     layout->addStretch();
     layout->addWidget(exitBtn, 0, Qt::AlignCenter);
     layout->addStretch();
-}
-
-void GameOverScreen::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Escape ||
-        event->key() == Qt::Key_Return ||
-        event->key() == Qt::Key_Enter)
-    {
-        GameEngine::getInstance().setState(Engine::State::MENU);
-    }
-    else
-    {
-        AbstractScreen::keyPressEvent(event);
-    }
-}
-
-void GameOverScreen::paintEvent(QPaintEvent *event)
-{
-    Q_UNUSED(event);
-    QPainter painter(this);
-
-    QColor overlayColor = m_titleLabel->objectName() == "victoryTitle"
-                              ? QColor(0, 20, 40, 200)
-                              : QColor(40, 0, 0, 200);
-
-    painter.fillRect(rect(), overlayColor);
 }

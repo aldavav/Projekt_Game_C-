@@ -33,7 +33,7 @@ public:
 
     void toggleDiagnostics() { m_showDiagnostics = !m_showDiagnostics; }
 
-    void setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos);
+    void setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos, uint32_t mapSeed);
 
 signals:
     void hudButtonClicked(int buttonIndex);
@@ -84,6 +84,8 @@ private:
     int m_frameCount = 0;
 
     int m_fps = 0;
+
+    uint32_t m_mapSeed = 0;
 
     bool m_showDiagnostics = false;
 

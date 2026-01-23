@@ -2,6 +2,28 @@
 
 LoadingScreen::LoadingScreen(QWidget *parent) : AbstractScreen(parent)
 {
+    setupUI();
+}
+
+void LoadingScreen::setProgress(int value)
+{
+    m_progressBar->setValue(value);
+    m_progressBar->repaint();
+}
+
+void LoadingScreen::setStatus(const QString &status)
+{
+    m_statusLabel->setText(status);
+}
+
+void LoadingScreen::resizeEvent(QResizeEvent *event)
+{
+    AbstractScreen::resizeEvent(event);
+    update();
+}
+
+void LoadingScreen::setupUI()
+{
     auto *layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
@@ -25,25 +47,4 @@ LoadingScreen::LoadingScreen(QWidget *parent) : AbstractScreen(parent)
     layout->addWidget(m_progressBar);
     layout->addWidget(m_statusLabel);
     layout->addStretch();
-}
-
-void LoadingScreen::onEnter() { this->show(); }
-
-void LoadingScreen::onExit() { this->hide(); }
-
-void LoadingScreen::setProgress(int value)
-{
-    m_progressBar->setValue(value);
-    m_progressBar->repaint();
-}
-
-void LoadingScreen::setStatus(const QString &status)
-{
-    m_statusLabel->setText(status);
-}
-
-void LoadingScreen::resizeEvent(QResizeEvent *event)
-{
-    AbstractScreen::resizeEvent(event);
-    update();
 }

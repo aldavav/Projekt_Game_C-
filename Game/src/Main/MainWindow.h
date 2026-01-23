@@ -32,8 +32,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
 
-    virtual ~MainWindow() = default;
-
     void toggleFullscreen();
 
     void applyCustomCursor(const QString &path);
@@ -61,6 +59,12 @@ private slots:
     void on_actionQuit_triggered();
 
 private:
+    void setupBackgroundMusic();
+
+    void applyGlobalStyles();
+
+    void centerOnScreen();
+
     QWidget *m_centralWidget;
 
     bool m_isFullscreen = false;
@@ -68,12 +72,6 @@ private:
     QMediaPlayer *m_bgmPlayer;
 
     QAudioOutput *m_audioOutput;
-
-    void setupBackgroundMusic();
-
-    void applyGlobalStyles();
-
-    void centerOnScreen();
 };
 
 #endif

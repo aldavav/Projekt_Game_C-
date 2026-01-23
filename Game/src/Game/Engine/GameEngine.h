@@ -25,10 +25,6 @@ class GameEngine : public QObject
 public:
     static GameEngine &getInstance();
 
-    GameEngine(const GameEngine &) = delete;
-
-    GameEngine &operator=(const GameEngine &) = delete;
-
     void startGame();
 
     void stopGame();

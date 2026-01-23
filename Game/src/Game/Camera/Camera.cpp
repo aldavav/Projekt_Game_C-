@@ -11,6 +11,20 @@ void Camera::update(float deltaTime)
     float lerpFactor = 1.0f - std::pow(Config::World::CAMERA_SMOOTHING, deltaTime * 60.0f);
     m_currentPos += (m_targetPos - m_currentPos) * lerpFactor;
 
+    if (!m_worldBounds.isNull())
+    {
+        float minX = static_cast<float>(m_worldBounds.left());
+        float maxX = static_cast<float>(m_worldBounds.right());
+        float minY = static_cast<float>(m_worldBounds.top());
+        float maxY = static_cast<float>(m_worldBounds.bottom());
+
+        m_currentPos.setX(std::clamp(static_cast<float>(m_currentPos.x()), minX, maxX));
+        m_currentPos.setY(std::clamp(static_cast<float>(m_currentPos.y()), minY, maxY));
+
+        m_targetPos.setX(std::clamp(static_cast<float>(m_targetPos.x()), minX, maxX));
+        m_targetPos.setY(std::clamp(static_cast<float>(m_targetPos.y()), minY, maxY));
+    }
+
     if (m_shakeIntensity > Config::World::SHAKE_THRESHOLD)
     {
         float rx = ((float)rand() / (float)RAND_MAX * 2.0f - 1.0f) * m_shakeIntensity;

@@ -11,6 +11,10 @@
 #include <QPainter>
 #include <QLabel>
 
+class QPaintEvent;
+class QKeyEvent;
+class QLabel;
+
 class GameOverScreen : public AbstractScreen
 {
     Q_OBJECT
@@ -18,20 +22,18 @@ class GameOverScreen : public AbstractScreen
 public:
     explicit GameOverScreen(bool victory, QWidget *parent = nullptr);
 
-    void onEnter() override;
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
 
-    void onExit() override;
+    void paintEvent(QPaintEvent *event) override;
 
 private:
     void setupUI(bool victory);
 
-    void keyPressEvent(QKeyEvent *event);
+private:
+    QLabel *m_titleLabel = nullptr;
 
-    void paintEvent(QPaintEvent *event);
-
-    QLabel *m_titleLabel;
-
-    QLabel *m_statsLabel;
+    QLabel *m_statsLabel = nullptr;
 };
 
 #endif

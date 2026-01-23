@@ -9,6 +9,7 @@
 class GameSettingsManager : public QObject
 {
     Q_OBJECT
+    
 public:
     static GameSettingsManager &getInstance();
 

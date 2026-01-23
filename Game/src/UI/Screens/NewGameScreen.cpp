@@ -5,9 +5,56 @@ NewGameScreen::NewGameScreen(QWidget *parent) : AbstractScreen(parent)
     setupUI();
 }
 
-void NewGameScreen::onEnter() { this->show(); }
+void NewGameScreen::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    {
+        onLaunchClicked();
+    }
+    else if (event->key() == Qt::Key_Escape)
+    {
+        onBackClicked();
+    }
+    else
+    {
+        AbstractScreen::keyPressEvent(event);
+    }
+}
 
-void NewGameScreen::onExit() { this->hide(); }
+void NewGameScreen::onLaunchClicked()
+{
+    QString mapName = m_mapNameEdit->text();
+    uint seed = m_seedEdit->text().toUInt();
+
+    auto *loading = new LoadingScreen();
+    MenuManager::getInstance().setScreen(loading);
+
+    QTimer::singleShot(Config::UI::GENERATION_DELAY, loading, [loading, mapName, seed]()
+                       {
+        loading->setStatus(tr("GENERATING TERRAIN PROTOCOLS..."));
+        loading->setProgress(30);
+        
+        GameEngine::getInstance().setupMatch(mapName, seed);
+
+        QTimer::singleShot(Config::UI::LOADING_STEP_DELAY, loading, [loading]() {
+            loading->setStatus(tr("ESTABLISHING NEURAL LINK..."));
+            loading->setProgress(70);
+            
+            GameEngine::getInstance().startGame();
+            MenuManager::getInstance().updateMetadata();
+
+            QTimer::singleShot(Config::UI::LOADING_FINAL_PAUSE, loading, []() {
+                auto* game = new GameScreen();
+                MenuManager::getInstance().setScreen(game);
+                game->setFocus();
+            });
+        }); });
+}
+
+void NewGameScreen::onBackClicked()
+{
+    MenuManager::getInstance().popScreen();
+}
 
 void NewGameScreen::setupUI()
 {
@@ -69,55 +116,4 @@ void NewGameScreen::setupUI()
     layout->addWidget(cancelBtn);
     layout->addWidget(launchBtn);
     m_mapNameEdit->setFocus();
-}
-
-void NewGameScreen::onLaunchClicked()
-{
-    QString mapName = m_mapNameEdit->text();
-    uint seed = m_seedEdit->text().toUInt();
-
-    auto *loading = new LoadingScreen();
-    MenuManager::getInstance().setScreen(loading);
-
-    QTimer::singleShot(Config::UI::GENERATION_DELAY, loading, [loading, mapName, seed]()
-                       {
-        loading->setStatus(tr("GENERATING TERRAIN PROTOCOLS..."));
-        loading->setProgress(30);
-        
-        GameEngine::getInstance().setupMatch(mapName, seed);
-
-        QTimer::singleShot(Config::UI::LOADING_STEP_DELAY, loading, [loading]() {
-            loading->setStatus(tr("ESTABLISHING NEURAL LINK..."));
-            loading->setProgress(70);
-            
-            GameEngine::getInstance().startGame();
-            MenuManager::getInstance().updateMetadata();
-
-            QTimer::singleShot(Config::UI::LOADING_FINAL_PAUSE, loading, []() {
-                auto* game = new GameScreen();
-                MenuManager::getInstance().setScreen(game);
-                game->setFocus();
-            });
-        }); });
-}
-
-void NewGameScreen::onBackClicked()
-{
-    MenuManager::getInstance().popScreen();
-}
-
-void NewGameScreen::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
-    {
-        onLaunchClicked();
-    }
-    else if (event->key() == Qt::Key_Escape)
-    {
-        onBackClicked();
-    }
-    else
-    {
-        AbstractScreen::keyPressEvent(event);
-    }
 }

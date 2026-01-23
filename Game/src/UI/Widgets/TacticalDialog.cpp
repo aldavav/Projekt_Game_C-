@@ -6,6 +6,18 @@ TacticalDialog::TacticalDialog(const QString &title, const QString &message, QWi
     setupUI(title, message);
 }
 
+void TacticalDialog::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
+        reject();
+    }
+    else
+    {
+        QDialog::keyPressEvent(event);
+    }
+}
+
 void TacticalDialog::setupUI(const QString &title, const QString &message)
 {
     setModal(true);
@@ -51,16 +63,4 @@ void TacticalDialog::setupUI(const QString &title, const QString &message)
     layout->addLayout(btnLayout);
 
     cancelBtn->setFocus();
-}
-
-void TacticalDialog::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Escape)
-    {
-        reject();
-    }
-    else
-    {
-        QDialog::keyPressEvent(event);
-    }
 }

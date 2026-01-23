@@ -109,11 +109,12 @@ void TacticalHUD::setSelection(QPointF hexCoords, bool hasSelection)
     m_hasSelection = hasSelection;
 }
 
-void TacticalHUD::setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos)
+void TacticalHUD::setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos, uint32_t mapSeed)
 {
     m_hoveredHex = hoveredHex;
     m_mouseWorldPos = mouseWorldPos;
     m_mouseScreenPos = mouseScreenPos;
+    m_mapSeed = mapSeed;
 }
 
 void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
@@ -332,7 +333,7 @@ void TacticalHUD::drawDayNightCycle(QPainter &painter, int width, int height)
 void TacticalHUD::drawDiagnostics(QPainter &painter, int width, int height)
 {
     int boxW = 250;
-    int boxH = 100;
+    int boxH = 118;
     int padding = Config::UI::HUD_MARGIN;
 
     QRect diagRect(padding, padding, boxW, boxH);
@@ -354,11 +355,13 @@ void TacticalHUD::drawDiagnostics(QPainter &painter, int width, int height)
 
     painter.setPen(Qt::white);
     painter.drawText(x, y + step, QString("SCREEN XY: [%1, %2]").arg(m_mouseScreenPos.x()).arg(m_mouseScreenPos.y()));
-
     painter.drawText(x, y + step * 2, QString("WORLD  XY: [%1, %2]").arg(static_cast<int>(m_mouseWorldPos.x())).arg(static_cast<int>(m_mouseWorldPos.y())));
 
     painter.setPen(QColor(Config::UI::COLOR_HABITABLE));
     painter.drawText(x, y + step * 3, QString("TILE   QR: %1, %2").arg(m_hoveredHex.x()).arg(m_hoveredHex.y()));
+
+    painter.setPen(QColor(Config::UI::COLOR_TACTICAL_BLUE));
+    painter.drawText(x, y + step * 4, QString("MAP SEED: %1").arg(m_mapSeed));
 }
 
 void TacticalHUD::drawScanlines(QPainter &painter, QRect rect)

@@ -6,20 +6,13 @@
 class AbstractScreen : public QWidget
 {
     Q_OBJECT
+
 public:
-    explicit AbstractScreen(QWidget *parent = nullptr) : QWidget(parent) {}
+    explicit AbstractScreen(QWidget *parent = nullptr);
 
-    virtual ~AbstractScreen() = default;
+    virtual void onEnter();
 
-    virtual void onEnter()
-    {
-        this->show();
-    }
-
-    virtual void onExit()
-    {
-        this->hide();
-    }
+    virtual void onExit();
 };
 
 #endif

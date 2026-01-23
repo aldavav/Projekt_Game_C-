@@ -6,16 +6,25 @@ InputManager &InputManager::getInstance()
     return instance;
 }
 
+bool InputManager::isKeyPressed(int keyCode) const
+{
+    return m_activeKeys.find(keyCode) != m_activeKeys.end();
+}
+
+bool InputManager::hasPendingCommands() const
+{
+    return !m_commandQueue.isEmpty();
+}
+
+CommandPtr InputManager::getNextCommand()
+{
+    QMutexLocker locker(&m_inputMutex);
+    return m_commandQueue.isEmpty() ? nullptr : m_commandQueue.dequeue();
+}
+
 InputManager::InputManager(QObject *parent) : QObject(parent)
 {
     setupDefaultBindings();
-}
-
-InputManager::~InputManager() {}
-
-void InputManager::setupDefaultBindings()
-{
-    ControlsSettingsManager::getInstance();
 }
 
 void InputManager::onKeyPress(int keyCode)
@@ -43,14 +52,6 @@ void InputManager::onKeyRelease(int keyCode)
     m_activeKeys.erase(keyCode);
 }
 
-bool InputManager::isKeyPressed(int keyCode) const
-{
-    return m_activeKeys.find(keyCode) != m_activeKeys.end();
-}
-
-void InputManager::onMouseMove(const QPoint &pos) {
-}
-
 void InputManager::onMouseClick(Qt::MouseButton button, const QPoint &pos)
 {
     Engine::Input::RawEvent event;
@@ -64,6 +65,30 @@ void InputManager::onMouseClick(Qt::MouseButton button, const QPoint &pos)
         m_commandQueue.enqueue(command);
         emit commandQueued();
     }
+}
+
+void InputManager::onMouseMove(const QPoint &pos)
+{
+    if (m_activeKeys.count(Qt::RightButton))
+    {
+        Engine::Input::RawEvent event;
+        event.type = Engine::Input::RawEvent::Type::MouseMove;
+        event.position = pos;
+
+        QMutexLocker locker(&m_inputMutex);
+
+        CommandPtr command = translateRawInput(event);
+        if (command)
+        {
+            m_commandQueue.enqueue(command);
+            emit commandQueued();
+        }
+    }
+}
+
+void InputManager::setupDefaultBindings()
+{
+    ControlsSettingsManager::getInstance();
 }
 
 CommandPtr InputManager::translateRawInput(const Engine::Input::RawEvent &event)
@@ -100,15 +125,4 @@ CommandPtr InputManager::translateRawInput(const Engine::Input::RawEvent &event)
     }
 
     return nullptr;
-}
-
-CommandPtr InputManager::getNextCommand()
-{
-    QMutexLocker locker(&m_inputMutex);
-    return m_commandQueue.isEmpty() ? nullptr : m_commandQueue.dequeue();
-}
-
-bool InputManager::hasPendingCommands() const
-{
-    return !m_commandQueue.isEmpty();
 }

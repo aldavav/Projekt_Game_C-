@@ -157,22 +157,6 @@ void Map::generateChunk(World::Chunk *chunk)
                 tile.type = World::TileType::GRASS;
             else
                 tile.type = World::TileType::MOUNTAIN;
-
-            switch (chunk->tiles[tx][ty].type)
-            {
-            case World::TileType::GRASS:
-                m_stats.grassCount++;
-                break;
-            case World::TileType::WATER:
-                m_stats.waterCount++;
-                break;
-            case World::TileType::MOUNTAIN:
-                m_stats.mountainCount++;
-                break;
-            case World::TileType::DIRT:
-                m_stats.dirtCount++;
-                break;
-            }
         }
     }
 }

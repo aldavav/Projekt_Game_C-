@@ -8,11 +8,12 @@
 class GraphicsSettingsManager : public QObject
 {
     Q_OBJECT
+
 public:
     static GraphicsSettingsManager &getInstance();
 
     void applyGraphicsSettings();
-    
+
     float getGammaValue() const;
 
 signals:
@@ -20,12 +21,6 @@ signals:
 
 private:
     GraphicsSettingsManager() = default;
-    
-    ~GraphicsSettingsManager() = default;
-
-    GraphicsSettingsManager(const GraphicsSettingsManager &) = delete;
-    
-    GraphicsSettingsManager &operator=(const GraphicsSettingsManager &) = delete;
 };
 
 #endif

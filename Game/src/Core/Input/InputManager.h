@@ -22,15 +22,11 @@ class InputManager : public QObject
 public:
     static InputManager &getInstance();
 
-    InputManager(const InputManager &) = delete;
-
-    void operator=(const InputManager &) = delete;
-
     bool isKeyPressed(int keyCode) const;
 
-    CommandPtr getNextCommand();
-
     bool hasPendingCommands() const;
+
+    CommandPtr getNextCommand();
 
 public slots:
     void onKeyPress(int keyCode);
@@ -47,19 +43,17 @@ signals:
 private:
     explicit InputManager(QObject *parent = nullptr);
 
-    ~InputManager() override;
+    void setupDefaultBindings();
 
     CommandPtr translateRawInput(const Engine::Input::RawEvent &event);
+
+    mutable QMutex m_inputMutex;
 
     QQueue<CommandPtr> m_commandQueue;
 
     std::set<int> m_activeKeys;
 
     std::map<int, QString> m_keyBindings;
-
-    mutable QMutex m_inputMutex;
-
-    void setupDefaultBindings();
 };
 
 #endif

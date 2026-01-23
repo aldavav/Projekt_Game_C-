@@ -6,8 +6,10 @@
 #include <QString>
 #include <QMap>
 
-class ControlsSettingsManager
+class ControlsSettingsManager : public QObject
 {
+    Q_OBJECT
+
 public:
     static ControlsSettingsManager &getInstance();
 
@@ -19,12 +21,6 @@ public:
 
 private:
     ControlsSettingsManager();
-    
-    ~ControlsSettingsManager() = default;
-
-    ControlsSettingsManager(const ControlsSettingsManager &) = delete;
-    
-    ControlsSettingsManager &operator=(const ControlsSettingsManager &) = delete;
 
     QMap<Engine::Input::Action, Engine::Input::KeyCode> m_bindings;
 };

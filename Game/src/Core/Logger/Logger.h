@@ -20,37 +20,29 @@
 
 class Logger
 {
-private:
-    Logger();
-
-    ~Logger();
-
-    std::ofstream logFile_;
-
-    std::recursive_mutex logMutex_;
-
-    std::string formatLogMessage(Engine::LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function);
-
-    static std::string logLevelToString(Engine::LogLevel type);
-
-    std::string getCurrentTime();
-
-    void archiveLogFile();
-
-    std::string stripPath(const std::string &path);
-
 public:
     static Logger &getInstance();
 
     void log(Engine::LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function);
 
-    Logger(const Logger &) = delete;
+private:
+    Logger();
 
-    Logger &operator=(const Logger &) = delete;
+    ~Logger();
 
-    Logger(Logger &&) = delete;
+    std::string formatLogMessage(Engine::LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function);
 
-    Logger &operator=(Logger &&) = delete;
+    void archiveLogFile();
+
+    static std::string logLevelToString(Engine::LogLevel type);
+
+    static std::string getCurrentTime();
+
+    static std::string stripPath(const std::string &path);
+
+    std::ofstream m_logFile;
+
+    std::recursive_mutex m_logMutex;
 };
 
 #endif

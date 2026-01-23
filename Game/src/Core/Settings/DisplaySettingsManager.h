@@ -11,14 +11,13 @@
 class DisplaySettingsManager : public QObject
 {
     Q_OBJECT
+
 public:
     static DisplaySettingsManager &getInstance();
 
     QStringList getAvailableResolutions() const;
 
     void applySettings();
-
-    QSize getResolutionFromIndex(int index) const;
 
 signals:
     void displayChanged();
