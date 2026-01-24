@@ -13,6 +13,25 @@ void Map::initializeNewMap(const std::string &name, Engine::Difficulty difficult
     m_difficulty = difficulty;
     std::random_device rd;
     m_seed = rd();
+
+    int radius = 6;
+    int q = 0;
+    int r = 0;
+    for (int i = q - radius; i <= q + radius; ++i)
+    {
+        for (int j = r - radius; j <= r + radius; ++j)
+        {
+            int dist = (std::abs(q - i) + 
+                        std::abs(q + r - i - j) + 
+                        std::abs(r - j)) / 2;
+
+            if (dist <= radius)
+            {
+                World::Tile &tile = getTileAt(i, j);
+                tile.discovered = true;
+            }
+        }
+    }
 }
 
 void Map::clear()
