@@ -38,6 +38,8 @@ private slots:
 
     void onEntrySelected(QListWidgetItem *item);
 
+    void onDeleteClicked();
+
 private:
     void setupUI();
 
@@ -48,6 +50,8 @@ private:
     QPushButton *m_loadBtn = nullptr;
 
     QLabel *m_detailsLabel = nullptr;
+
+    QPushButton *m_deleteBtn = nullptr;
 };
 
 #endif

@@ -17,25 +17,6 @@ void LoadGameScreen::onEnter()
     }
 }
 
-void LoadGameScreen::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Escape)
-    {
-        MenuManager::getInstance().popScreen();
-    }
-    else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
-    {
-        if (m_loadBtn->isEnabled())
-        {
-            onLoadClicked();
-        }
-    }
-    else
-    {
-        AbstractScreen::keyPressEvent(event);
-    }
-}
-
 void LoadGameScreen::onLoadClicked()
 {
     if (!m_saveList->currentItem())
@@ -84,8 +65,60 @@ void LoadGameScreen::onEntrySelected(QListWidgetItem *item)
         return;
 
     m_loadBtn->setEnabled(true);
+    m_deleteBtn->setEnabled(true);
 
     m_detailsLabel->setText(tr("> SECTOR IDENTIFIED: ") + item->text().toUpper());
+}
+
+void LoadGameScreen::onDeleteClicked()
+{
+    if (!m_saveList->currentItem())
+        return;
+
+    QString selectedMap = m_saveList->currentItem()->text();
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, tr("ERASE DATA"),
+                                  tr("Confirm deletion of deployment data for: ") + selectedMap,
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes)
+    {
+        QString savePath = QCoreApplication::applicationDirPath() +
+                           Config::Paths::SAVE_DIR_NAME + "/" + selectedMap;
+
+        QDir dir(savePath);
+        if (dir.exists())
+        {
+            dir.removeRecursively();
+            refreshSaveList();
+            m_detailsLabel->setText(tr("> DATA PURGED SUCCESSFULLY."));
+            m_loadBtn->setEnabled(false);
+            m_deleteBtn->setEnabled(false);
+        }
+    }
+}
+
+void LoadGameScreen::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
+        MenuManager::getInstance().popScreen();
+    }
+    else if (event->key() == Qt::Key_Delete)
+    {
+        if (m_deleteBtn->isEnabled())
+            onDeleteClicked();
+    }
+    else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    {
+        if (m_loadBtn->isEnabled())
+            onLoadClicked();
+    }
+    else
+    {
+        AbstractScreen::keyPressEvent(event);
+    }
 }
 
 void LoadGameScreen::setupUI()
@@ -116,7 +149,16 @@ void LoadGameScreen::setupUI()
     QPushButton *backBtn = new QPushButton(tr("BACK"));
     backBtn->setObjectName("cancelButton");
 
+    m_deleteBtn = new QPushButton(tr("ABORT SAVED DATA"));
+    m_deleteBtn->setObjectName("cancelButton");
+    m_deleteBtn->setEnabled(false);
+
+    m_loadBtn = new QPushButton(tr("RESUME MISSION"));
+    m_loadBtn->setObjectName("applyButton");
+    m_loadBtn->setEnabled(false);
+
     btnLayout->addWidget(backBtn);
+    btnLayout->addWidget(m_deleteBtn);
     btnLayout->addWidget(m_loadBtn);
     layout->addLayout(btnLayout);
 
@@ -126,6 +168,7 @@ void LoadGameScreen::setupUI()
     connect(m_loadBtn, &QPushButton::clicked, this, &LoadGameScreen::onLoadClicked);
     connect(backBtn, &QPushButton::clicked, []()
             { MenuManager::getInstance().popScreen(); });
+    connect(m_deleteBtn, &QPushButton::clicked, this, &LoadGameScreen::onDeleteClicked);
 }
 
 void LoadGameScreen::refreshSaveList()

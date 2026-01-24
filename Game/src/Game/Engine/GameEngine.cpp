@@ -58,10 +58,17 @@ void GameEngine::saveCurrentMatch()
         dir.mkpath(mapFolder);
 
     QString savePath = mapFolder + Config::Paths::INITIAL_SAVE_FILENAME;
-
     QSettings saveFile(savePath, QSettings::IniFormat);
-    saveFile.setValue("Metadata/Seed", m_currentSeed);
-    saveFile.setValue("Metadata/Timestamp", QDateTime::currentDateTime().toSecsSinceEpoch());
+
+    QPointF camPos = Camera::getInstance().getCurrentPos();
+
+    saveFile.beginGroup("Metadata");
+    saveFile.setValue("Version", Config::System::VERSION);
+    saveFile.setValue("Seed", m_currentSeed);
+    saveFile.setValue("CamX", camPos.x());
+    saveFile.setValue("CamY", camPos.y());
+    saveFile.setValue("Timestamp", QDateTime::currentDateTime().toSecsSinceEpoch());
+    saveFile.endGroup();
 
     saveFile.sync();
 }
@@ -69,13 +76,30 @@ void GameEngine::saveCurrentMatch()
 void GameEngine::loadMatch(const QString &mapName)
 {
     m_currentMapName = mapName;
-    QString path = QCoreApplication::applicationDirPath() + "/saves/" + mapName + "/initial_state.sav";
+    QString path = QCoreApplication::applicationDirPath() +
+                   Config::Paths::SAVE_DIR_NAME + "/" +
+                   mapName +
+                   Config::Paths::INITIAL_SAVE_FILENAME;
+
+    if (!QFile::exists(path))
+        return;
 
     QSettings saveFile(path, QSettings::IniFormat);
-    uint32_t seed = saveFile.value("Seed").toUInt();
 
-    setupMatch(mapName, seed);
+    uint32_t seed = saveFile.value("Metadata/Seed").toUInt();
+    m_currentSeed = seed;
+
+    setupMatch(mapName, m_currentSeed);
+
+    float cx = saveFile.value("Metadata/CamX", 0.0f).toFloat();
+    float cy = saveFile.value("Metadata/CamY", 0.0f).toFloat();
+    Camera::getInstance().setTargetPos(QPointF(cx, cy));
+
+    m_lastTime = std::chrono::steady_clock::now();
+    m_accumulator = 0.0f;
+    m_isRunning = true;
     setState(Engine::State::RUNNING);
+    m_gameTimer.start();
 }
 
 void GameEngine::setState(Engine::State newState)
