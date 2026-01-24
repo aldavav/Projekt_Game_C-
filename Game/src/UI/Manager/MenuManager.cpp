@@ -26,6 +26,24 @@ void MenuManager::setMainWindow(QWidget *window)
     }
 }
 
+void MenuManager::setScreen(AbstractScreen *screen)
+{
+    while (!m_screenStack.isEmpty())
+    {
+        AbstractScreen *oldScreen = m_screenStack.pop();
+
+        if (m_mainWindow && m_mainWindow->layout())
+        {
+            m_mainWindow->layout()->removeWidget(oldScreen);
+        }
+
+        oldScreen->hide();
+        oldScreen->deleteLater();
+    }
+
+    pushScreen(screen);
+}
+
 void MenuManager::pushScreen(AbstractScreen *screen)
 {
     if (!m_mainWindow || !screen)
@@ -64,24 +82,6 @@ void MenuManager::popScreen()
     }
 }
 
-void MenuManager::setScreen(AbstractScreen *screen)
-{
-    while (!m_screenStack.isEmpty())
-    {
-        AbstractScreen *oldScreen = m_screenStack.pop();
-
-        if (m_mainWindow && m_mainWindow->layout())
-        {
-            m_mainWindow->layout()->removeWidget(oldScreen);
-        }
-
-        oldScreen->hide();
-        oldScreen->deleteLater();
-    }
-
-    pushScreen(screen);
-}
-
 void MenuManager::updateMetadata()
 {
     if (m_mainWindow)
@@ -102,20 +102,20 @@ void MenuManager::updateScreenVisibility()
 
 void MenuManager::handleGameStateChange(int newState)
 {
-    switch (newState)
+    AbstractScreen *nextScreen = nullptr;
+
+    if (newState == static_cast<int>(Engine::State::MENU))
     {
-    case STATE_MENU:
-        setScreen(new MenuScreen(m_mainWindow));
-        break;
-
-    case STATE_RUNNING:
-        break;
-
-    case STATE_GAMEOVER:
+        nextScreen = new MenuScreen(m_mainWindow);
+    }
+    else if (newState == static_cast<int>(Engine::State::GAMEOVER))
     {
         bool winStatus = GameEngine::getInstance().didPlayerWin();
-        setScreen(new GameOverScreen(winStatus, m_mainWindow));
-        break;
+        nextScreen = new GameOverScreen(winStatus, m_mainWindow);
     }
+
+    if (nextScreen)
+    {
+        setScreen(nextScreen);
     }
 }

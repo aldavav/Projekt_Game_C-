@@ -1,16 +1,13 @@
 #ifndef TACTICALDIALOG_H
 #define TACTICALDIALOG_H
 
-#include <Core/Config/Config.h>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
+#include <UI/Widgets/BaseTacticalDialog.h>
+#include <Core/Config/Configuration.h>
 #include <QPushButton>
-#include <QKeyEvent>
-#include <QDialog>
-#include <QFrame>
+#include <QVBoxLayout>
 #include <QLabel>
 
-class TacticalDialog : public QDialog
+class TacticalDialog : public BaseTacticalDialog
 {
     Q_OBJECT
 
@@ -19,8 +16,6 @@ public:
 
 private:
     void setupUI(const QString &title, const QString &message);
-
-    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif

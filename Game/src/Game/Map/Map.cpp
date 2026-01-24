@@ -6,19 +6,153 @@ Map &Map::getInstance()
     return instance;
 }
 
-Map::~Map()
-{
-    clear();
-}
-
-void Map::initializeNewMap(const std::string &name, Difficulty difficulty)
+void Map::initializeNewMap(const std::string &name, Engine::Difficulty difficulty)
 {
     clear();
     m_mapName = name;
     m_difficulty = difficulty;
     std::random_device rd;
     m_seed = rd();
-    LOG_INFO("New Map Initialized: " + std::string(name) + " | Seed: " + std::to_string(m_seed));
+
+    int radius = 6;
+    int q = 0;
+    int r = 0;
+    for (int i = q - radius; i <= q + radius; ++i)
+    {
+        for (int j = r - radius; j <= r + radius; ++j)
+        {
+            int dist = (std::abs(q - i) + 
+                        std::abs(q + r - i - j) + 
+                        std::abs(r - j)) / 2;
+
+            if (dist <= radius)
+            {
+                World::Tile &tile = getTileAt(i, j);
+                tile.discovered = true;
+            }
+        }
+    }
+}
+
+void Map::clear()
+{
+    for (auto &pair : m_chunks)
+    {
+        delete pair.second;
+    }
+    m_chunks.clear();
+}
+
+World::Tile &Map::getTileAt(int x, int y)
+{
+    int cx = static_cast<int>(std::floor(static_cast<float>(x) / Config::World::CHUNK_SIZE));
+    int cy = static_cast<int>(std::floor(static_cast<float>(y) / Config::World::CHUNK_SIZE));
+
+    uint64_t key = getChunkKey(cx, cy);
+
+    if (m_chunks.find(key) == m_chunks.end())
+    {
+        World::Chunk *newChunk = new World::Chunk();
+        newChunk->x = cx;
+        newChunk->y = cy;
+        generateChunk(newChunk);
+        m_chunks[key] = newChunk;
+    }
+
+    int tx = x % Config::World::CHUNK_SIZE;
+    int ty = y % Config::World::CHUNK_SIZE;
+    if (tx < 0)
+        tx += Config::World::CHUNK_SIZE;
+    if (ty < 0)
+        ty += Config::World::CHUNK_SIZE;
+
+    return m_chunks[key]->tiles[tx][ty];
+}
+
+bool Map::isAreaWalkable(int q, int r, int w, int h)
+{
+    for (int i = q; i < q + w; ++i)
+    {
+        for (int j = r; j < r + h; ++j)
+        {
+            World::TileType type = getTileAt(i, j).type;
+
+            if (type == World::TileType::WATER || type == World::TileType::MOUNTAIN)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void Map::revealRadiusWithCleanup(int centerQ, int centerR, int radius)
+{
+    int cleanupRadius = radius + 2;
+
+    for (int q = centerQ - cleanupRadius; q <= centerQ + cleanupRadius; ++q)
+    {
+        for (int r = centerR - cleanupRadius; r <= centerR + cleanupRadius; ++r)
+        {
+            int dist = (std::abs(centerQ - q) +
+                        std::abs(centerQ + centerR - q - r) +
+                        std::abs(centerR - r)) /
+                       2;
+
+            if (dist <= radius)
+            {
+                getTileAt(q, r).visible = true;
+            }
+            else if (dist <= cleanupRadius)
+            {
+                if (hasTileAt(q, r))
+                {
+                    getTileAt(q, r).visible = false;
+                }
+            }
+        }
+    }
+}
+
+void Map::clearAllDiscovered()
+{
+    for (auto &pair : m_chunks)
+    {
+        if (pair.second)
+        {
+            for (int x = 0; x < Config::World::CHUNK_SIZE; ++x)
+            {
+                for (int y = 0; y < Config::World::CHUNK_SIZE; ++y)
+                {
+                    pair.second->tiles[x][y].visible = false;
+                }
+            }
+        }
+    }
+}
+
+bool Map::hasTileAt(int q, int r)
+{
+    int cx = static_cast<int>(std::floor(static_cast<float>(q) / Config::World::CHUNK_SIZE));
+    int cy = static_cast<int>(std::floor(static_cast<float>(r) / Config::World::CHUNK_SIZE));
+
+    uint64_t key = getChunkKey(cx, cy);
+
+    return (m_chunks.find(key) != m_chunks.end());
+}
+
+void Map::debugRevealAll()
+{
+    for (auto &pair : m_chunks)
+    {
+        for (int x = 0; x < World::Chunk::S; ++x)
+        {
+            for (int y = 0; y < World::Chunk::S; ++y)
+            {
+                pair.second->tiles[x][y].visible = true;
+            }
+        }
+    }
 }
 
 uint64_t Map::getChunkKey(int cx, int cy) const
@@ -27,34 +161,6 @@ uint64_t Map::getChunkKey(int cx, int cy) const
     uint32_t high = static_cast<uint32_t>(cy);
     return (static_cast<uint64_t>(high) << 32) | low;
 }
-
-Tile &Map::getTileAt(int x, int y)
-{
-    int cx = static_cast<int>(std::floor(static_cast<float>(x) / Chunk::SIZE));
-    int cy = static_cast<int>(std::floor(static_cast<float>(y) / Chunk::SIZE));
-
-    uint64_t key = getChunkKey(cx, cy);
-
-    if (m_chunks.find(key) == m_chunks.end())
-    {
-        Chunk *newChunk = new Chunk();
-        newChunk->x = cx;
-        newChunk->y = cy;
-        generateChunk(newChunk);
-        m_chunks[key] = newChunk;
-    }
-
-    int tx = x % Chunk::SIZE;
-    int ty = y % Chunk::SIZE;
-    if (tx < 0)
-        tx += Chunk::SIZE;
-    if (ty < 0)
-        ty += Chunk::SIZE;
-
-    return m_chunks[key]->tiles[tx][ty];
-}
-
-#include <cmath>
 
 float getNoise(float q, float r, uint32_t seed)
 {
@@ -82,115 +188,34 @@ float getNoise(float q, float r, uint32_t seed)
     return top * (1 - fr) + bot * fr;
 }
 
-void Map::generateChunk(Chunk *chunk)
+void Map::generateChunk(World::Chunk *chunk)
 {
-    const int MAP_RADIUS = 40;
-    const float scale = 15.0f;
-
-    for (int ty = 0; ty < Chunk::SIZE; ++ty)
+    for (int ty = 0; ty < Config::World::CHUNK_SIZE; ++ty)
     {
-        for (int tx = 0; tx < Chunk::SIZE; ++tx)
+        for (int tx = 0; tx < Config::World::CHUNK_SIZE; ++tx)
         {
-            int q = chunk->x * Chunk::SIZE + tx;
-            int r = chunk->y * Chunk::SIZE + ty;
+            int q = chunk->x * Config::World::CHUNK_SIZE + tx;
+            int r = chunk->y * Config::World::CHUNK_SIZE + ty;
 
-            float e = 1.0f * getNoise(q / scale, r / scale, m_seed);
-            e += 0.5f * getNoise(q / (scale / 2), r / (scale / 2), m_seed);
-            e += 0.25f * getNoise(q / (scale / 4), r / (scale / 4), m_seed);
-            e /= (1.0f + 0.5f + 0.25f);
+            float s = Config::World::NOISE_SCALE;
+            float e = 1.0f * getNoise(q / s, r / s, m_seed);
+            e += 0.5f * getNoise(q / (s / 0.5f), r / (s / 0.5f), m_seed);
+            e += 0.25f * getNoise(q / (s / 0.25f), r / (s / 0.25f), m_seed);
+            e /= 1.75f;
 
             float dist = (std::abs(q) + std::abs(q + r) + std::abs(r)) / 2.0f;
-            float d = dist / MAP_RADIUS;
+            float d = dist / Config::World::CHUNK_SIZE;
+            float height = (e + Config::World::HEIGHT_BIAS) - (d * d);
 
-            float height = (e + 0.1f) - (d * d);
-
-            if (height < 0.2f)
-            {
-                chunk->tiles[tx][ty].type = TileType::WATER;
-            }
-            else if (height < 0.3f)
-            {
-                chunk->tiles[tx][ty].type = TileType::DIRT;
-            }
-            else if (height < 0.65f)
-            {
-                chunk->tiles[tx][ty].type = TileType::GRASS;
-            }
+            World::Tile &tile = chunk->tiles[tx][ty];
+            if (height < Config::World::THRESH_WATER)
+                tile.type = World::TileType::WATER;
+            else if (height < Config::World::THRESH_DIRT)
+                tile.type = World::TileType::DIRT;
+            else if (height < Config::World::THRESH_GRASS)
+                tile.type = World::TileType::GRASS;
             else
-            {
-
-                
-                    chunk->tiles[tx][ty].type = TileType::MOUNTAIN;
-                
-            }
-
-            switch (chunk->tiles[tx][ty].type)
-            {
-            case TileType::GRASS:
-                m_stats.grassCount++;
-                break;
-            case TileType::WATER:
-                m_stats.waterCount++;
-                break;
-            case TileType::MOUNTAIN:
-                m_stats.mountainCount++;
-                break;
-            case TileType::DIRT:
-                m_stats.dirtCount++;
-                break;
-            }
-        }
-    }
-}
-
-void Map::clear()
-{
-    for (auto &pair : m_chunks)
-    {
-        delete pair.second;
-    }
-    m_chunks.clear();
-}
-
-bool Map::isAreaWalkable(int q, int r, int w, int h)
-{
-    for (int i = q; i < q + w; ++i)
-    {
-        for (int j = r; j < r + h; ++j)
-        {
-            TileType type = getTileAt(i, j).type;
-
-            if (type == TileType::WATER || type == TileType::MOUNTAIN)
-            {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-void Map::revealRadius(int centerQ, int centerR, int radius)
-{
-    for (int q = centerQ - radius; q <= centerQ + radius; ++q)
-    {
-        for (int r = centerR - radius; r <= centerR + radius; ++r)
-        {
-            int dist = (std::abs(centerQ - q) + std::abs(centerQ + centerR - q - r) + std::abs(centerR - r)) / 2;
-            if (dist <= radius)
-            {
-                getTileAt(q, r).discovered = true;
-            }
-        }
-    }
-}
-
-// Temporary debug function in Map.cpp to test the HUD
-void Map::debugRevealAll() {
-    for (auto& pair : m_chunks) {
-        for (int x = 0; x < Chunk::SIZE; ++x) {
-            for (int y = 0; y < Chunk::SIZE; ++y) {
-                pair.second->tiles[x][y].discovered = true;
-            }
+                tile.type = World::TileType::MOUNTAIN;
         }
     }
 }

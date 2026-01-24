@@ -6,17 +6,9 @@ Camera &Camera::getInstance()
     return instance;
 }
 
-Camera::Camera() : m_currentPos(0, 0), m_targetPos(0, 0) {}
-
-void Camera::move(float dx, float dy)
-{
-    m_targetPos.setX(m_targetPos.x() + dx);
-    m_targetPos.setY(m_targetPos.y() + dy);
-}
-
 void Camera::update(float deltaTime)
 {
-    float lerpFactor = 1.0f - std::pow(m_smoothing, deltaTime * 60.0f);
+    float lerpFactor = 1.0f - std::pow(Config::World::CAMERA_SMOOTHING, deltaTime * 60.0f);
     m_currentPos += (m_targetPos - m_currentPos) * lerpFactor;
 
     if (!m_worldBounds.isNull())
@@ -33,12 +25,12 @@ void Camera::update(float deltaTime)
         m_targetPos.setY(std::clamp(static_cast<float>(m_targetPos.y()), minY, maxY));
     }
 
-    if (m_shakeIntensity > 0.1f)
+    if (m_shakeIntensity > Config::World::SHAKE_THRESHOLD)
     {
         float rx = ((float)rand() / (float)RAND_MAX * 2.0f - 1.0f) * m_shakeIntensity;
         float ry = ((float)rand() / (float)RAND_MAX * 2.0f - 1.0f) * m_shakeIntensity;
         m_shakeOffset = QPointF(rx, ry);
-        m_shakeIntensity *= 0.9f;
+        m_shakeIntensity *= Config::World::SHAKE_DECAY;
     }
     else
     {
@@ -47,32 +39,26 @@ void Camera::update(float deltaTime)
     }
 }
 
-void Camera::adjustZoom(float delta)
+void Camera::handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHeight, float deltaTime)
 {
-    float minZ = static_cast<float>(MIN_ZOOM);
-    float maxZ = static_cast<float>(MAX_ZOOM);
-    m_zoom = std::clamp(m_zoom + delta, minZ, maxZ);
-}
+    float moveAmount = (Config::World::EDGE_PAN_SPEED / m_zoom) * deltaTime;
+    float dx = 0, dy = 0;
 
-QPoint Camera::toScreen(int q, int r, int tileSize, bool is3D) const
-{
-    float size = static_cast<float>(tileSize);
+    if (mousePos.x() < 0 || mousePos.y() < 0 || mousePos.x() > viewWidth || mousePos.y() > viewHeight)
+        return;
 
-    float worldX = size * (3.0f / 2.0f * q);
-    float worldY = size * (std::sqrt(3.0f) / 2.0f * q + std::sqrt(3.0f) * r);
+    if (mousePos.x() < Config::World::EDGE_MARGIN)
+        dx = -moveAmount;
+    else if (mousePos.x() > viewWidth - Config::World::EDGE_MARGIN)
+        dx = moveAmount;
 
-    float screenX = (worldX - m_currentPos.x()) * m_zoom + (m_viewportWidth / 2.0f);
+    if (mousePos.y() < Config::World::EDGE_MARGIN)
+        dy = -moveAmount;
+    else if (mousePos.y() > viewHeight - Config::World::EDGE_MARGIN)
+        dy = moveAmount;
 
-    float screenY_Relative = (worldY - m_currentPos.y());
-
-    if (is3D)
-    {
-        screenY_Relative *= 0.5f;
-    }
-
-    float screenY = (screenY_Relative * m_zoom) + (m_viewportHeight / 2.0f);
-
-    return QPoint(static_cast<int>(screenX), static_cast<int>(screenY));
+    if (dx != 0 || dy != 0)
+        move(dx, dy);
 }
 
 QPointF Camera::screenToWorld(const QPoint &screenPos, bool is3D) const
@@ -92,6 +78,49 @@ QPointF Camera::screenToWorld(const QPoint &screenPos, bool is3D) const
     }
 
     return QPointF(worldX, worldY);
+}
+
+QPoint Camera::screenToHex(const QPoint &screenPos, bool is3D) const
+{
+    QPointF worldPos = screenToWorld(screenPos, is3D);
+
+    const float size = Config::World::BASE_TILE_SIZE;
+    float q, r;
+
+    if (is3D)
+    {
+        float correctedY = worldPos.y() + Config::World::HEIGHT_OFFSET;
+
+        q = (2.0f / 3.0f * worldPos.x()) / size;
+        r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * correctedY) / size;
+    }
+    else
+    {
+        q = (2.0f / 3.0f * worldPos.x()) / size;
+        r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size;
+    }
+
+    QPointF rounded = hexRound(q, r);
+    return QPoint(static_cast<int>(rounded.x()), static_cast<int>(rounded.y()));
+}
+
+QPoint Camera::toScreen(int q, int r, int tileSize, bool is3D) const
+{
+    float size = static_cast<float>(tileSize);
+
+    float worldX = size * (3.0f / 2.0f * q);
+    float worldY = size * (std::sqrt(3.0f) / 2.0f * q + std::sqrt(3.0f) * r);
+
+    float screenX = (worldX - m_currentPos.x()) * m_zoom + (m_viewportWidth / 2.0f);
+    float screenY_Relative = (worldY - m_currentPos.y());
+
+    if (is3D)
+        screenY_Relative *= Config::World::HEX_Y_SQUASH;
+
+    float screenY = (screenY_Relative * m_zoom) + (m_viewportHeight / 2.0f);
+
+    return QPoint(static_cast<int>(screenX + m_shakeOffset.x()),
+                  static_cast<int>(screenY + m_shakeOffset.y()));
 }
 
 QPointF Camera::hexRound(float q, float r) const
@@ -124,31 +153,10 @@ QPointF Camera::hexRound(float q, float r) const
     return QPointF(rx, rz);
 }
 
-void Camera::handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHeight, float deltaTime)
+void Camera::move(float dx, float dy)
 {
-    float dx = 0;
-    float dy = 0;
-
-    float moveAmount = (500.0f / m_zoom) * deltaTime;
-
-    if (mousePos.x() < 0 || mousePos.y() < 0 ||
-        mousePos.x() > viewWidth || mousePos.y() > viewHeight)
-        return;
-
-    if (mousePos.x() < EDGE_MARGIN)
-        dx = -moveAmount;
-    else if (mousePos.x() > viewWidth - EDGE_MARGIN)
-        dx = moveAmount;
-
-    if (mousePos.y() < EDGE_MARGIN)
-        dy = -moveAmount;
-    else if (mousePos.y() > viewHeight - EDGE_MARGIN)
-        dy = moveAmount;
-
-    if (dx != 0 || dy != 0)
-    {
-        move(dx, dy);
-    }
+    m_targetPos.setX(m_targetPos.x() + dx);
+    m_targetPos.setY(m_targetPos.y() + dy);
 }
 
 void Camera::setTargetPos(QPointF hexCoords)
@@ -166,31 +174,15 @@ void Camera::setTargetRawPos(QPointF worldPos)
     m_targetPos = worldPos;
 }
 
-QPointF Camera::getCurrentPos()
+void Camera::adjustZoom(float delta)
 {
-    return m_currentPos;
+    float minZ = static_cast<float>(Config::World::MIN_ZOOM);
+    float maxZ = static_cast<float>(Config::World::MAX_ZOOM);
+    m_zoom = std::clamp(m_zoom + delta, minZ, maxZ);
 }
 
-QPoint Camera::screenToHex(const QPoint &screenPos, bool is3D) const
+void Camera::setViewportSize(int w, int h)
 {
-    QPointF worldPos = screenToWorld(screenPos, is3D);
-
-    const float size = GameConfig::BASE_TILE_SIZE;
-    float q, r;
-
-    if (is3D)
-    {
-        float correctedY = worldPos.y() + GameConfig::HEIGHT_OFFSET;
-
-        q = (2.0f / 3.0f * worldPos.x()) / size;
-        r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * correctedY) / size;
-    }
-    else
-    {
-        q = (2.0f / 3.0f * worldPos.x()) / size;
-        r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size;
-    }
-
-    QPointF rounded = hexRound(q, r);
-    return QPoint(static_cast<int>(rounded.x()), static_cast<int>(rounded.y()));
+    m_viewportWidth = static_cast<float>(w);
+    m_viewportHeight = static_cast<float>(h);
 }

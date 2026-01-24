@@ -3,17 +3,22 @@
 
 #include <UI/Screens/AbstractScreen.h>
 #include <UI/Screens/LoadGameScreen.h>
+#include <Core/Config/Configuration.h>
 #include <UI/Screens/LoadingScreen.h>
 #include <UI/Manager/MenuManager.h>
 #include <Game/Engine/GameEngine.h>
 #include <UI/Screens/GameScreen.h>
-#include <Core/Config/Config.h>
 #include <QRandomGenerator>
 #include <QFormLayout>
 #include <QLineEdit>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QSpinBox>
+
+class QLineEdit;
+class QComboBox;
+class QKeyEvent;
+class QSpinBox;
 
 class NewGameScreen : public AbstractScreen
 {
@@ -22,30 +27,26 @@ class NewGameScreen : public AbstractScreen
 public:
     explicit NewGameScreen(QWidget *parent = nullptr);
 
-    virtual ~NewGameScreen() = default;
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
 
-    void onEnter() override;
-
-    void onExit() override;
-
-private:
-    void setupUI();
-
+private slots:
     void onLaunchClicked();
 
     void onBackClicked();
 
-    QLineEdit *m_mapNameEdit;
+private:
+    void setupUI();
 
-    QLineEdit *m_seedEdit;
+    QLineEdit *m_mapNameEdit = nullptr;
 
-    QComboBox *m_difficultyCombo;
+    QLineEdit *m_seedEdit = nullptr;
 
-    QComboBox *m_opponentCombo;
+    QComboBox *m_difficultyCombo = nullptr;
 
-    QSpinBox *m_aiLevelSpin;
+    QComboBox *m_opponentCombo = nullptr;
 
-    void keyPressEvent(QKeyEvent *event) override;
+    QSpinBox *m_aiLevelSpin = nullptr;
 };
 
 #endif

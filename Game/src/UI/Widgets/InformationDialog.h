@@ -1,21 +1,17 @@
 #ifndef INFORMATIONDIALOG_H
 #define INFORMATIONDIALOG_H
 
-#include <Core/Config/Config.h>
-#include <QCoreApplication>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QPushButton>
+#include <UI/Widgets/BaseTacticalDialog.h>
+#include <Core/Config/Configuration.h>
 #include <QScrollArea>
+#include <QPushButton>
+#include <QVBoxLayout>
 #include <QScrollBar>
-#include <QKeyEvent>
 #include <QCheckBox>
-#include <QDialog>
-#include <QLabel>
-#include <QFrame>
 #include <QTimer>
+#include <QLabel>
 
-class InformationDialog : public QDialog
+class InformationDialog : public BaseTacticalDialog
 {
     Q_OBJECT
 
@@ -24,6 +20,8 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+
+    void handleEscape() override;
 
 private slots:
     void onDecline();
@@ -35,11 +33,11 @@ private slots:
 private:
     void setupUI(const QString &header, const QString &body);
 
-    QCheckBox *m_acceptCheck;
+    QCheckBox *m_acceptCheck = nullptr;
 
-    QPushButton *m_confirmBtn;
+    QPushButton *m_confirmBtn = nullptr;
 
-    QScrollArea *m_scrollArea;
+    QScrollArea *m_scrollArea = nullptr;
 
     bool m_scrolledToBottom = false;
 };

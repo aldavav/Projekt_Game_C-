@@ -1,18 +1,17 @@
 #ifndef SETTINGSSCREEN_H
 #define SETTINGSSCREEN_H
 
-#include <UI/Manager/GraphicsSettingsManager.h>
-#include <UI/Manager/ControlsSettingsManager.h>
-#include <UI/Manager/DisplaySettingsManager.h>
-#include <UI/Manager/AudioSettingsManager.h>
-#include <UI/Manager/GameSettingsManager.h>
+#include <Core/Settings/GraphicsSettingsManager.h>
+#include <Core/Settings/ControlsSettingsManager.h>
+#include <Core/Settings/DisplaySettingsManager.h>
+#include <Core/Settings/AudioSettingsManager.h>
+#include <Core/Settings/GameSettingsManager.h>
+#include <Game/Resources/ConfigManager.h>
 #include <UI/Widgets/KeyCaptureDialog.h>
+#include <Core/Config/Configuration.h>
 #include <UI/Screens/AbstractScreen.h>
 #include <UI/Widgets/TacticalDialog.h>
-#include <UI/Manager/ConfigManager.h>
 #include <UI/Manager/MenuManager.h>
-#include <Core/Common/KeyCodes.h>
-#include <Core/Config/Config.h>
 #include <qpushbutton.h>
 #include <qformlayout.h>
 #include <qtabwidget.h>
@@ -22,10 +21,13 @@
 #include <qslider.h>
 #include <qlabel.h>
 
-class QTabWidget;
-class QSlider;
-class QCheckBox;
 class QVBoxLayout;
+class QPushButton;
+class QTabWidget;
+class QCheckBox;
+class QKeyEvent;
+class QSlider;
+class QLabel;
 
 class SettingsScreen : public AbstractScreen
 {
@@ -34,26 +36,24 @@ class SettingsScreen : public AbstractScreen
 public:
     explicit SettingsScreen(QWidget *parent = nullptr);
 
-    virtual ~SettingsScreen() = default;
+protected:
+    void changeEvent(QEvent *event) override;
 
-    void onEnter() override;
+    void keyPressEvent(QKeyEvent *event) override;
 
-    void onExit() override;
+private slots:
+    void onApplyClicked();
+
+    void onResetClicked();
+
+    void onBackClicked();
+
+    void onBindButtonClicked(const QString &actionName);
 
 private:
-    bool m_isDirty = false;
-
-    QTabWidget *m_tabs = nullptr;
-
-    QLabel *m_headerLabel = nullptr;
-
     void setupUI();
 
     void retranslateUi();
-
-    void changeEvent(QEvent *event);
-
-    void markDirty();
 
     QWidget *createGameTab();
 
@@ -65,16 +65,13 @@ private:
 
     QWidget *createInputTab();
 
-private slots:
-    void onApplyClicked();
+    void markDirty();
 
-    void onResetClicked();
+    QTabWidget *m_tabs = nullptr;
 
-    void onBackClicked();
+    QLabel *m_headerLabel = nullptr;
 
-    void onBindButtonClicked(const QString &actionName);
-
-    void keyPressEvent(QKeyEvent *event);
+    bool m_isDirty = false;
 };
 
 #endif

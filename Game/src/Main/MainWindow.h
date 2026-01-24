@@ -1,15 +1,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <UI/Manager/DisplaySettingsManager.h>
+#include <Core/Settings/DisplaySettingsManager.h>
 #include <UI/Widgets/InformationDialog.h>
+#include <Game/Resources/AssetManager.h>
 #include <UI/Widgets/TacticalDialog.h>
-#include <Core/Logger/LoggerMacros.h>
-#include <Core/Assets/AssetManager.h>
-#include <Core/Config/GameConfig.h>
+#include <Core/Config/Configuration.h>
+#include <Core/Config/Configuration.h>
 #include <UI/Manager/MenuManager.h>
 #include <UI/Screens/MenuScreen.h>
-#include <Core/Config/Config.h>
 #include <qguiapplication.h>
 #include <qfontdatabase.h>
 #include <QFontDatabase>
@@ -20,10 +19,10 @@
 #include <QMainWindow>
 #include <QFile>
 
-class QKeyEvent;
-class QMouseEvent;
 class QResizeEvent;
 class QCloseEvent;
+class QMouseEvent;
+class QKeyEvent;
 class QWidget;
 
 class MainWindow : public QMainWindow
@@ -32,8 +31,6 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-
-    virtual ~MainWindow() = default;
 
     void toggleFullscreen();
 
@@ -62,6 +59,12 @@ private slots:
     void on_actionQuit_triggered();
 
 private:
+    void setupBackgroundMusic();
+
+    void applyGlobalStyles();
+
+    void centerOnScreen();
+
     QWidget *m_centralWidget;
 
     bool m_isFullscreen = false;
@@ -69,12 +72,6 @@ private:
     QMediaPlayer *m_bgmPlayer;
 
     QAudioOutput *m_audioOutput;
-
-    void setupBackgroundMusic();
-
-    void applyGlobalStyles();
-
-    void centerOnScreen();
 };
 
 #endif

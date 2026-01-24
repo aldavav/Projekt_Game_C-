@@ -1,29 +1,27 @@
 #ifndef TACTICALHUD_H
 #define TACTICALHUD_H
 
-#include <Core/Config/GameConfig.h>
-#include <Game/Engine/GameSpeed.h>
+#include <Game/Engine/GameManager.h>
+#include <UI/HUD/MinimapProvider.h>
+#include <Core/Common/WorldData.h>
+#include <Core/Common/GameTypes.h>
 #include <Game/Camera/Camera.h>
-#include <Core/Config/Config.h>
 #include <Game/Map/Map.h>
 #include <QElapsedTimer>
 #include <qpainter.h>
-#include <QPolygonF>
 #include <qevent.h>
 #include <QObject>
 #include <QPointF>
 #include <QString>
 
-class QPainter;
-class QMouseEvent;
-
 class TacticalHUD : public QObject
 {
     Q_OBJECT
+
 public:
     explicit TacticalHUD(QObject *parent = nullptr);
 
-    void update(float gameTime, bool isPaused, GameSpeed speed);
+    void update(float gameTime, bool isPaused, Engine::GameSpeed speed);
 
     void draw(QPainter &painter, int width, int height);
 
@@ -31,14 +29,9 @@ public:
 
     void setSelection(QPointF hexCoords, bool hasSelection);
 
-    void setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos)
-    {
-        m_hoveredHex = hoveredHex;
-        m_mouseWorldPos = mouseWorldPos;
-        m_mouseScreenPos = mouseScreenPos;
-    }
-
     void toggleDiagnostics() { m_showDiagnostics = !m_showDiagnostics; }
+
+    void setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos, uint32_t mapSeed);
 
 signals:
     void hudButtonClicked(int buttonIndex);
@@ -46,33 +39,37 @@ signals:
     void minimapClicked(QPointF worldPos);
 
 private:
-    void drawSelectionBox(QPainter &painter, int width, int height);
-
     void drawResourceStats(QPainter &painter, int width, int height);
-
-    void drawMinimap(QPainter &painter, int width, int height);
 
     void drawDayNightCycle(QPainter &painter, int width, int height);
 
+    void drawMinimap(QPainter &painter, int width, int height);
+
     void drawDiagnostics(QPainter &painter, int width, int height);
-
-    void drawMinimapCached(QPainter &painter, int width, int height);
-
-    QString getTileTypeName(TileType type);
-
+    
     void drawScanlines(QPainter &painter, QRect rect);
 
-    void updateMinimapCache(int size, int width, int height);
+    QString getTileTypeName(World::TileType type) const;
 
     float m_gameTime = 0.0f;
 
     bool m_isPaused = false;
 
-    GameSpeed m_currentSpeed = GameSpeed::NORMAL;
+    Engine::GameSpeed m_currentSpeed = Engine::GameSpeed::NORMAL;
 
     QPointF m_selectedHex;
 
     bool m_hasSelection = false;
+
+    QPoint m_hoveredHex;
+
+    QPointF m_mouseWorldPos;
+
+    QPoint m_mouseScreenPos;
+
+    uint32_t m_mapSeed = 0;
+
+    bool m_showDiagnostics = false;
 
     QElapsedTimer m_fpsTimer;
 
@@ -80,23 +77,9 @@ private:
 
     int m_fps = 0;
 
-    const int HUD_BOX_H = 75;
-
-    QPixmap m_minimapCache;
-
-    bool m_minimapNeedsUpdate = true;
+    MinimapProvider m_minimapProvider;
 
     QRect m_minimapBox;
-
-    QElapsedTimer m_minimapThrottleTimer;
-
-    QPoint m_hoveredHex;
-    
-    QPointF m_mouseWorldPos;
-    
-    QPoint m_mouseScreenPos;
-
-    bool m_showDiagnostics = false;
 };
 
 #endif

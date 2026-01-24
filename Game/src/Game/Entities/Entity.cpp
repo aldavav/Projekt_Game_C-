@@ -1,22 +1,18 @@
 #include "Entity.h"
 
-Entity::Entity(EntityTypes::EntityType type, const std::string &name, const std::string &symbol, Player *owner)
-    : m_name(name), m_type(type), m_symbol(symbol), m_owner(owner),
-      m_position(0, 0), m_targetPosition(0, 0)
-{
-}
-
 void Entity::update(float deltaTime)
 {
     QPointF diff = m_targetPosition - m_position;
+
     float distSq = diff.x() * diff.x() + diff.y() * diff.y();
 
-    if (distSq > 1.0f)
+    if (distSq > Config::Entities::MIN_MOVE_DIST_SQ)
     {
         float dist = std::sqrt(distSq);
         QPointF direction = diff / dist;
 
         float moveStep = m_speed * deltaTime;
+
         if (moveStep > dist)
             moveStep = dist;
 
@@ -24,31 +20,31 @@ void Entity::update(float deltaTime)
     }
 }
 
+void Entity::setPosition(const QPointF &pos)
+{
+    m_position = pos;
+    m_targetPosition = pos;
+}
+
 std::unique_ptr<Entity> Entity::createEntityFromFile(std::ifstream &file)
 {
-    EntityTypes::EntityType type;
+    Engine::Entity::Type type;
     if (!file.read(reinterpret_cast<char *>(&type), sizeof(type)))
     {
-        LOG_ERROR("Failed to read EntityType from file.");
         return nullptr;
     }
 
     switch (type)
     {
-        case EntityTypes::EntityType::UNIT:
-            LOG_ERROR("Entity loading not yet implemented for UNIT type.");
-            return nullptr;
-    case EntityTypes::EntityType::BUILDING:
-        LOG_ERROR("Entity loading not yet implemented for BUILDING type.");
+    case Engine::Entity::Type::UNIT:
         return nullptr;
-    case EntityTypes::EntityType::RESOURCE:
-        LOG_ERROR("Entity loading not yet implemented for RESOURCE type.");
+    case Engine::Entity::Type::BUILDING:
         return nullptr;
-    case EntityTypes::EntityType::DEBRIS:
-        LOG_ERROR("Entity loading not yet implemented for DEBRIS type.");
+    case Engine::Entity::Type::RESOURCE:
+        return nullptr;
+    case Engine::Entity::Type::DEBRIS:
         return nullptr;
     default:
-        LOG_ERROR("Unknown EntityType encountered during loading.");
         return nullptr;
     }
 }

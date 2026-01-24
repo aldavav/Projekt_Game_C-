@@ -2,11 +2,15 @@
 #define LOADINGSCREEN_H
 
 #include <UI/Screens/AbstractScreen.h>
-#include <Core/Config/Config.h>
+#include <Core/Config/Configuration.h>
 #include <QProgressBar>
 #include <QVBoxLayout>
 #include <QPainter>
 #include <QLabel>
+
+class QProgressBar;
+class QResizeEvent;
+class QLabel;
 
 class LoadingScreen : public AbstractScreen
 {
@@ -15,20 +19,19 @@ class LoadingScreen : public AbstractScreen
 public:
     explicit LoadingScreen(QWidget *parent = nullptr);
 
-    void onEnter() override;
-
-    void onExit() override;
-
     void setProgress(int value);
 
     void setStatus(const QString &status);
 
-    void resizeEvent(QResizeEvent *event);
+protected:
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
-    QProgressBar *m_progressBar;
+    void setupUI();
 
-    QLabel *m_statusLabel;
+    QProgressBar *m_progressBar = nullptr;
+
+    QLabel *m_statusLabel = nullptr;
 };
 
 #endif

@@ -2,20 +2,24 @@
 #define GAMESCREEN_H
 
 #include <UI/Screens/AbstractScreen.h>
-#include <UI/Manager/GameManager.h>
-#include <Core/Config/GameConfig.h>
-#include <Core/Config/Config.h>
+#include <Core/Config/Configuration.h>
+#include <Game/Engine/GameManager.h>
+#include <UI/Manager/MenuManager.h>
+#include <Core/Common/WorldData.h>
 #include <qpainter.h>
 #include <QPolygonF>
 #include <QPointF>
 #include <QPixmap>
 #include <QTimer>
 
-class QPainter;
+class QResizeEvent;
+class QPaintEvent;
 class QMouseEvent;
 class QWheelEvent;
-class QResizeEvent;
-class Tile;
+class QKeyEvent;
+class QPainter;
+class Camera;
+class QTimer;
 
 class GameScreen : public AbstractScreen
 {
@@ -38,8 +42,6 @@ public:
 
     void onEnter() override;
 
-    void onExit() override;
-
 protected:
     void paintEvent(QPaintEvent *event) override;
 
@@ -51,17 +53,17 @@ protected:
 
     void wheelEvent(QWheelEvent *event) override;
 
-    void resizeEvent(QResizeEvent *event) override;
-
     void keyPressEvent(QKeyEvent *event) override;
 
     void keyReleaseEvent(QKeyEvent *event) override;
+
+    void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void updateGameDisplay();
 
 private:
-    void drawMap(QPainter &painter);
+    void setupUI(QPainter &painter);
 
     void drawMap3D(QPainter &painter, QPoint currentHover);
 
@@ -73,9 +75,10 @@ private:
 
     void drawClouds(QPainter &painter, Camera &cam, float gameTime, float zoom);
 
-    QColor getTileVisualColor(const Tile &tile, float gameTime);
+    QColor getTileVisualColor(const World::Tile &tile, float gameTime, bool override = false);
 
-    QTimer *m_updateTimer;
+private:
+    QTimer *m_updateTimer = nullptr;
 
     QPixmap m_cloudTexture;
 
@@ -83,13 +86,17 @@ private:
 
     float m_lastRadius = 0.0f;
 
-    bool m_isDragging = false;
+    QSet<int> m_pressedKeys;
 
     QPoint m_lastMousePos;
 
     QPointF m_hoveredHex;
 
-    QSet<int> m_pressedKeys;
+    bool m_isDragging = false;
+
+    bool m_is3D = false;
+
+    bool m_isDiscoveryActive = false;
 
     QColor m_grassColor;
 
@@ -102,8 +109,6 @@ private:
     QColor m_selectionColor;
 
     QColor m_fogColor;
-
-    bool m_is3D = false;
 };
 
 #endif

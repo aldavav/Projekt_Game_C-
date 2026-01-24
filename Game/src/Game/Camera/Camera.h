@@ -1,9 +1,10 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include <Core/Config/GameConfig.h>
+#include <Core/Config/Configuration.h>
 #include <algorithm>
 #include <QPointF>
+#include <QPoint>
 #include <QRect>
 
 class Camera
@@ -11,72 +12,54 @@ class Camera
 public:
     static Camera &getInstance();
 
-    QPointF screenToWorld(const QPoint& screenPos, bool is3D = false) const;
+    void update(float deltaTime);
+
+    QPointF screenToWorld(const QPoint &screenPos, bool is3D = Config::World::DEFAULT_3D_VIEW) const;
+
+    QPoint screenToHex(const QPoint &screenPos, bool is3D = Config::World::DEFAULT_3D_VIEW) const;
+
+    QPoint toScreen(int q, int r, int tileSize = Config::World::BASE_TILE_SIZE, bool is3D = Config::World::DEFAULT_3D_VIEW) const;
 
     QPointF hexRound(float q, float r) const;
 
-    void handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHeight, float deltaTime);
-
-    void setTargetPos(QPointF worldPos);
-
-    void setTargetRawPos(QPointF worldPos);
-
-    QPointF getCurrentPos();
-
-    static constexpr float MIN_ZOOM = 0.75f;
-
-    static constexpr float MAX_ZOOM = 3.0f;
-
-    void update(float deltaTime);
-
     void move(float dx, float dy);
+
+    void handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHeight, float deltaTime);
 
     void adjustZoom(float delta);
 
-    void setWorldBounds(const QRect &bounds) { m_worldBounds = bounds; }
+    void shake(float intensity) { m_shakeIntensity = intensity; }
 
-    void setViewportSize(int w, int h)
-    {
-        m_viewportWidth = w;
-        m_viewportHeight = h;
-    }
+    void setTargetPos(QPointF hexCoords);
 
-    QPointF pos() const { return m_currentPos; }
+    void setTargetRawPos(QPointF worldPos);
+
+    void setViewportSize(int w, int h);
+
+    QPointF getCurrentPos() const { return m_currentPos; }
 
     float getZoom() const { return m_zoom; }
 
-    QPoint toScreen(int tileX, int tileY, int tileSize, bool is3D = false) const;
-
-    void shake(float intensity) { m_shakeIntensity = intensity; }
-    
-    QPoint screenToHex(const QPoint& screenPos, bool is3D = false) const;
-
-    int getViewportWidth() const { return m_viewportWidth; }
+    int getViewportWidth() const { return static_cast<int>(m_viewportWidth); }
 
 private:
-    Camera();
+    Camera() = default;
 
     QPointF m_currentPos;
 
     QPointF m_targetPos;
 
-    float m_zoom = 1.5f;
+    QRect m_worldBounds = Config::World::WORLD_BOUNDS;
 
-    QRect m_worldBounds;
+    float m_zoom = Config::Gameplay::INITIAL_ZOOM;
 
-    int m_viewportWidth = 800;
+    float m_viewportWidth = Config::Gameplay::DEFAULT_WINDOW_WIDTH;
 
-    int m_viewportHeight = 600;
-
-    const float m_smoothing = 0.15f;
+    float m_viewportHeight = Config::Gameplay::DEFAULT_WINDOW_HEIGHT;
 
     float m_shakeIntensity = 0.0f;
 
     QPointF m_shakeOffset;
-
-    const int EDGE_MARGIN = 15;
-    
-    const float EDGE_MOVE_SPEED = 10.0f;
 };
 
 #endif

@@ -1,9 +1,4 @@
 #include "GameEngine.h"
-#include <qcoreapplication.h>
-#include <qdir.h>
-#include <qsettings.h>
-
-static constexpr float TICK_RATE = 1.0f / 30.0f;
 
 GameEngine &GameEngine::getInstance()
 {
@@ -11,65 +6,20 @@ GameEngine &GameEngine::getInstance()
     return instance;
 }
 
-GameEngine::GameEngine(QObject *parent)
-    : QObject(parent), m_currentState(STATE_MENU)
-{
-    connect(&m_gameTimer, &QTimer::timeout, this, &GameEngine::gameLoopTick);
-    m_gameTimer.setInterval(16);
-    initializeSystems();
-}
-
 void GameEngine::startGame()
 {
     if (m_isRunning)
         return;
 
-    LOG_INFO("Engine: Initializing World...");
-    Map::getInstance().initializeNewMap("Default Campaign");
+    Map::getInstance().initializeNewMap(Config::Gameplay::DEFAULT_MISSION_NAME.toStdString());
 
     m_lastTime = std::chrono::steady_clock::now();
     m_accumulator = 0.0f;
     m_isRunning = true;
-    m_currentState = STATE_RUNNING;
+    setState(Engine::State::RUNNING);
 
-    emit gameStateChanged(m_currentState);
     m_gameTimer.start();
     saveCurrentMatch();
-}
-
-void GameEngine::saveCurrentMatch()
-{
-    QString saveRoot = QCoreApplication::applicationDirPath() + "/saves";
-    QString mapFolder = saveRoot + "/" + m_currentMapName;
-
-    QDir dir;
-    if (!dir.exists(mapFolder))
-    {
-        dir.mkpath(mapFolder);
-    }
-
-    QString savePath = mapFolder + "/initial_state.sav";
-
-    QSettings saveFile(savePath, QSettings::IniFormat);
-    saveFile.setValue("Seed", m_currentSeed);
-    saveFile.setValue("Timestamp", QDateTime::currentDateTime().toString());
-    saveFile.sync();
-
-    LOG_INFO("Game auto-saved at: " + savePath);
-}
-
-void GameEngine::loadMatch(const QString &mapName)
-{
-    m_currentMapName = mapName;
-    QString path = QCoreApplication::applicationDirPath() + "/saves/" + mapName + "/initial_state.sav";
-
-    QSettings saveFile(path, QSettings::IniFormat);
-    uint32_t seed = saveFile.value("Seed").toUInt();
-
-    setupMatch(mapName, seed);
-    setState(STATE_RUNNING);
-
-    LOG_INFO("Match successfully reconstructed from " + path);
 }
 
 void GameEngine::stopGame()
@@ -79,13 +29,92 @@ void GameEngine::stopGame()
 
     m_gameTimer.stop();
     m_isRunning = false;
-    m_currentState = STATE_GAMEOVER;
+    m_currentState = Engine::State::GAMEOVER;
 
-    emit gameStateChanged(m_currentState);
+    emit gameStateChanged(static_cast<int>(m_currentState));
+}
+
+void GameEngine::triggerEndGame(bool victory)
+{
+    m_playerWon = victory;
+    setState(Engine::State::GAMEOVER);
 }
 
 void GameEngine::setupMatch(QString mapName, uint32_t seed)
 {
+    m_currentMapName = mapName;
+    m_currentSeed = seed;
+
+    Map::getInstance().initializeNewMap(mapName.toStdString(), Config::Gameplay::DEFAULT_DIFFICULTY);
+}
+
+void GameEngine::saveCurrentMatch()
+{
+    QString saveRoot = QCoreApplication::applicationDirPath() + Config::Paths::SAVE_DIR_NAME;
+    QString mapFolder = saveRoot + "/" + m_currentMapName;
+
+    QDir dir;
+    if (!dir.exists(mapFolder))
+        dir.mkpath(mapFolder);
+
+    QString savePath = mapFolder + Config::Paths::INITIAL_SAVE_FILENAME;
+    QSettings saveFile(savePath, QSettings::IniFormat);
+
+    QPointF camPos = Camera::getInstance().getCurrentPos();
+
+    saveFile.beginGroup("Metadata");
+    saveFile.setValue("Version", Config::System::VERSION);
+    saveFile.setValue("Seed", m_currentSeed);
+    saveFile.setValue("CamX", camPos.x());
+    saveFile.setValue("CamY", camPos.y());
+    saveFile.setValue("Timestamp", QDateTime::currentDateTime().toSecsSinceEpoch());
+    saveFile.endGroup();
+
+    saveFile.sync();
+}
+
+void GameEngine::loadMatch(const QString &mapName)
+{
+    m_currentMapName = mapName;
+    QString path = QCoreApplication::applicationDirPath() +
+                   Config::Paths::SAVE_DIR_NAME + "/" +
+                   mapName +
+                   Config::Paths::INITIAL_SAVE_FILENAME;
+
+    if (!QFile::exists(path))
+        return;
+
+    QSettings saveFile(path, QSettings::IniFormat);
+
+    uint32_t seed = saveFile.value("Metadata/Seed").toUInt();
+    m_currentSeed = seed;
+
+    setupMatch(mapName, m_currentSeed);
+
+    float cx = saveFile.value("Metadata/CamX", 0.0f).toFloat();
+    float cy = saveFile.value("Metadata/CamY", 0.0f).toFloat();
+    Camera::getInstance().setTargetPos(QPointF(cx, cy));
+
+    m_lastTime = std::chrono::steady_clock::now();
+    m_accumulator = 0.0f;
+    m_isRunning = true;
+    setState(Engine::State::RUNNING);
+    m_gameTimer.start();
+}
+
+void GameEngine::setState(Engine::State newState)
+{
+    if (m_currentState == newState)
+        return;
+
+    m_currentState = newState;
+
+    emit gameStateChanged(static_cast<int>(m_currentState));
+}
+
+void GameEngine::handlePlayerInput(const QString &inputCommand)
+{
+    auto &input = InputManager::getInstance();
 }
 
 void GameEngine::gameLoopTick()
@@ -95,23 +124,37 @@ void GameEngine::gameLoopTick()
     m_lastTime = currentTime;
 
     float frameTime = elapsed.count();
-    if (frameTime > 0.25f)
-        frameTime = 0.25f;
+
+    if (frameTime > Config::System::MAX_FRAME_TIME)
+        frameTime = Config::System::MAX_FRAME_TIME;
 
     m_accumulator += frameTime;
 
-    while (m_accumulator >= TICK_RATE)
+    while (m_accumulator >= Config::Simulation::TICK_RATE)
     {
-        updateSimulation(TICK_RATE);
-        m_accumulator -= TICK_RATE;
+        updateSimulation(Config::Simulation::TICK_RATE);
+        m_accumulator -= Config::Simulation::TICK_RATE;
     }
 
     emit gameLoopUpdate(frameTime);
 }
 
+GameEngine::GameEngine(QObject *parent)
+    : QObject(parent), m_currentState(Engine::State::MENU)
+{
+    connect(&m_gameTimer, &QTimer::timeout, this, &GameEngine::gameLoopTick);
+
+    m_gameTimer.setInterval(Config::System::TIMER_INTERVAL_MS);
+    initializeSystems();
+}
+
+void GameEngine::initializeSystems()
+{
+    InputManager::getInstance();
+}
+
 void GameEngine::updateSimulation(float fixedStep)
 {
-
     auto &input = InputManager::getInstance();
     while (input.hasPendingCommands())
     {
@@ -145,47 +188,19 @@ void GameEngine::updateCameraMovement(float fixedStep)
     auto &cam = Camera::getInstance();
 
     QPointF velocity(0, 0);
-    const float speed = 800.0f;
 
-    if (input.isKeyPressed(static_cast<int>(Input::KeyCode::UP_ARROW)))
+    if (input.isKeyPressed(Qt::Key_Up) || input.isKeyPressed(Qt::Key_W))
         velocity.setY(-1);
-    if (input.isKeyPressed(static_cast<int>(Input::KeyCode::DOWN_ARROW)))
+    if (input.isKeyPressed(Qt::Key_Down) || input.isKeyPressed(Qt::Key_S))
         velocity.setY(1);
-    if (input.isKeyPressed(static_cast<int>(Input::KeyCode::LEFT_ARROW)))
+    if (input.isKeyPressed(Qt::Key_Left) || input.isKeyPressed(Qt::Key_A))
         velocity.setX(-1);
-    if (input.isKeyPressed(static_cast<int>(Input::KeyCode::RIGHT_ARROW)))
+    if (input.isKeyPressed(Qt::Key_Right) || input.isKeyPressed(Qt::Key_D))
         velocity.setX(1);
 
     if (!velocity.isNull())
     {
-        QPointF delta = velocity * speed * fixedStep;
+        QPointF delta = velocity * Config::World::CAMERA_KEYBOARD_SPEED * fixedStep;
         cam.move(delta.x(), delta.y());
     }
-}
-
-void GameEngine::initializeSystems()
-{
-    LOG_INFO("Systems Initializing...");
-}
-
-void GameEngine::handlePlayerInput(const QString &inputCommand)
-{
-}
-
-void GameEngine::setState(State newState)
-{
-    if (m_currentState == newState)
-        return;
-
-    m_currentState = newState;
-
-    LOG_INFO("Engine State Transition: " + QString::number(static_cast<int>(newState)));
-
-    emit gameStateChanged(static_cast<int>(m_currentState));
-}
-
-void GameEngine::triggerEndGame(bool victory)
-{
-    m_playerWon = victory;
-    setState(STATE_GAMEOVER);
 }

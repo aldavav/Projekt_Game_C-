@@ -3,9 +3,9 @@
 
 #include <UI/Screens/SettingsScreen.h>
 #include <UI/Screens/AbstractScreen.h>
+#include <Core/Config/Configuration.h>
 #include <UI/Components/MenuButton.h>
 #include <UI/Screens/NewGameScreen.h>
-#include <Core/Config/Config.h>
 #include <QCoreApplication>
 #include <QResizeEvent>
 #include <QPushButton>
@@ -16,11 +16,11 @@
 #include <QLabel>
 #include <QMovie>
 
-class QLabel;
-class QMovie;
+class QResizeEvent;
 class QPushButton;
 class QVBoxLayout;
-class QResizeEvent;
+class QLabel;
+class QMovie;
 
 class MenuScreen : public AbstractScreen
 {
@@ -28,8 +28,6 @@ class MenuScreen : public AbstractScreen
 
 public:
     explicit MenuScreen(QWidget *parent = nullptr);
-
-    virtual ~MenuScreen() = default;
 
     void onEnter() override;
 
@@ -56,6 +54,12 @@ private slots:
     void onQuitClicked();
 
 private:
+    void setupUI();
+
+    void setupBackground();
+
+    void updatePanelContent(const QString &title, const QString &description);
+    
     QLabel *m_backgroundLabel = nullptr;
 
     QMovie *m_bgMovie = nullptr;
@@ -69,12 +73,6 @@ private:
     QVBoxLayout *m_buttonLayout = nullptr;
 
     QList<MenuButton*> m_buttons;
-
-    void setupUI();
-
-    void setupBackground();
-
-    void updatePanelContent(const QString &title, const QString &description);
 };
 
 #endif

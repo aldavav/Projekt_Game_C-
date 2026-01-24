@@ -6,15 +6,25 @@ InputManager &InputManager::getInstance()
     return instance;
 }
 
+bool InputManager::isKeyPressed(int keyCode) const
+{
+    return m_activeKeys.find(keyCode) != m_activeKeys.end();
+}
+
+bool InputManager::hasPendingCommands() const
+{
+    return !m_commandQueue.isEmpty();
+}
+
+CommandPtr InputManager::getNextCommand()
+{
+    QMutexLocker locker(&m_inputMutex);
+    return m_commandQueue.isEmpty() ? nullptr : m_commandQueue.dequeue();
+}
+
 InputManager::InputManager(QObject *parent) : QObject(parent)
 {
     setupDefaultBindings();
-}
-
-InputManager::~InputManager() {}
-
-void InputManager::setupDefaultBindings()
-{
 }
 
 void InputManager::onKeyPress(int keyCode)
@@ -25,8 +35,8 @@ void InputManager::onKeyPress(int keyCode)
     if (isRepeat)
         return;
 
-    RawInputEvent event;
-    event.type = RawInputEvent::Type::Keyboard;
+    Engine::Input::RawEvent event;
+    event.type = Engine::Input::RawEvent::Type::Keyboard;
     event.keyCode = keyCode;
 
     CommandPtr command = translateRawInput(event);
@@ -42,15 +52,10 @@ void InputManager::onKeyRelease(int keyCode)
     m_activeKeys.erase(keyCode);
 }
 
-bool InputManager::isKeyPressed(int keyCode) const
-{
-    return m_activeKeys.find(keyCode) != m_activeKeys.end();
-}
-
 void InputManager::onMouseClick(Qt::MouseButton button, const QPoint &pos)
 {
-    RawInputEvent event;
-    event.type = RawInputEvent::Type::MouseClick;
+    Engine::Input::RawEvent event;
+    event.type = Engine::Input::RawEvent::Type::MouseClick;
     event.button = button;
     event.position = pos;
 
@@ -64,44 +69,60 @@ void InputManager::onMouseClick(Qt::MouseButton button, const QPoint &pos)
 
 void InputManager::onMouseMove(const QPoint &pos)
 {
+    if (m_activeKeys.count(Qt::RightButton))
+    {
+        Engine::Input::RawEvent event;
+        event.type = Engine::Input::RawEvent::Type::MouseMove;
+        event.position = pos;
+
+        QMutexLocker locker(&m_inputMutex);
+
+        CommandPtr command = translateRawInput(event);
+        if (command)
+        {
+            m_commandQueue.enqueue(command);
+            emit commandQueued();
+        }
+    }
 }
 
-CommandPtr InputManager::translateRawInput(const RawInputEvent &event)
+void InputManager::setupDefaultBindings()
 {
-    if (event.type == RawInputEvent::Type::Keyboard)
+    ControlsSettingsManager::getInstance();
+}
+
+CommandPtr InputManager::translateRawInput(const Engine::Input::RawEvent &event)
+{
+    auto &settings = ControlsSettingsManager::getInstance();
+
+    if (event.type == Engine::Input::RawEvent::Type::Keyboard)
     {
-        switch (event.keyCode)
+        int keyCode = event.keyCode;
+
+        if (keyCode == static_cast<int>(settings.getKey(Engine::Input::Action::STOP)))
+            return QSharedPointer<StopUnitAction>::create().staticCast<ICommand>();
+
+        if (keyCode == static_cast<int>(settings.getKey(Engine::Input::Action::GUARD)))
+            return QSharedPointer<GuardUnitAction>::create().staticCast<ICommand>();
+
+        if (keyCode == static_cast<int>(settings.getKey(Engine::Input::Action::ZOOM_OUT)))
+            return QSharedPointer<ZoomAction>::create(-Config::Gameplay::ZOOM_STEP).staticCast<ICommand>();
+
+        if (keyCode == static_cast<int>(settings.getKey(Engine::Input::Action::ZOOM_IN)) ||
+            keyCode == static_cast<int>(settings.getKey(Engine::Input::Action::ZOOM_IN_ALT)))
         {
-        case Qt::Key_S:
-            return QSharedPointer<StopAction>::create().staticCast<ICommand>();
-        case Qt::Key_Minus:
-            return QSharedPointer<ZoomAction>::create(-0.1f).staticCast<ICommand>();
-        case Qt::Key_Plus:
-        case Qt::Key_Equal:
-            return qSharedPointerCast<ICommand>(QSharedPointer<ZoomAction>::create(0.1f));
-        default:
-            break;
+            return QSharedPointer<ZoomAction>::create(Config::Gameplay::ZOOM_STEP).staticCast<ICommand>();
         }
     }
 
-    if (event.type == RawInputEvent::Type::MouseClick)
+    if (event.type == Engine::Input::RawEvent::Type::MouseClick)
     {
-        if (event.button == Qt::LeftButton)
+
+        if (event.button == Config::Input::BTN_MOVE)
         {
-            return qSharedPointerCast<ICommand>(QSharedPointer<MoveUnitAction>::create(event.position));
+            return QSharedPointer<MoveUnitAction>::create(event.position).staticCast<ICommand>();
         }
     }
 
     return nullptr;
-}
-
-CommandPtr InputManager::getNextCommand()
-{
-    QMutexLocker locker(&m_inputMutex);
-    return m_commandQueue.isEmpty() ? nullptr : m_commandQueue.dequeue();
-}
-
-bool InputManager::hasPendingCommands() const
-{
-    return !m_commandQueue.isEmpty();
 }

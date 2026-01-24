@@ -13,6 +13,12 @@
 #include <QLabel>
 #include <QDir>
 
+class QListWidgetItem;
+class QPushButton;
+class QListWidget;
+class QKeyEvent;
+class QLabel;
+
 class LoadGameScreen : public AbstractScreen
 {
     Q_OBJECT
@@ -22,24 +28,30 @@ public:
 
     void onEnter() override;
 
-    void onExit() override;
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
+private slots:
+    void onLoadClicked();
+
+    void onBackClicked();
+
+    void onEntrySelected(QListWidgetItem *item);
+
+    void onDeleteClicked();
 
 private:
-    QListWidget *m_saveList;
-
-    QPushButton *m_loadBtn;
-
-    QLabel *m_detailsLabel;
-
     void setupUI();
 
     void refreshSaveList();
 
-    void onLoadClicked();
+    QListWidget *m_saveList = nullptr;
 
-    void onEntrySelected(QListWidgetItem *item);
+    QPushButton *m_loadBtn = nullptr;
 
-    void keyPressEvent(QKeyEvent *event);
+    QLabel *m_detailsLabel = nullptr;
+
+    QPushButton *m_deleteBtn = nullptr;
 };
 
 #endif

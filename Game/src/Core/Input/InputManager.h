@@ -1,11 +1,13 @@
 #ifndef INPUTMANAGER_H
 #define INPUTMANAGER_H
 
+#include <Core/Settings/ControlsSettingsManager.h>
+#include <Game/Actions/GuardUnitAction.h>
+#include <Game/Actions/StopUnitAction.h>
+#include <Game/Actions/MoveUnitAction.h>
 #include <Game/Actions/CameraActions.h>
-#include <Game/Actions/GameCommands.h>
-#include <Game/Actions/UnitActions.h>
-#include <Core/Input/RawInputEvent.h>
-#include <Core/Common/KeyCodes.h>
+#include <Core/Config/Configuration.h>
+#include <Core/Common/ICommand.h>
 #include <qmutex.h>
 #include <QObject>
 #include <QQueue>
@@ -20,15 +22,11 @@ class InputManager : public QObject
 public:
     static InputManager &getInstance();
 
-    InputManager(const InputManager &) = delete;
-
-    void operator=(const InputManager &) = delete;
-
     bool isKeyPressed(int keyCode) const;
 
-    CommandPtr getNextCommand();
-
     bool hasPendingCommands() const;
+
+    CommandPtr getNextCommand();
 
 public slots:
     void onKeyPress(int keyCode);
@@ -45,19 +43,17 @@ signals:
 private:
     explicit InputManager(QObject *parent = nullptr);
 
-    ~InputManager() override;
+    void setupDefaultBindings();
 
-    CommandPtr translateRawInput(const RawInputEvent &event);
+    CommandPtr translateRawInput(const Engine::Input::RawEvent &event);
+
+    mutable QMutex m_inputMutex;
 
     QQueue<CommandPtr> m_commandQueue;
 
     std::set<int> m_activeKeys;
 
     std::map<int, QString> m_keyBindings;
-
-    mutable QMutex m_inputMutex;
-
-    void setupDefaultBindings();
 };
 
 #endif

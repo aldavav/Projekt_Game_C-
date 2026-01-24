@@ -1,8 +1,10 @@
 #ifndef MENUBUTTON_H
 #define MENUBUTTON_H
 
+#include <Core/Config/Configuration.h>
 #include <QGraphicsDropShadowEffect>
-#include <Core/Config/Config.h>
+#include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
 #include <QPushButton>
 #include <QWidget>
 #include <QLabel>
@@ -14,6 +16,7 @@ class QLabel;
 class MenuButton : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit MenuButton(const QString &text, bool isQuit = false, QWidget *parent = nullptr);
 
@@ -24,9 +27,19 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
+    void setupUI(const QString &header, bool isQuit);
+
+    void setupAnimations();
+
     QPushButton *m_btn;
 
     QLabel *m_arrow;
+
+    QParallelAnimationGroup *m_hoverAnimation;
+
+    QPropertyAnimation *m_moveAnim;
+
+    QPropertyAnimation *m_sizeAnim;
 };
 
 #endif

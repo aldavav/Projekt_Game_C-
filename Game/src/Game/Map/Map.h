@@ -1,64 +1,57 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include <Core/Logger/LoggerMacros.h>
-#include <Game/Map/Difficulty.h>
-#include <Game/Map/MapStats.h>
-#include <Game/Map/Chunk.h>
-#include <Game/Map/Tile.h>
+#include <Core/Common/GameTypes.h>
+#include <Core/Common/WorldData.h>
 #include <unordered_map>
-#include <qpoint.h>
 #include <cstdint>
-#include <random>
 #include <string>
 #include <vector>
-#include <cmath>
+#include <random>
 
 class Map
 {
-private:
-    Map() = default;
-
-    ~Map();
-
-    std::string m_mapName;
-
-    uint32_t m_seed = 12343;
-
-    Difficulty m_difficulty = Difficulty::MEDIUM;
-
-    std::unordered_map<uint64_t, Chunk *> m_chunks;
-
-    uint64_t getChunkKey(int cx, int cy) const;
-
-    void generateChunk(Chunk *chunk);
-
-    MapStats m_stats;
-
 public:
     static Map &getInstance();
 
-    void initializeNewMap(const std::string &name, Difficulty difficulty = Difficulty::EASY);
-
-    Tile &getTileAt(int x, int y);
-
-    bool isAreaWalkable(int x, int y, int w, int h);
-
-    void revealRadius(int centerQ, int centerR, int radius);
-
-    void debugRevealAll();
-
-    std::string getMapName() const { return m_mapName; }
+    void initializeNewMap(const std::string &name = Config::Gameplay::DEFAULT_MISSION_NAME.toStdString(), Engine::Difficulty difficulty = Config::Gameplay::DEFAULT_DIFFICULTY);
 
     void clear();
 
-    Map(const Map &) = delete;
+    World::Tile &getTileAt(int x, int y);
 
-    Map &operator=(const Map &) = delete;
+    bool isAreaWalkable(int x, int y, int w, int h);
 
-    const MapStats &getStats() const { return m_stats; }
+    void revealRadiusWithCleanup(int centerQ, int centerR, int radius);
+
+    void clearAllDiscovered();
+
+    bool hasTileAt(int q, int r);
+
+    std::string getMapName() const { return m_mapName; }
 
     uint32_t getSeed() const { return m_seed; }
+
+    void debugRevealAll();
+
+    std::unordered_map<uint64_t, World::Chunk *> getChunks() { return m_chunks; }
+
+private:
+    Map() = default;
+
+    ~Map() = default;
+
+    uint64_t getChunkKey(int cx, int cy) const;
+
+    void generateChunk(World::Chunk *chunk);
+
+    std::string m_mapName = Config::Gameplay::DEFAULT_MISSION_NAME.toStdString();
+
+    uint32_t m_seed = Config::World::DEFAULT_SEED;
+
+    Engine::Difficulty m_difficulty = Config::Gameplay::DEFAULT_DIFFICULTY;
+
+    std::unordered_map<uint64_t, World::Chunk *> m_chunks;
 };
 
 #endif

@@ -1,10 +1,9 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include <Game/Entities/EntityTypes.h>
-#include <Core/Logger/LoggerMacros.h>
-#include <QPointF>
+#include <Core/Config/Configuration.h>
 #include <fstream>
+#include <QPointF>
 #include <string>
 #include <memory>
 
@@ -12,23 +11,8 @@ class Player;
 
 class Entity
 {
-protected:
-    std::string m_name;
-
-    EntityTypes::EntityType m_type;
-
-    std::string m_symbol;
-
-    Player *m_owner;
-
-    QPointF m_position;
-
-    QPointF m_targetPosition;
-
-    float m_speed = 200.0f;
-
 public:
-    Entity(EntityTypes::EntityType type, const std::string &name, const std::string &symbol, Player *owner = nullptr);
+    Entity() = default;
 
     virtual ~Entity() = default;
 
@@ -36,15 +20,9 @@ public:
 
     QPointF getPosition() const { return m_position; }
 
-    void setPosition(const QPointF &pos)
-    {
-        m_position = pos;
-        m_targetPosition = pos;
-    }
+    QPointF getTarget() const { return m_targetPosition; }
 
-    void setTarget(const QPointF &target) { m_targetPosition = target; }
-
-    EntityTypes::EntityType getType() const { return m_type; }
+    Engine::Entity::Type getType() const { return m_type; }
 
     std::string getName() const { return m_name; }
 
@@ -52,9 +30,30 @@ public:
 
     Player *getOwner() const { return m_owner; }
 
+    void setPosition(const QPointF &pos);
+
+    void setTarget(const QPointF &target) { m_targetPosition = target; }
+
+    void setOwner(Player *owner) { m_owner = owner; }
+
     virtual void saveEntity(std::ofstream &file) = 0;
 
     static std::unique_ptr<Entity> createEntityFromFile(std::ifstream &file);
+
+protected:
+    std::string m_name;
+
+    std::string m_symbol;
+
+    Engine::Entity::Type m_type = Engine::Entity::Type::UNIT;
+
+    Player *m_owner = nullptr;
+
+    QPointF m_position = {0.0f, 0.0f};
+
+    QPointF m_targetPosition = {0.0f, 0.0f};
+
+    float m_speed = Config::Entities::DEFAULT_SPEED;
 };
 
 #endif
