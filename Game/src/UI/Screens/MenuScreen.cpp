@@ -232,7 +232,7 @@ void MenuScreen::setupBackground()
     m_backgroundLabel = new QLabel(this);
     m_backgroundLabel->setScaledContents(true);
 
-    m_bgMovie = new QMovie(Config::UI::PATH_MENU_BG);
+    m_bgMovie = new QMovie(Config::Paths::PATH_MENU_BG);
     m_bgMovie->setSpeed(Config::UI::BG_ANIM_SPEED);
 
     m_backgroundLabel->setMovie(m_bgMovie);

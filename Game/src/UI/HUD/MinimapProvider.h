@@ -16,7 +16,7 @@ class MinimapProvider
 public:
     MinimapProvider();
 
-    QPixmap getMinimap(int size, int screenWidth, int screenHeight, bool override = false);
+    QPixmap getMinimap(int size, int screenWidth, int screenHeight, float gameTime);
 
     QPointF screenToWorld(const QPoint &clickPos, const QRect &mmRect);
 

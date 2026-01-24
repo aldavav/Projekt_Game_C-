@@ -71,7 +71,7 @@ private:
 
     bool m_playerWon = false;
 
-    QString m_currentMapName = Config::World::DEFAULT_MAP_NAME;
+    QString m_currentMapName = Config::Gameplay::DEFAULT_MISSION_NAME;
 
     uint32_t m_currentSeed = Config::World::DEFAULT_SEED;
 

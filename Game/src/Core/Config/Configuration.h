@@ -111,6 +111,14 @@ namespace Config
         const QString TOS = ":/legal/assets/legal/ToS/ToS.html";
         const QString BUTTON_BG = ":/images/assets/images/button.png";
         const QString ARROW_ICON = ":/images/assets/images/arrow.png";
+        const QString PATH_MENU_BG = ":/animations/assets/animations/menu.gif";
+        const QStringList PATHS_FONTS = {
+            ":/fonts/assets/fonts/Orbitron-Black.ttf",
+            ":/fonts/assets/fonts/Orbitron-Bold.ttf",
+            ":/fonts/assets/fonts/Orbitron-ExtraBold.ttf",
+            ":/fonts/assets/fonts/Orbitron-Medium.ttf",
+            ":/fonts/assets/fonts/Orbitron-Regular.ttf",
+            ":/fonts/assets/fonts/Orbitron-SemiBold.ttf"};
     }
 
     namespace Simulation
@@ -145,7 +153,6 @@ namespace Config
         constexpr int BTN_HEIGHT_HOVER = 75;
         constexpr int BTN_X_NORMAL = 100;
         constexpr int BTN_X_HOVER = 92;
-        const QString PATH_MENU_BG = ":/animations/assets/animations/menu.gif";
         constexpr int BG_ANIM_SPEED = 50;
         constexpr int MENU_LEFT_MARGIN = 200;
         constexpr int GENERATION_DELAY = 500;
@@ -155,13 +162,6 @@ namespace Config
         constexpr int LOADING_STEP_DELAY = 200;
         constexpr int LOADING_FINAL_PAUSE = 300;
         const QString FONT_FAMILY = "Orbitron";
-        const QStringList PATHS_FONTS = {
-            ":/fonts/assets/fonts/Orbitron-Black.ttf",
-            ":/fonts/assets/fonts/Orbitron-Bold.ttf",
-            ":/fonts/assets/fonts/Orbitron-ExtraBold.ttf",
-            ":/fonts/assets/fonts/Orbitron-Medium.ttf",
-            ":/fonts/assets/fonts/Orbitron-Regular.ttf",
-            ":/fonts/assets/fonts/Orbitron-SemiBold.ttf"};
         const QString COLOR_TACTICAL_BLUE = "#4FC3F7";
         const QString COLOR_GOLD_ORE = "#FFD600";
         const QString COLOR_HABITABLE = "#81C784";
@@ -170,6 +170,15 @@ namespace Config
         const QString COLOR_GRASS = "#388E3C";
         const QString COLOR_MOUNTAIN = "#757575";
         const QString COLOR_DIRT = "#795548";
+        const QString COLOR_PHASE_NOON = "#FFD600";
+        const QString COLOR_PHASE_AFTERNOON = "#FFA000";
+        const QString COLOR_PHASE_EVENING = "#FF5722";
+        const QString COLOR_PHASE_NIGHT = "#3F51B5";
+        const QString COLOR_PHASE_MIDNIGHT = "#1A237E";
+        const QString COLOR_WATER = "#1976D2";
+        const QString COLOR_GRASS = "#388E3C";
+        const QString COLOR_MOUNTAIN = "#757575";
+        const QString COLOR_UNKNOWN = "#555555";
         constexpr int CURSOR_SIZE = 32;
         constexpr int HUD_MARGIN = 15;
         constexpr int HUD_MINIMAP_SIZE = 150;
@@ -211,7 +220,6 @@ STRATEGIC OBJECTIVE:
         constexpr int LOAD_STEP_RETRIEVE = 100;
         constexpr int LOAD_STEP_RECONSTRUCT = 200;
         const QStringList DIFFICULTIES = {"EASY", "NORMAL", "HARD", "BRUTAL"};
-
         const QStringList OPPONENTS = {
             "AI: NEURAL NETWORK",
             "HUMAN: UPLINK (NETWORK)"};
@@ -220,19 +228,18 @@ STRATEGIC OBJECTIVE:
     namespace World
     {
         const QRect WORLD_BOUNDS = QRect(-2000, -1500, 3500, 3000);
-        constexpr int CHUNK_SIZE = 32;
-        constexpr float BASE_TILE_SIZE = 32.0f;
-        const QString DEFAULT_MAP_NAME = "NEW_DEPLOYMENT";
         constexpr uint32_t DEFAULT_SEED = 123456789;
+        constexpr bool DEFAULT_3D_VIEW = true;
+        constexpr float BASE_TILE_SIZE = 32.0f;
+        constexpr int CHUNK_SIZE = 32;
         constexpr float NOISE_SCALE = 15.0f;
         constexpr float THRESH_WATER = 0.2f;
         constexpr float THRESH_DIRT = 0.3f;
         constexpr float THRESH_GRASS = 0.65f;
-        constexpr int MAP_GEN_RADIUS = 40;
         constexpr float HEIGHT_BIAS = 0.1f;
         constexpr int HEIGHT_OFFSET = 15;
         constexpr int REVEAL_RADIUS = 10;
-        constexpr bool DEFAULT_3D_VIEW = true;
+        constexpr float CAMERA_BASE_SPEED = 25.0f;
         constexpr float CAMERA_SMOOTHING = 0.1f;
         constexpr float CAMERA_KEYBOARD_SPEED = 800.0f;
         constexpr float EDGE_PAN_SPEED = 500.0f;
@@ -254,14 +261,8 @@ STRATEGIC OBJECTIVE:
         constexpr int GRASS_HEIGHT = 10;
         constexpr int DIRT_HEIGHT = 5;
         constexpr int WATER_HEIGHT = 0;
-        constexpr float CAMERA_BASE_SPEED = 25.0f;
         constexpr int MINIMAP_UPDATE_MS = 100;
         constexpr int MINIMAP_RANGE = 40;
-        const QString COLOR_PHASE_NOON = "#FFD600";
-        const QString COLOR_PHASE_AFTERNOON = "#FFA000";
-        const QString COLOR_PHASE_EVENING = "#FF5722";
-        const QString COLOR_PHASE_NIGHT = "#3F51B5";
-        const QString COLOR_PHASE_MIDNIGHT = "#1A237E";
         constexpr int SCANLINE_SPACING = 3;
         constexpr int WORLD_BOUNDS_INT = 50;
     }

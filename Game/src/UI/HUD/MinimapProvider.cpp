@@ -5,12 +5,11 @@ MinimapProvider::MinimapProvider()
     m_throttleTimer.start();
 }
 
-QPixmap MinimapProvider::getMinimap(int size, int screenWidth, int screenHeight, bool override)
+QPixmap MinimapProvider::getMinimap(int size, int screenWidth, int screenHeight, float gameTime)
 {
-    if (m_needsUpdate || !m_throttleTimer.isValid() ||
-        m_throttleTimer.elapsed() > Config::World::MINIMAP_UPDATE_MS)
+    if (m_needsUpdate || m_throttleTimer.elapsed() > Config::World::MINIMAP_UPDATE_MS)
     {
-        updateCache(size, screenWidth, screenHeight, override);
+        updateCache(size, screenWidth, screenHeight, gameTime);
         m_needsUpdate = false;
         m_throttleTimer.restart();
     }

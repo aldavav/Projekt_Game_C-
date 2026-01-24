@@ -14,7 +14,7 @@ class Map
 public:
     static Map &getInstance();
 
-    void initializeNewMap(const std::string &name = Config::World::DEFAULT_MAP_NAME.toStdString(), Engine::Difficulty difficulty = Config::Gameplay::DEFAULT_DIFFICULTY);
+    void initializeNewMap(const std::string &name = Config::Gameplay::DEFAULT_MISSION_NAME.toStdString(), Engine::Difficulty difficulty = Config::Gameplay::DEFAULT_DIFFICULTY);
 
     void clear();
 
@@ -45,7 +45,7 @@ private:
 
     void generateChunk(World::Chunk *chunk);
 
-    std::string m_mapName = Config::World::DEFAULT_MAP_NAME.toStdString();
+    std::string m_mapName = Config::Gameplay::DEFAULT_MISSION_NAME.toStdString();
 
     uint32_t m_seed = Config::World::DEFAULT_SEED;
 

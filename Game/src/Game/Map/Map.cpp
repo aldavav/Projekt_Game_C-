@@ -204,7 +204,7 @@ void Map::generateChunk(World::Chunk *chunk)
             e /= 1.75f;
 
             float dist = (std::abs(q) + std::abs(q + r) + std::abs(r)) / 2.0f;
-            float d = dist / Config::World::MAP_GEN_RADIUS;
+            float d = dist / Config::World::CHUNK_SIZE;
             float height = (e + Config::World::HEIGHT_BIAS) - (d * d);
 
             World::Tile &tile = chunk->tiles[tx][ty];

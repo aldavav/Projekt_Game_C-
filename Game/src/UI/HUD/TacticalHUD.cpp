@@ -30,16 +30,16 @@ void TacticalHUD::draw(QPainter &painter, int width, int height)
     {
         drawDiagnostics(painter, width, height);
     }
+
     drawResourceStats(painter, width, height);
 
     int mmSize = Config::UI::HUD_MINIMAP_SIZE;
     int mmMargin = Config::UI::HUD_MARGIN;
     int mmX = width - mmSize - mmMargin;
     int mmY = mmMargin;
-
     m_minimapBox = QRect(mmX, mmY, mmSize, mmSize);
 
-    QPixmap mmCache = m_minimapProvider.getMinimap(mmSize, width, height, GameManager::getInstance().getIsDiscoveryActive());
+    QPixmap mmCache = m_minimapProvider.getMinimap(mmSize, width, height, m_gameTime);
     painter.drawPixmap(mmX, mmY, mmCache);
 
     painter.setPen(QPen(QColor(Config::UI::COLOR_TACTICAL_BLUE), 2));
@@ -71,9 +71,7 @@ bool TacticalHUD::handleMousePress(QMouseEvent *event, int width, int height)
     if (m_minimapBox.contains(event->pos()))
     {
         QPointF targetWorldPos = m_minimapProvider.screenToWorld(event->pos(), m_minimapBox);
-
         emit minimapClicked(targetWorldPos);
-
         return true;
     }
 
@@ -220,16 +218,19 @@ void TacticalHUD::drawMinimap(QPainter &painter, int width, int height)
             switch (tile.type)
             {
             case World::TileType::WATER:
-                dotColor = QColor("#1976D2");
+                dotColor = QColor(Config::UI::COLOR_WATER);
                 break;
             case World::TileType::GRASS:
-                dotColor = QColor("#388E3C");
+                dotColor = QColor(Config::UI::COLOR_GRASS);
                 break;
             case World::TileType::MOUNTAIN:
-                dotColor = QColor("#757575");
+                dotColor = QColor(Config::UI::COLOR_MOUNTAIN);
+                break;
+            case World::TileType::UNKNOWN:
+                dotColor = QColor(Config::UI::COLOR_UNKNOWN);
                 break;
             default:
-                dotColor = QColor("#555555");
+                dotColor = QColor(Config::UI::COLOR_UNKNOWN);
                 break;
             }
 
@@ -264,27 +265,27 @@ void TacticalHUD::drawDayNightCycle(QPainter &painter, int width, int height)
     if (cycleVal < 0.2f)
     {
         phaseText = "NOON";
-        phaseColor = QColor(Config::World::COLOR_PHASE_NOON);
+        phaseColor = QColor(Config::UI::COLOR_PHASE_NOON);
     }
     else if (cycleVal < 0.4f)
     {
         phaseText = "AFTERNOON";
-        phaseColor = QColor(Config::World::COLOR_PHASE_AFTERNOON);
+        phaseColor = QColor(Config::UI::COLOR_PHASE_AFTERNOON);
     }
     else if (cycleVal < 0.6f)
     {
         phaseText = "EVENING";
-        phaseColor = QColor(Config::World::COLOR_PHASE_EVENING);
+        phaseColor = QColor(Config::UI::COLOR_PHASE_EVENING);
     }
     else if (cycleVal < 0.8f)
     {
         phaseText = "NIGHT";
-        phaseColor = QColor(Config::World::COLOR_PHASE_NIGHT);
+        phaseColor = QColor(Config::UI::COLOR_PHASE_NIGHT);
     }
     else
     {
         phaseText = "MIDNIGHT";
-        phaseColor = QColor(Config::World::COLOR_PHASE_MIDNIGHT);
+        phaseColor = QColor(Config::UI::COLOR_PHASE_MIDNIGHT);
     }
 
     int margin = 20;

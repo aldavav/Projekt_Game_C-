@@ -2,7 +2,7 @@
 
 void AssetManager::loadFonts()
 {
-    for (const QString &fontPath : Config::UI::PATHS_FONTS)
+    for (const QString &fontPath : Config::Paths::PATHS_FONTS)
     {
         QFontDatabase::addApplicationFont(fontPath);
     }

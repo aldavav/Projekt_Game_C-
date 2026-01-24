@@ -11,7 +11,7 @@ void GameEngine::startGame()
     if (m_isRunning)
         return;
 
-    Map::getInstance().initializeNewMap(Config::World::DEFAULT_MAP_NAME.toStdString());
+    Map::getInstance().initializeNewMap(Config::Gameplay::DEFAULT_MISSION_NAME.toStdString());
 
     m_lastTime = std::chrono::steady_clock::now();
     m_accumulator = 0.0f;
