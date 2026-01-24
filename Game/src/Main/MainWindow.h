@@ -19,10 +19,10 @@
 #include <QMainWindow>
 #include <QFile>
 
-class QKeyEvent;
-class QMouseEvent;
 class QResizeEvent;
 class QCloseEvent;
+class QMouseEvent;
+class QKeyEvent;
 class QWidget;
 
 class MainWindow : public QMainWindow

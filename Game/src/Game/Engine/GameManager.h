@@ -7,6 +7,8 @@
 #include <QObject>
 #include <QPointF>
 
+class TacticalHUD;
+
 class GameManager : public QObject
 {
     Q_OBJECT
@@ -14,7 +16,7 @@ class GameManager : public QObject
 public:
     static GameManager &getInstance();
 
-    void update(float deltaTime);
+    void update();
 
     float getGameTime() const;
 
@@ -35,6 +37,10 @@ public:
     bool hasSelection() const;
 
     QPointF getSelectedHex() const;
+
+    void switchIsDiscoveryActive() { m_isDiscoveryActive = !m_isDiscoveryActive; };
+
+    bool getIsDiscoveryActive() { return m_isDiscoveryActive; };
 
 public slots:
     void handleHudButton(int index);
@@ -57,6 +63,8 @@ private:
     bool m_hasSelection = false;
 
     TacticalHUD *m_hud;
+
+    bool m_isDiscoveryActive = false;
 };
 
 #endif

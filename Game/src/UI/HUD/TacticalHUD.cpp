@@ -32,29 +32,21 @@ void TacticalHUD::draw(QPainter &painter, int width, int height)
     }
     drawResourceStats(painter, width, height);
 
-    int mmSize = Config::UI::HUD_MINIMAP_SIZE, mmMargin = Config::UI::HUD_MARGIN;
+    int mmSize = Config::UI::HUD_MINIMAP_SIZE;
+    int mmMargin = Config::UI::HUD_MARGIN;
     int mmX = width - mmSize - mmMargin;
     int mmY = mmMargin;
 
-    if (m_minimapNeedsUpdate || m_minimapCache.isNull())
-    {
-        if (!m_minimapThrottleTimer.isValid() || m_minimapThrottleTimer.elapsed() > Config::World::MINIMAP_UPDATE_MS)
-        {
-            updateMinimapCache(mmSize, width, height);
-            m_minimapNeedsUpdate = false;
-            m_minimapThrottleTimer.restart();
-        }
-    }
+    m_minimapBox = QRect(mmX, mmY, mmSize, mmSize);
 
-    painter.drawPixmap(mmX, mmY, m_minimapCache);
+    QPixmap mmCache = m_minimapProvider.getMinimap(mmSize, width, height, GameManager::getInstance().getIsDiscoveryActive());
+    painter.drawPixmap(mmX, mmY, mmCache);
 
     painter.setPen(QPen(QColor(Config::UI::COLOR_TACTICAL_BLUE), 2));
     painter.setBrush(Qt::NoBrush);
-    painter.drawRect(mmX, mmY, mmSize, mmSize);
+    painter.drawRect(m_minimapBox);
 
     drawDayNightCycle(painter, width, height);
-
-    m_minimapNeedsUpdate = true;
 }
 
 bool TacticalHUD::handleMousePress(QMouseEvent *event, int width, int height)
@@ -76,26 +68,11 @@ bool TacticalHUD::handleMousePress(QMouseEvent *event, int width, int height)
         }
     }
 
-    int mmSize = Config::UI::HUD_MINIMAP_SIZE, mmMargin = Config::UI::HUD_MARGIN;
-    int mmX = width - mmSize - mmMargin;
-    int mmY = mmMargin;
-    QRect minimapRect(mmX, mmY, mmSize, mmSize);
-
-    if (minimapRect.contains(event->pos()))
+    if (m_minimapBox.contains(event->pos()))
     {
-        auto &cam = Camera::getInstance();
+        QPointF targetWorldPos = m_minimapProvider.screenToWorld(event->pos(), m_minimapBox);
 
-        float relX = (event->pos().x() - (mmX + mmSize / 2.0f)) / (float)mmSize;
-        float relY = (event->pos().y() - (mmY + mmSize / 2.0f)) / (float)mmSize;
-
-        float viewPortScale = cam.getViewportWidth() * 3.0f;
-
-        QPointF currentCamPos = cam.getCurrentPos();
-
-        float targetWorldX = currentCamPos.x() + (relX * viewPortScale);
-        float targetWorldY = currentCamPos.y() + (relY * viewPortScale);
-
-        cam.setTargetRawPos(QPointF(targetWorldX, targetWorldY));
+        emit minimapClicked(targetWorldPos);
 
         return true;
     }
@@ -120,7 +97,7 @@ void TacticalHUD::setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mo
 void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
 {
     int rightBoxW = Config::UI::HUD_STATS_WIDTH * 2;
-    int rightBoxH = 110;
+    int rightBoxH = 130;
     int padding = 15;
     QRect statsBox(width - rightBoxW - padding, height - rightBoxH - padding, rightBoxW, rightBoxH);
 
@@ -129,9 +106,32 @@ void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
     painter.drawRoundedRect(statsBox, 2, 2);
     drawScanlines(painter, statsBox);
 
+    int totalSeconds = static_cast<int>(m_gameTime);
+    int hours = (totalSeconds / 3600);
+    int minutes = (totalSeconds % 3600) / 60;
+    int seconds = totalSeconds % 60;
+    QString timeString = QString("%1:%2:%3")
+                             .arg(hours, 2, 10, QChar('0'))
+                             .arg(minutes, 2, 10, QChar('0'))
+                             .arg(seconds, 2, 10, QChar('0'));
+
     int textX = statsBox.x() + 12;
     int textY = statsBox.y() + 22;
     int spacing = 20;
+
+    painter.setFont(QFont("Consolas", 9, QFont::Bold));
+    painter.setPen(QColor(Config::UI::COLOR_TACTICAL_BLUE));
+    painter.drawText(textX, textY, "MISSION TIME:");
+
+    painter.setPen(Qt::white);
+
+    painter.drawText(statsBox.right() - 80, textY, timeString);
+
+    painter.setPen(QPen(QColor(Config::UI::COLOR_TACTICAL_BLUE), 1));
+    painter.drawLine(textX, textY + 8, statsBox.right() - 12, textY + 8);
+
+    textY += spacing + 5;
+
     painter.setFont(QFont("Consolas", 10, QFont::Bold));
 
     if (m_hasSelection)
@@ -213,7 +213,7 @@ void TacticalHUD::drawMinimap(QPainter &painter, int width, int height)
         for (int r = cr - MM_RANGE; r <= cr + MM_RANGE; ++r)
         {
             World::Tile &tile = map.getTileAt(q, r);
-            if (!tile.discovered)
+            if (!tile.visible)
                 continue;
 
             QColor dotColor;
@@ -373,66 +373,6 @@ void TacticalHUD::drawScanlines(QPainter &painter, QRect rect)
     }
 }
 
-void TacticalHUD::updateMinimapCache(int size, int width, int height)
-{
-    if (m_minimapCache.size() != QSize(size, size))
-        m_minimapCache = QPixmap(size, size);
-
-    m_minimapCache.fill(QColor(10, 10, 10, 200));
-    QPainter cachePainter(&m_minimapCache);
-
-    auto &map = Map::getInstance();
-
-    const int WORLD_BOUNDS = Config::World::WORLD_BOUNDS_INT;
-    const float tileS = Config::World::BASE_TILE_SIZE;
-
-    auto &cam = Camera::getInstance();
-    QPointF camPos = cam.getCurrentPos();
-
-    int viewPortWidth = cam.getViewportWidth() * Config::World::SCANLINE_SPACING;
-
-    for (int q = -WORLD_BOUNDS * 2; q <= WORLD_BOUNDS * 2; ++q)
-    {
-        int rStart = -WORLD_BOUNDS - (q / 2) - 10;
-        int rEnd = WORLD_BOUNDS - (q / 2) + 10;
-
-        for (int r = rStart; r <= rEnd; ++r)
-        {
-            World::Tile &tile = map.getTileAt(q, r);
-
-            QColor dotColor;
-            if (tile.type == World::TileType::WATER)
-                dotColor = QColor("#1976D2");
-            else if (tile.type == World::TileType::GRASS)
-                dotColor = QColor("#388E3C");
-            else if (tile.type == World::TileType::MOUNTAIN)
-                dotColor = QColor("#757575");
-            else if (tile.type == World::TileType::DIRT)
-                dotColor = QColor("#795548");
-            else
-                continue;
-
-            float worldX = tileS * (1.5f * q);
-            float worldY = tileS * (0.866f * q + 1.732f * r);
-
-            float mmX = (size / 2.0f) + ((worldX - camPos.x()) / viewPortWidth) * size;
-            float mmY = (size / 2.0f) + ((worldY - camPos.y()) / viewPortWidth) * size;
-
-            if (mmX >= 0 && mmX < size && mmY >= 0 && mmY < size)
-            {
-                cachePainter.fillRect(QRectF(mmX, mmY, 2, 2), dotColor);
-            }
-        }
-    }
-
-    float zoom = cam.getZoom();
-    float viewW = (width / zoom) / viewPortWidth * size;
-    float viewH = (height / zoom) / viewPortWidth * size;
-
-    cachePainter.setPen(QPen(Qt::white, 1));
-    cachePainter.drawRect(QRectF((size - viewW) / 2.0f, (size - viewH) / 2.0f, viewW, viewH));
-}
-
 QString TacticalHUD::getTileTypeName(World::TileType type) const
 {
     switch (type)
@@ -445,6 +385,8 @@ QString TacticalHUD::getTileTypeName(World::TileType type) const
         return "Grass";
     case World::TileType::MOUNTAIN:
         return "Mountain";
+    case World::TileType::UNKNOWN:
+        return "Unknown";
     default:
         return "Unknown";
     }

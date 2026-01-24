@@ -75,7 +75,7 @@ private:
 
     void drawClouds(QPainter &painter, Camera &cam, float gameTime, float zoom);
 
-    QColor getTileVisualColor(const World::Tile &tile, float gameTime);
+    QColor getTileVisualColor(const World::Tile &tile, float gameTime, bool override = false);
 
 private:
     QTimer *m_updateTimer = nullptr;
@@ -95,6 +95,8 @@ private:
     bool m_isDragging = false;
 
     bool m_is3D = false;
+
+    bool m_isDiscoveryActive = false;
 
     QColor m_grassColor;
 

@@ -75,6 +75,8 @@ set(SRC_UI_COMPONENTS
 )
 
 set(SRC_UI_HUD
+    src/UI/HUD/MinimapProvider.cpp
+    src/UI/HUD/MinimapProvider.h
     src/UI/HUD/TacticalHUD.cpp
     src/UI/HUD/TacticalHUD.h
 )
@@ -104,6 +106,8 @@ set(SRC_UI_SCREENS
 )
 
 set(SRC_UI_WIDGETS
+    src/UI/Widgets/BaseTacticalDialog.cpp
+    src/UI/Widgets/BaseTacticalDialog.h
     src/UI/Widgets/InformationDialog.cpp
     src/UI/Widgets/InformationDialog.h
     src/UI/Widgets/KeyCaptureDialog.cpp

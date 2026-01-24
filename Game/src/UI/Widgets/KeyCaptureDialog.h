@@ -1,14 +1,12 @@
 #ifndef KEYCAPTUREDIALOG_H
 #define KEYCAPTUREDIALOG_H
 
+#include <UI/Widgets/BaseTacticalDialog.h>
 #include <Core/Config/Configuration.h>
-#include <Core/Common/GameTypes.h>
 #include <QVBoxLayout>
-#include <QKeyEvent>
-#include <QDialog>
 #include <QLabel>
 
-class KeyCaptureDialog : public QDialog
+class KeyCaptureDialog : public BaseTacticalDialog
 {
     Q_OBJECT
 

@@ -14,10 +14,6 @@ class Map
 public:
     static Map &getInstance();
 
-    Map(const Map &) = delete;
-
-    Map &operator=(const Map &) = delete;
-
     void initializeNewMap(const std::string &name = Config::World::DEFAULT_MAP_NAME.toStdString(), Engine::Difficulty difficulty = Config::Gameplay::DEFAULT_DIFFICULTY);
 
     void clear();
@@ -26,13 +22,19 @@ public:
 
     bool isAreaWalkable(int x, int y, int w, int h);
 
-    void revealRadius(int centerQ, int centerR, int radius);
+    void revealRadiusWithCleanup(int centerQ, int centerR, int radius);
+
+    void clearAllDiscovered();
+
+    bool hasTileAt(int q, int r);
 
     std::string getMapName() const { return m_mapName; }
 
     uint32_t getSeed() const { return m_seed; }
 
     void debugRevealAll();
+
+    std::unordered_map<uint64_t, World::Chunk *> getChunks() { return m_chunks; }
 
 private:
     Map() = default;

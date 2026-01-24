@@ -12,7 +12,8 @@ namespace World
         GRASS = 0,
         DIRT = 1,
         WATER = 2,
-        MOUNTAIN = 3
+        MOUNTAIN = 3,
+        UNKNOWN = 4
     };
 
     struct Tile
@@ -20,6 +21,7 @@ namespace World
         TileType type = TileType::GRASS;
         uint8_t variant = 0;
         bool discovered = false;
+        bool visible = false;
     };
 
     struct Chunk

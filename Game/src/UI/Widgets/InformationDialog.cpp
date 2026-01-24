@@ -1,7 +1,8 @@
 #include "InformationDialog.h"
 
 InformationDialog::InformationDialog(const QString &header, const QString &body, QWidget *parent)
-    : QDialog(parent)
+    : BaseTacticalDialog(QSize(Config::UI::INFO_DIALOG_WIDTH, Config::UI::INFO_DIALOG_HEIGHT),
+                         "informationDialog", parent)
 {
     setupUI(header, body);
 
@@ -11,6 +12,16 @@ InformationDialog::InformationDialog(const QString &header, const QString &body,
         if (!bar->isVisible() || bar->maximum() <= 0) {
             handleScroll(0); 
         } });
+}
+
+void InformationDialog::handleEscape()
+{
+    onDecline();
+}
+
+void InformationDialog::onDecline()
+{
+    QCoreApplication::quit();
 }
 
 void InformationDialog::keyPressEvent(QKeyEvent *event)
@@ -23,35 +34,18 @@ void InformationDialog::keyPressEvent(QKeyEvent *event)
     case Qt::Key_PageDown:
         bar->setValue(bar->value() + Config::Input::KEYBOARD_SCROLL_STEP);
         break;
-
     case Qt::Key_Up:
     case Qt::Key_PageUp:
         bar->setValue(bar->value() - Config::Input::KEYBOARD_SCROLL_STEP);
         break;
-
     case Qt::Key_Return:
     case Qt::Key_Enter:
         if (m_confirmBtn->isEnabled())
             accept();
         break;
-
-    case Qt::Key_Escape:
-        onDecline();
-        break;
-
     default:
-        QDialog::keyPressEvent(event);
+        BaseTacticalDialog::keyPressEvent(event);
     }
-}
-
-void InformationDialog::onDecline()
-{
-    QCoreApplication::quit();
-}
-
-void InformationDialog::checkRequirements()
-{
-    m_confirmBtn->setEnabled(m_scrolledToBottom && m_acceptCheck->isChecked());
 }
 
 void InformationDialog::handleScroll(int value)
@@ -65,14 +59,13 @@ void InformationDialog::handleScroll(int value)
     }
 }
 
+void InformationDialog::checkRequirements()
+{
+    m_confirmBtn->setEnabled(m_scrolledToBottom && m_acceptCheck->isChecked());
+}
+
 void InformationDialog::setupUI(const QString &header, const QString &body)
 {
-    setModal(true);
-    setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
-    setAttribute(Qt::WA_TranslucentBackground);
-    setObjectName("informationDialog");
-    setFixedSize(Config::UI::INFO_DIALOG_WIDTH, Config::UI::INFO_DIALOG_HEIGHT);
-
     auto *mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -93,7 +86,6 @@ void InformationDialog::setupUI(const QString &header, const QString &body)
     contentLabel->setObjectName("infoBody");
     contentLabel->setWordWrap(true);
     contentLabel->setTextFormat(Qt::RichText);
-    contentLabel->setContentsMargins(10, 10, 15, 10);
     contentLabel->setOpenExternalLinks(true);
 
     m_scrollArea->setWidget(contentLabel);
@@ -120,7 +112,8 @@ void InformationDialog::setupUI(const QString &header, const QString &body)
     btnLayout->addWidget(declineBtn);
     btnLayout->addStretch();
     btnLayout->addWidget(m_confirmBtn);
-
     frameLayout->addLayout(btnLayout);
     mainLayout->addWidget(backgroundFrame);
+
+    m_scrollArea->setFocus();
 }

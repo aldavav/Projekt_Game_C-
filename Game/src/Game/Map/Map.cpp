@@ -67,19 +67,59 @@ bool Map::isAreaWalkable(int q, int r, int w, int h)
     return true;
 }
 
-void Map::revealRadius(int centerQ, int centerR, int radius)
+void Map::revealRadiusWithCleanup(int centerQ, int centerR, int radius)
 {
-    for (int q = centerQ - radius; q <= centerQ + radius; ++q)
+    int cleanupRadius = radius + 2;
+
+    for (int q = centerQ - cleanupRadius; q <= centerQ + cleanupRadius; ++q)
     {
-        for (int r = centerR - radius; r <= centerR + radius; ++r)
+        for (int r = centerR - cleanupRadius; r <= centerR + cleanupRadius; ++r)
         {
-            int dist = (std::abs(centerQ - q) + std::abs(centerQ + centerR - q - r) + std::abs(centerR - r)) / 2;
+            int dist = (std::abs(centerQ - q) +
+                        std::abs(centerQ + centerR - q - r) +
+                        std::abs(centerR - r)) /
+                       2;
+
             if (dist <= radius)
             {
-                getTileAt(q, r).discovered = true;
+                getTileAt(q, r).visible = true;
+            }
+            else if (dist <= cleanupRadius)
+            {
+                if (hasTileAt(q, r))
+                {
+                    getTileAt(q, r).visible = false;
+                }
             }
         }
     }
+}
+
+void Map::clearAllDiscovered()
+{
+    for (auto &pair : m_chunks)
+    {
+        if (pair.second)
+        {
+            for (int x = 0; x < Config::World::CHUNK_SIZE; ++x)
+            {
+                for (int y = 0; y < Config::World::CHUNK_SIZE; ++y)
+                {
+                    pair.second->tiles[x][y].visible = false;
+                }
+            }
+        }
+    }
+}
+
+bool Map::hasTileAt(int q, int r)
+{
+    int cx = static_cast<int>(std::floor(static_cast<float>(q) / Config::World::CHUNK_SIZE));
+    int cy = static_cast<int>(std::floor(static_cast<float>(r) / Config::World::CHUNK_SIZE));
+
+    uint64_t key = getChunkKey(cx, cy);
+
+    return (m_chunks.find(key) != m_chunks.end());
 }
 
 void Map::debugRevealAll()
@@ -90,7 +130,7 @@ void Map::debugRevealAll()
         {
             for (int y = 0; y < World::Chunk::S; ++y)
             {
-                pair.second->tiles[x][y].discovered = true;
+                pair.second->tiles[x][y].visible = true;
             }
         }
     }

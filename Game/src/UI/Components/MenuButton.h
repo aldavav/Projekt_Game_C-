@@ -3,6 +3,8 @@
 
 #include <Core/Config/Configuration.h>
 #include <QGraphicsDropShadowEffect>
+#include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
 #include <QPushButton>
 #include <QWidget>
 #include <QLabel>
@@ -27,9 +29,17 @@ protected:
 private:
     void setupUI(const QString &header, bool isQuit);
 
+    void setupAnimations();
+
     QPushButton *m_btn;
 
     QLabel *m_arrow;
+
+    QParallelAnimationGroup *m_hoverAnimation;
+
+    QPropertyAnimation *m_moveAnim;
+
+    QPropertyAnimation *m_sizeAnim;
 };
 
 #endif

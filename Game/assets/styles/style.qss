@@ -41,7 +41,6 @@ MenuButton:focus {
 
 /* Arrow Icon */
 QLabel#buttonArrow {
-    qproperty-pixmap: url(":/images/assets/images/arrow.png");
     min-width: 102px;
     max-width: 102px;
     min-height: 22px;
@@ -58,7 +57,6 @@ QPushButton#menuButton {
     min-width: 250px;
     min-height: 70px;
     font-size: 24px;
-    border-image: url(:/images/assets/images/button.png) 0 0 0 0 stretch stretch;
     border-width: 0px;
     padding-bottom: 8px; 
     color: white;
@@ -187,9 +185,10 @@ QFormLayout QLabel {
 /* ========================================================================
    5. TACTICAL HUD & DIALOGS
    ======================================================================== */
-QWidget#tacticalDialog {
-    background-color: rgba(20, 0, 0, 245);
-    border: 2px solid #FF3131;
+#tacticalDialogContainer {
+    background-color: rgba(20, 20, 25, 230);
+    border: 2px solid #FFD700;
+    border-radius: 8px;
 }
 
 QLabel#dialogTitle {

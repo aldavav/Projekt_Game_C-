@@ -1,6 +1,8 @@
 #ifndef TACTICALHUD_H
 #define TACTICALHUD_H
 
+#include <Game/Engine/GameManager.h>
+#include <UI/HUD/MinimapProvider.h>
 #include <Core/Common/WorldData.h>
 #include <Core/Common/GameTypes.h>
 #include <Game/Camera/Camera.h>
@@ -51,8 +53,6 @@ private:
 
     void drawScanlines(QPainter &painter, QRect rect);
 
-    void updateMinimapCache(int size, int width, int height);
-
     QString getTileTypeName(World::TileType type) const;
 
     float m_gameTime = 0.0f;
@@ -90,6 +90,8 @@ private:
     bool m_showDiagnostics = false;
 
     static constexpr int HUD_BOX_H = 75;
+
+    MinimapProvider m_minimapProvider;
 };
 
 #endif

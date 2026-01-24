@@ -67,7 +67,7 @@ namespace Config
     namespace Gameplay
     {
         constexpr float ZOOM_STEP = 0.1f;
-        constexpr float INITIAL_ZOOM = 1.0f;
+        constexpr float INITIAL_ZOOM = 5.0f;
         constexpr Engine::Difficulty DEFAULT_DIFFICULTY = Engine::Difficulty::MEDIUM;
         const QString TEXT_VICTORY = "VICTORY ACHIEVED";
         const QString TEXT_DEFEAT = "DEFEAT: SIGNAL LOST";
@@ -109,6 +109,8 @@ namespace Config
         const QString CLOUD_TEXTURE = ":/images/assets/images/cloud.png";
         const QString EULA = ":/legal/assets/legal/EULA/EULA.html";
         const QString TOS = ":/legal/assets/legal/ToS/ToS.html";
+        const QString BUTTON_BG = ":/images/assets/images/button.png";
+        const QString ARROW_ICON = ":/images/assets/images/arrow.png";
     }
 
     namespace Simulation
@@ -164,6 +166,10 @@ namespace Config
         const QString COLOR_GOLD_ORE = "#FFD600";
         const QString COLOR_HABITABLE = "#81C784";
         const QString COLOR_WATER_INFO = "#64B5F6";
+        const QString COLOR_WATER = "#1976D2";
+        const QString COLOR_GRASS = "#388E3C";
+        const QString COLOR_MOUNTAIN = "#757575";
+        const QString COLOR_DIRT = "#795548";
         constexpr int CURSOR_SIZE = 32;
         constexpr int HUD_MARGIN = 15;
         constexpr int HUD_MINIMAP_SIZE = 150;
@@ -225,14 +231,14 @@ STRATEGIC OBJECTIVE:
         constexpr int MAP_GEN_RADIUS = 40;
         constexpr float HEIGHT_BIAS = 0.1f;
         constexpr int HEIGHT_OFFSET = 15;
-        constexpr int REVEAL_RADIUS = 6;
+        constexpr int REVEAL_RADIUS = 10;
         constexpr bool DEFAULT_3D_VIEW = true;
         constexpr float CAMERA_SMOOTHING = 0.1f;
         constexpr float CAMERA_KEYBOARD_SPEED = 800.0f;
         constexpr float EDGE_PAN_SPEED = 500.0f;
         constexpr int EDGE_MARGIN = 30;
-        constexpr float MIN_ZOOM = 0.5f;
-        constexpr float MAX_ZOOM = 3.0f;
+        constexpr float MIN_ZOOM = 2.0f;
+        constexpr float MAX_ZOOM = 5.0f;
         constexpr float HEX_Y_SQUASH = 0.5f;
         constexpr float SHAKE_DECAY = 0.9f;
         constexpr float SHAKE_THRESHOLD = 0.1f;
@@ -248,7 +254,7 @@ STRATEGIC OBJECTIVE:
         constexpr int GRASS_HEIGHT = 10;
         constexpr int DIRT_HEIGHT = 5;
         constexpr int WATER_HEIGHT = 0;
-        constexpr float CAMERA_BASE_SPEED = 15.0f;
+        constexpr float CAMERA_BASE_SPEED = 25.0f;
         constexpr int MINIMAP_UPDATE_MS = 100;
         constexpr int MINIMAP_RANGE = 40;
         const QString COLOR_PHASE_NOON = "#FFD600";

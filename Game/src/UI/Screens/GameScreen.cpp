@@ -125,6 +125,7 @@ void GameScreen::keyPressEvent(QKeyEvent *event)
         if (gm.getHUD())
         {
             gm.getHUD()->toggleDiagnostics();
+            gm.switchIsDiscoveryActive();
             update();
         }
     }
@@ -167,7 +168,7 @@ void GameScreen::updateGameDisplay()
     if (m_pressedKeys.contains(Qt::Key_D))
         cam.move(speed, 0);
 
-    GameManager::getInstance().update(Config::Simulation::DELTA_TIME);
+    GameManager::getInstance().update();
     update();
 }
 
@@ -219,7 +220,7 @@ void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
         for (int r = minR; r <= maxR; ++r)
         {
             World::Tile &tile = map.getTileAt(q, r);
-            if (!tile.discovered)
+            if (!tile.visible && !tile.discovered)
                 continue;
 
             QPoint screenPos = cam.toScreen(q, r, BASE_TILE, true);
@@ -252,7 +253,7 @@ void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
                          d.q == GameManager::getInstance().getSelectedHex().x() &&
                          d.r == GameManager::getInstance().getSelectedHex().y());
 
-        QColor color = getTileVisualColor(map.getTileAt(d.q, d.r), GameManager::getInstance().getGameTime());
+        QColor color = getTileVisualColor(map.getTileAt(d.q, d.r), GameManager::getInstance().getGameTime(), GameManager::getInstance().getIsDiscoveryActive());
         if (selected)
             color = color.lighter(150);
         else if (hovered)
@@ -287,7 +288,7 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
         for (int r = minR; r <= maxR; ++r)
         {
             World::Tile &tile = map.getTileAt(q, r);
-            if (!tile.discovered)
+            if (!tile.visible && !tile.discovered)
                 continue;
 
             QPoint screenPos = cam.toScreen(q, r, BASE_TILE, false);
@@ -298,7 +299,7 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
             bool isSelected = (gm.hasSelection() && q == gm.getSelectedHex().x() && r == gm.getSelectedHex().y());
             bool isHovered = (q == currentHover.x() && r == currentHover.y());
 
-            QColor tileColor = getTileVisualColor(tile, gm.getGameTime());
+            QColor tileColor = getTileVisualColor(tile, gm.getGameTime(), GameManager::getInstance().getIsDiscoveryActive());
 
             if (isSelected)
             {
@@ -417,22 +418,40 @@ void GameScreen::drawClouds(QPainter &painter, Camera &cam, float gameTime, floa
     painter.setOpacity(1.0f);
 }
 
-QColor GameScreen::getTileVisualColor(const World::Tile &tile, float gameTime)
+QColor GameScreen::getTileVisualColor(const World::Tile &tile, float gameTime, bool override)
 {
+    QColor baseColor;
+
     switch (tile.type)
     {
     case World::TileType::WATER:
     {
         float wave = std::sin(gameTime * Config::World::WATER_WAVE_SPEED) * 0.5f + 0.5f;
-        return m_waterColor.lighter(Config::World::WATER_BRIGHTNESS_BASE + wave * Config::World::WATER_BRIGHTNESS_SWING);
+        baseColor = m_waterColor.lighter(Config::World::WATER_BRIGHTNESS_BASE + wave * Config::World::WATER_BRIGHTNESS_SWING);
+        break;
     }
     case World::TileType::GRASS:
-        return m_grassColor;
+        baseColor = m_grassColor;
+        break;
     case World::TileType::MOUNTAIN:
-        return m_mountainColor;
+        baseColor = m_mountainColor;
+        break;
     case World::TileType::DIRT:
-        return m_dirtColor;
+        baseColor = m_dirtColor;
+        break;
     default:
-        return m_grassColor;
+        baseColor = m_grassColor;
+        break;
     }
+
+    if (override || (tile.discovered && tile.visible))
+    {
+        return baseColor;
+    }
+    else if (tile.visible || tile.discovered)
+    {
+        return baseColor.darker(250);
+    }
+
+    return Qt::black;
 }

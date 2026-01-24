@@ -6,22 +6,23 @@ GameManager &GameManager::getInstance()
     return instance;
 }
 
-void GameManager::update(float deltaTime)
+void GameManager::update()
 {
     if (!m_isPaused)
     {
-        m_gameTime += (deltaTime * m_timeScale);
+        m_gameTime += (Config::Simulation::DELTA_TIME * m_timeScale);
     }
 
     auto &cam = Camera::getInstance();
-    cam.update(deltaTime);
+    cam.update(m_gameTime);
 
     QPointF worldPos = cam.getCurrentPos();
+    const float size = Config::World::BASE_TILE_SIZE;
 
-    float q = (2.0f / 3.0f * worldPos.x()) / Config::World::BASE_TILE_SIZE;
-    float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / Config::World::BASE_TILE_SIZE;
+    int q = std::round((2.0f / 3.0f * worldPos.x()) / size);
+    int r = std::round((-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size);
 
-    Map::getInstance().revealRadius(std::round(q), std::round(r), Config::World::REVEAL_RADIUS);
+    Map::getInstance().revealRadiusWithCleanup(q, r, Config::World::REVEAL_RADIUS);
 
     m_hud->update(m_gameTime, m_isPaused, m_currentSpeed);
 }
@@ -76,7 +77,6 @@ void GameManager::setPaused(bool paused)
 void GameManager::handleMouseClick(QPoint screenPos)
 {
     auto &cam = Camera::getInstance();
-
     QPointF worldPos = cam.screenToWorld(screenPos);
 
     const float size = Config::World::BASE_TILE_SIZE;
@@ -84,10 +84,8 @@ void GameManager::handleMouseClick(QPoint screenPos)
     float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size;
 
     QPoint selection = cam.hexRound(q, r).toPoint();
-
     m_selectedHex = QPointF(selection.x(), selection.y());
     m_hasSelection = true;
-
     m_hud->setSelection(m_selectedHex, true);
 }
 
@@ -121,6 +119,7 @@ void GameManager::handleHudButton(int index)
 
 void GameManager::handleMinimapNavigation(QPointF worldPos)
 {
+    Map::getInstance().clearAllDiscovered();
     Camera::getInstance().setTargetPos(worldPos);
 }
 

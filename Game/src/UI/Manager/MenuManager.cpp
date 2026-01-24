@@ -102,20 +102,20 @@ void MenuManager::updateScreenVisibility()
 
 void MenuManager::handleGameStateChange(int newState)
 {
-    switch (newState)
+    AbstractScreen *nextScreen = nullptr;
+
+    if (newState == static_cast<int>(Engine::State::MENU))
     {
-    case static_cast<int>(Engine::State::MENU):
-        setScreen(new MenuScreen(m_mainWindow));
-        break;
-
-    case static_cast<int>(Engine::State::RUNNING):
-        break;
-
-    case static_cast<int>(Engine::State::GAMEOVER):
+        nextScreen = new MenuScreen(m_mainWindow);
+    }
+    else if (newState == static_cast<int>(Engine::State::GAMEOVER))
     {
         bool winStatus = GameEngine::getInstance().didPlayerWin();
-        setScreen(new GameOverScreen(winStatus, m_mainWindow));
-        break;
+        nextScreen = new GameOverScreen(winStatus, m_mainWindow);
     }
+
+    if (nextScreen)
+    {
+        setScreen(nextScreen);
     }
 }

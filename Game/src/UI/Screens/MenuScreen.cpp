@@ -217,7 +217,7 @@ void MenuScreen::setupUI()
     footerLayout->addStretch();
     footerLayout->addWidget(versionLabel);
     mainLayout->addLayout(footerLayout);
-    
+
     if (m_buttonLayout->count() > 0)
     {
         if (auto *firstBtn = qobject_cast<QWidget *>(m_buttonLayout->itemAt(0)->widget()))
@@ -236,6 +236,12 @@ void MenuScreen::setupBackground()
     m_bgMovie->setSpeed(Config::UI::BG_ANIM_SPEED);
 
     m_backgroundLabel->setMovie(m_bgMovie);
+
+    connect(m_bgMovie, &QMovie::frameChanged, this, [this](int frameNumber)
+            {
+        if (frameNumber == m_bgMovie->frameCount() - 1) {
+            m_bgMovie->stop();
+        } });
 
     m_backgroundLabel->lower();
     m_backgroundLabel->setGeometry(0, 0, width(), height());

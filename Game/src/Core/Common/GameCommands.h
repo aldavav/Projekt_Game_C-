@@ -15,7 +15,6 @@ public:
 
     bool execute(GameEngine &engine) override
     {
-        qDebug() << "EXECUTING ACTION:" << m_action;
         return true;
     }
 

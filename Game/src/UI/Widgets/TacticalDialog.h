@@ -1,24 +1,18 @@
 #ifndef TACTICALDIALOG_H
 #define TACTICALDIALOG_H
 
+#include <UI/Widgets/BaseTacticalDialog.h>
 #include <Core/Config/Configuration.h>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QPushButton>
-#include <QKeyEvent>
-#include <QDialog>
-#include <QFrame>
+#include <QVBoxLayout>
 #include <QLabel>
 
-class TacticalDialog : public QDialog
+class TacticalDialog : public BaseTacticalDialog
 {
     Q_OBJECT
 
 public:
     explicit TacticalDialog(const QString &title, const QString &message, QWidget *parent = nullptr);
-
-protected:
-    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     void setupUI(const QString &title, const QString &message);

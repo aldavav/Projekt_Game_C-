@@ -26,7 +26,7 @@ public:
     static MenuManager &getInstance();
 
     void setMainWindow(QWidget *window);
-    
+
     void setScreen(AbstractScreen *screen);
 
     void pushScreen(AbstractScreen *screen);
