@@ -55,7 +55,7 @@ private:
 
     bool m_isPaused = false;
 
-    Engine::GameSpeed m_currentSpeed = Engine::GameSpeed::NORMAL;
+    Engine::GameSpeed m_currentSpeed = Engine::GameSpeed::Normal;
 
     QPointF m_selectedHex;
 
@@ -67,7 +67,7 @@ private:
 
     QPoint m_mouseScreenPos;
 
-    uint32_t m_mapSeed = 0;
+    uint32_t m_mapSeed = Config::World::DEFAULT_SEED;
 
     bool m_showDiagnostics = false;
 

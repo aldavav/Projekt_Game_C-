@@ -42,6 +42,8 @@ public:
 
     int getViewportWidth() const { return static_cast<int>(m_viewportWidth); }
 
+    void setZoom(float newZoom);
+
 private:
     Camera() = default;
 

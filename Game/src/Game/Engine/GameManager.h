@@ -56,13 +56,13 @@ private:
 
     bool m_isPaused = false;
 
-    Engine::GameSpeed m_currentSpeed = Engine::GameSpeed::NORMAL;
+    Engine::GameSpeed m_currentSpeed = Engine::GameSpeed::Normal;
 
     QPointF m_selectedHex;
 
     bool m_hasSelection = false;
 
-    TacticalHUD *m_hud;
+    TacticalHUD *m_hud = nullptr;
 
     bool m_isDiscoveryActive = false;
 };

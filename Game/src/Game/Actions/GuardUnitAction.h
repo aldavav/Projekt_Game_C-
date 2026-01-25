@@ -4,22 +4,23 @@
 #include <Core/Common/ICommand.h>
 #include <QPoint>
 
+class GameEngine;
+
 class GuardUnitAction : public ICommand
 {
 public:
-    GuardUnitAction() : m_targetPos(0, 0) {}
-
-    explicit GuardUnitAction(const QPoint &targetPos)
-        : m_targetPos(targetPos) {}
+    GuardUnitAction(uint32_t unitId, const QPoint &target);
 
     bool execute(GameEngine &engine) override;
 
-    bool undo() override;
+    QString name() const override;
 
-    QString debugName() const override { return "GuardAction"; }
+    QString description() const override;
 
 private:
-    QPoint m_targetPos;
+    uint32_t m_unitId;
+
+    QPoint m_target;
 };
 
 #endif

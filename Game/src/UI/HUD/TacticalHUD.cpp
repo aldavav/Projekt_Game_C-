@@ -2,7 +2,7 @@
 
 TacticalHUD::TacticalHUD(QObject *parent)
     : QObject(parent), m_fps(0), m_frameCount(0), m_isPaused(false),
-      m_hasSelection(false), m_currentSpeed(Engine::GameSpeed::NORMAL)
+      m_hasSelection(false), m_currentSpeed(Engine::GameSpeed::Normal)
 {
     m_fpsTimer.start();
 }
@@ -147,17 +147,17 @@ void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
 
         painter.setPen(QColor(200, 200, 200, 200));
         QString statusLine;
-        if (tile.type == World::TileType::WATER)
+        if (tile.type == World::TileType::Water)
         {
             painter.setPen(QColor(Config::UI::COLOR_WATER_INFO));
             statusLine = "ANALYSIS: H2O Sourced - Cooling Available";
         }
-        else if (tile.type == World::TileType::MOUNTAIN)
+        else if (tile.type == World::TileType::Mountain)
         {
             painter.setPen(QColor(200, 100, 50));
             statusLine = "ANALYSIS: High Mineral Density Detected";
         }
-        else if (tile.type == World::TileType::GRASS)
+        else if (tile.type == World::TileType::Grass)
         {
             painter.setPen(QColor(Config::UI::COLOR_HABITABLE));
             statusLine = "ANALYSIS: Bio-Habitable Terrain";
@@ -217,17 +217,14 @@ void TacticalHUD::drawMinimap(QPainter &painter, int width, int height)
             QColor dotColor;
             switch (tile.type)
             {
-            case World::TileType::WATER:
+            case World::TileType::Water:
                 dotColor = QColor(Config::UI::COLOR_WATER);
                 break;
-            case World::TileType::GRASS:
+            case World::TileType::Grass:
                 dotColor = QColor(Config::UI::COLOR_GRASS);
                 break;
-            case World::TileType::MOUNTAIN:
+            case World::TileType::Mountain:
                 dotColor = QColor(Config::UI::COLOR_MOUNTAIN);
-                break;
-            case World::TileType::UNKNOWN:
-                dotColor = QColor(Config::UI::COLOR_UNKNOWN);
                 break;
             default:
                 dotColor = QColor(Config::UI::COLOR_UNKNOWN);
@@ -313,9 +310,9 @@ void TacticalHUD::drawDayNightCycle(QPainter &painter, int width, int height)
     {
         QRect btnRect(rectX + 15 + (i * (btnW + btnSpacing)), rectY + 38, btnW, btnH);
         bool isActive = (i == 0 && m_isPaused) ||
-                        (i == 1 && !m_isPaused && m_currentSpeed == Engine::GameSpeed::SLOW) ||
-                        (i == 2 && !m_isPaused && m_currentSpeed == Engine::GameSpeed::NORMAL) ||
-                        (i == 3 && !m_isPaused && m_currentSpeed == Engine::GameSpeed::FAST);
+                        (i == 1 && !m_isPaused && m_currentSpeed == Engine::GameSpeed::Slow) ||
+                        (i == 2 && !m_isPaused && m_currentSpeed == Engine::GameSpeed::Normal) ||
+                        (i == 3 && !m_isPaused && m_currentSpeed == Engine::GameSpeed::Fast);
 
         painter.setBrush(isActive ? phaseColor.darker(150) : QColor(50, 50, 50));
         painter.setPen(QPen(isActive ? Qt::white : Qt::gray, isActive ? 2 : 1));
@@ -378,16 +375,14 @@ QString TacticalHUD::getTileTypeName(World::TileType type) const
 {
     switch (type)
     {
-    case World::TileType::WATER:
+    case World::TileType::Water:
         return "Water";
-    case World::TileType::DIRT:
+    case World::TileType::Dirt:
         return "Dirt";
-    case World::TileType::GRASS:
+    case World::TileType::Grass:
         return "Grass";
-    case World::TileType::MOUNTAIN:
+    case World::TileType::Mountain:
         return "Mountain";
-    case World::TileType::UNKNOWN:
-        return "Unknown";
     default:
         return "Unknown";
     }

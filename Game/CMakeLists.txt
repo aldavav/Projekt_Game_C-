@@ -20,7 +20,6 @@ set(SRC_MAIN
 )
 
 set(SRC_CORE
-    src/Core/Common/GameCommands.h
     src/Core/Common/GameTypes.h
     src/Core/Common/ICommand.h
     src/Core/Common/WorldData.h
@@ -43,14 +42,14 @@ set(SRC_CORE
 )
 
 set(SRC_GAME
-    src/Game/Actions/CameraActions.cpp
-    src/Game/Actions/CameraActions.h
     src/Game/Actions/GuardUnitAction.cpp
     src/Game/Actions/GuardUnitAction.h
     src/Game/Actions/MoveUnitAction.cpp
     src/Game/Actions/MoveUnitAction.h
     src/Game/Actions/StopUnitAction.cpp
     src/Game/Actions/StopUnitAction.h
+    src/Game/Actions/ZoomAction.cpp
+    src/Game/Actions/ZoomAction.h
     src/Game/Camera/Camera.cpp
     src/Game/Camera/Camera.h
     src/Game/Engine/GameEngine.cpp

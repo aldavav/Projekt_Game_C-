@@ -17,7 +17,6 @@ namespace Config
         const QString GAME_TITLE = "Tiny Tiles Tactics";
         const QString VERSION = "1.0.0 Beta";
         const QString CONFIG_FILE_NAME = "settings.ini";
-        constexpr int TARGET_FPS = 60;
         constexpr int TIMER_INTERVAL_MS = 16;
         constexpr float MAX_FRAME_TIME = 0.1f;
         const QList<QPair<QString, QString>> LANGUAGES = {
@@ -68,7 +67,7 @@ namespace Config
     {
         constexpr float ZOOM_STEP = 0.1f;
         constexpr float INITIAL_ZOOM = 5.0f;
-        constexpr Engine::Difficulty DEFAULT_DIFFICULTY = Engine::Difficulty::MEDIUM;
+        constexpr Engine::Difficulty DEFAULT_DIFFICULTY = Engine::Difficulty::Medium;
         const QString TEXT_VICTORY = "VICTORY ACHIEVED";
         const QString TEXT_DEFEAT = "DEFEAT: SIGNAL LOST";
         const QString DEFAULT_MISSION_NAME = "Sector_7";
@@ -253,14 +252,14 @@ STRATEGIC OBJECTIVE:
         constexpr float CLOUD_SPEED_MULT = 15.0f;
         constexpr int CULLING_MARGIN = 50;
         constexpr float HEX_VISUAL_SCALE = 0.98f;
-        constexpr int MOUNTAIN_HEIGHT = 15;
-        constexpr int GRASS_HEIGHT = 10;
-        constexpr int DIRT_HEIGHT = 5;
-        constexpr int WATER_HEIGHT = 0;
         constexpr int MINIMAP_UPDATE_MS = 100;
         constexpr int MINIMAP_RANGE = 40;
         constexpr int SCANLINE_SPACING = 3;
         constexpr int WORLD_BOUNDS_INT = 50;
+        constexpr int MOUNTAIN_HEIGHT = 15;
+        constexpr int GRASS_HEIGHT = 10;
+        constexpr int DIRT_HEIGHT = 5;
+        constexpr int WATER_HEIGHT = 0;
     }
 }
 

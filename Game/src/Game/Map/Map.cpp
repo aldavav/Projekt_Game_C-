@@ -77,7 +77,7 @@ bool Map::isAreaWalkable(int q, int r, int w, int h)
         {
             World::TileType type = getTileAt(i, j).type;
 
-            if (type == World::TileType::WATER || type == World::TileType::MOUNTAIN)
+            if (type == World::TileType::Water || type == World::TileType::Mountain)
             {
                 return false;
             }
@@ -145,9 +145,9 @@ void Map::debugRevealAll()
 {
     for (auto &pair : m_chunks)
     {
-        for (int x = 0; x < World::Chunk::S; ++x)
+        for (int x = 0; x < World::Chunk::Size; ++x)
         {
-            for (int y = 0; y < World::Chunk::S; ++y)
+            for (int y = 0; y < World::Chunk::Size; ++y)
             {
                 pair.second->tiles[x][y].visible = true;
             }
@@ -209,13 +209,13 @@ void Map::generateChunk(World::Chunk *chunk)
 
             World::Tile &tile = chunk->tiles[tx][ty];
             if (height < Config::World::THRESH_WATER)
-                tile.type = World::TileType::WATER;
+                tile.type = World::TileType::Water;
             else if (height < Config::World::THRESH_DIRT)
-                tile.type = World::TileType::DIRT;
+                tile.type = World::TileType::Dirt;
             else if (height < Config::World::THRESH_GRASS)
-                tile.type = World::TileType::GRASS;
+                tile.type = World::TileType::Grass;
             else
-                tile.type = World::TileType::MOUNTAIN;
+                tile.type = World::TileType::Mountain;
         }
     }
 }

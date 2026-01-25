@@ -36,13 +36,13 @@ std::unique_ptr<Entity> Entity::createEntityFromFile(std::ifstream &file)
 
     switch (type)
     {
-    case Engine::Entity::Type::UNIT:
+    case Engine::Entity::Type::Unit:
         return nullptr;
-    case Engine::Entity::Type::BUILDING:
+    case Engine::Entity::Type::Building:
         return nullptr;
-    case Engine::Entity::Type::RESOURCE:
+    case Engine::Entity::Type::Resource:
         return nullptr;
-    case Engine::Entity::Type::DEBRIS:
+    case Engine::Entity::Type::Debris:
         return nullptr;
     default:
         return nullptr;

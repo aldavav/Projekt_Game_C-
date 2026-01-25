@@ -113,15 +113,15 @@ void Logger::log(const Engine::LogLevel type, const std::string &message, const 
         m_logFile << formatted << std::endl;
     }
 
-    std::string color = Engine::ANSIColors::RESET;
+    std::string color = Engine::ConsoleColor::Reset;
     if (type == Engine::LogLevel::Error)
-        color = Engine::ANSIColors::RED_BOLD;
+        color = Engine::ConsoleColor::RedBold;
     else if (type == Engine::LogLevel::Warning)
-        color = Engine::ANSIColors::YELLOW_BOLD;
+        color = Engine::ConsoleColor::YellowBold;
     else if (type == Engine::LogLevel::Info)
-        color = Engine::ANSIColors::GREEN_NORMAL;
+        color = Engine::ConsoleColor::GreenNormal;
 
-    std::cout << color << formatted << Engine::ANSIColors::RESET << std::endl;
+    std::cout << color << formatted << Engine::ConsoleColor::Reset << std::endl;
 }
 
 std::string Logger::formatLogMessage(const Engine::LogLevel type, const std::string &message, const std::string &file, int line, const std::string &function)

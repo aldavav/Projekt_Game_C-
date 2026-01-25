@@ -7,19 +7,18 @@
 class StopUnitAction : public ICommand
 {
 public:
-    StopUnitAction() : m_targetPos(0, 0) {}
-
-    explicit StopUnitAction(const QPoint &targetPos)
-        : m_targetPos(targetPos) {}
+    StopUnitAction(uint32_t unitId, const QPoint &target);
 
     bool execute(GameEngine &engine) override;
 
-    bool undo() override;
+    QString name() const override;
 
-    QString debugName() const override { return "StopAction"; }
+    QString description() const override;
 
 private:
-    QPoint m_targetPos;
+    uint32_t m_unitId;
+
+    QPoint m_target;
 };
 
 #endif

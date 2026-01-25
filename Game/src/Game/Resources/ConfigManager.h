@@ -27,7 +27,7 @@ public:
 private:
     ConfigManager();
 
-    QString m_configPath;
+    QString m_configPath = nullptr;
 
     Config::System::PlayerSettings m_cachedSettings;
 };

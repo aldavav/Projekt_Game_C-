@@ -327,11 +327,11 @@ QWidget *SettingsScreen::createInputTab()
         layout->addRow(label, btn);
     };
 
-    createBindRow(tr("MOVE UP"), Engine::Input::Action::MOVE_UP);
-    createBindRow(tr("MOVE DOWN"), Engine::Input::Action::MOVE_DOWN);
-    createBindRow(tr("UNIT: STOP"), Engine::Input::Action::STOP);
-    createBindRow(tr("UNIT: GUARD"), Engine::Input::Action::GUARD);
-    createBindRow(tr("UNIT: SCATTER"), Engine::Input::Action::SCATTER);
+    createBindRow(tr("MOVE UP"), Engine::Input::Action::MoveUp);
+    createBindRow(tr("MOVE DOWN"), Engine::Input::Action::MoveDown);
+    createBindRow(tr("UNIT: STOP"), Engine::Input::Action::Stop);
+    createBindRow(tr("UNIT: GUARD"), Engine::Input::Action::Guard);
+    createBindRow(tr("UNIT: SCATTER"), Engine::Input::Action::Scatter);
 
     return w;
 }

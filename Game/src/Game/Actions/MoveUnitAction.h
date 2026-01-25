@@ -7,19 +7,18 @@
 class MoveUnitAction : public ICommand
 {
 public:
-    MoveUnitAction() : m_targetPos(0, 0) {}
-
-    explicit MoveUnitAction(const QPoint &targetPos)
-        : m_targetPos(targetPos) {}
+    MoveUnitAction(uint32_t unitId, const QPoint &target);
 
     bool execute(GameEngine &engine) override;
 
-    bool undo() override;
+    QString name() const override;
 
-    QString debugName() const override { return "MoveAction"; }
+    QString description() const override;
 
 private:
-    QPoint m_targetPos;
+    uint32_t m_unitId;
+
+    QPoint m_target;
 };
 
 #endif

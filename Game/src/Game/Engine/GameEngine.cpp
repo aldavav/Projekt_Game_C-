@@ -16,7 +16,7 @@ void GameEngine::startGame()
     m_lastTime = std::chrono::steady_clock::now();
     m_accumulator = 0.0f;
     m_isRunning = true;
-    setState(Engine::State::RUNNING);
+    setState(Engine::GameState::Running);
 
     m_gameTimer.start();
     saveCurrentMatch();
@@ -29,7 +29,7 @@ void GameEngine::stopGame()
 
     m_gameTimer.stop();
     m_isRunning = false;
-    m_currentState = Engine::State::GAMEOVER;
+    m_currentState = Engine::GameState::GameOver;
 
     emit gameStateChanged(static_cast<int>(m_currentState));
 }
@@ -37,7 +37,7 @@ void GameEngine::stopGame()
 void GameEngine::triggerEndGame(bool victory)
 {
     m_playerWon = victory;
-    setState(Engine::State::GAMEOVER);
+    setState(Engine::GameState::GameOver);
 }
 
 void GameEngine::setupMatch(QString mapName, uint32_t seed)
@@ -98,11 +98,11 @@ void GameEngine::loadMatch(const QString &mapName)
     m_lastTime = std::chrono::steady_clock::now();
     m_accumulator = 0.0f;
     m_isRunning = true;
-    setState(Engine::State::RUNNING);
+    setState(Engine::GameState::Running);
     m_gameTimer.start();
 }
 
-void GameEngine::setState(Engine::State newState)
+void GameEngine::setState(Engine::GameState newState)
 {
     if (m_currentState == newState)
         return;
@@ -140,7 +140,7 @@ void GameEngine::gameLoopTick()
 }
 
 GameEngine::GameEngine(QObject *parent)
-    : QObject(parent), m_currentState(Engine::State::MENU)
+    : QObject(parent), m_currentState(Engine::GameState::Menu)
 {
     connect(&m_gameTimer, &QTimer::timeout, this, &GameEngine::gameLoopTick);
 

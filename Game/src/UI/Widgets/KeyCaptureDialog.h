@@ -21,7 +21,7 @@ protected:
 private:
     void setupUI();
 
-    Engine::Input::KeyCode capturedKey = Engine::Input::KeyCode::ESC;
+    Engine::Input::KeyCode capturedKey = Engine::Input::KeyCode::Escape;
 };
 
 #endif

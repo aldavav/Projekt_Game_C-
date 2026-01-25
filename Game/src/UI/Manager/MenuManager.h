@@ -45,7 +45,7 @@ private:
 
     QStack<AbstractScreen *> m_screenStack;
 
-    QWidget *m_mainWindow;
+    QWidget *m_mainWindow = nullptr;
 };
 
 #endif

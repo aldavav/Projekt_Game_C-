@@ -13,7 +13,7 @@ void GameOverScreen::keyPressEvent(QKeyEvent *event)
         event->key() == Qt::Key_Return ||
         event->key() == Qt::Key_Enter)
     {
-        GameEngine::getInstance().setState(Engine::State::MENU);
+        GameEngine::getInstance().setState(Engine::GameState::Menu);
     }
     else
     {
@@ -69,7 +69,7 @@ void GameOverScreen::setupUI(bool victory)
     exitBtn->setDefault(true);
 
     connect(exitBtn, &QPushButton::clicked, this, []()
-            { GameEngine::getInstance().setState(Engine::State::MENU); });
+            { GameEngine::getInstance().setState(Engine::GameState::Menu); });
 
     layout->addStretch();
     layout->addWidget(m_titleLabel);
