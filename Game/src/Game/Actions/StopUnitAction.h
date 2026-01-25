@@ -1,5 +1,5 @@
-#ifndef MOVEUNITACTIONS_H
-#define MOVEUNITACTIONS_H
+#ifndef STOPUNITACTIONS_H
+#define STOPUNITACTIONS_H
 
 #include <Core/Common/ICommand.h>
 #include <QPoint>

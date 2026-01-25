@@ -1,13 +1,13 @@
-#ifndef MOVEUNITACTIONS_H
-#define MOVEUNITACTIONS_H
+#ifndef SCATTERUNITACTIONS_H
+#define SCATTERUNITACTIONS_H
 
 #include <Core/Common/ICommand.h>
 #include <QPoint>
 
-class MoveUnitAction : public ICommand
+class ScatterUnitAction : public ICommand
 {
 public:
-    MoveUnitAction(uint32_t unitId, const QPoint &target);
+    ScatterUnitAction(uint32_t unitId, const QPoint &target);
 
     bool execute(GameEngine &engine) override;
 

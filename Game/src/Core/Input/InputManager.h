@@ -2,8 +2,12 @@
 #define INPUTMANAGER_H
 
 #include <Core/Settings/ControlsSettingsManager.h>
+#include <Game/Actions/ScatterUnitAction.h>
+#include <Game/Actions/GuardUnitAction.h>
+#include <Game/Actions/MoveUnitAction.h>
+#include <Game/Actions/StopUnitAction.h>
 #include <Core/Config/Configuration.h>
-#include <Core/Common/ICommand.h>
+#include <Game/Actions/ZoomAction.h>
 #include <QObject>
 #include <QMutex>
 #include <QQueue>

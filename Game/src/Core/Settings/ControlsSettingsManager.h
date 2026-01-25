@@ -16,6 +16,8 @@ public:
 
     void setKey(Engine::Input::Action action, Engine::Input::KeyCode key);
 
+    Engine::Input::Action getActionForKey(int qtKey) const;
+
     Engine::Input::KeyCode getKey(Engine::Input::Action action) const;
 
     QString getKeyName(Engine::Input::Action action) const;

@@ -32,3 +32,18 @@ ControlsSettingsManager::ControlsSettingsManager()
     m_bindings[Engine::Input::Action::Guard] = Engine::Input::KeyCode::Guard;
     m_bindings[Engine::Input::Action::Scatter] = Engine::Input::KeyCode::Scatter;
 }
+
+Engine::Input::Action ControlsSettingsManager::getActionForKey(int qtKey) const
+{
+    auto it = m_bindings.begin();
+    while (it != m_bindings.end())
+    {
+        if (static_cast<int>(it.value()) == qtKey)
+        {
+            return it.key();
+        }
+        ++it;
+    }
+
+    return static_cast<Engine::Input::Action>(-1);
+}
