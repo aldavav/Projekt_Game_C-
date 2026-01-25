@@ -1,6 +1,7 @@
 #ifndef GAMETYPES_H
 #define GAMETYPES_H
 
+#include <QMetaType>
 #include <QtGlobal>
 #include <QPoint>
 
@@ -8,29 +9,32 @@ namespace Engine
 {
     enum class LogLevel
     {
-        Info = 0,
-        Warning = 1,
-        Error = 2
+        Info,
+        Warning,
+        Error
     };
-    enum class State
+
+    enum class GameState
     {
-        MENU = 0,
-        LOADING = 1,
-        RUNNING = 2,
-        GAMEOVER = 3
+        Menu,
+        Loading,
+        Running,
+        GameOver
     };
+
     enum class GameSpeed
     {
-        SLOW = 0,
-        NORMAL = 1,
-        FAST = 2
+        Slow,
+        Normal,
+        Fast
     };
+
     enum class Difficulty
     {
-        EASY = 0,
-        MEDIUM = 1,
-        HARD = 2,
-        BRUTAL = 3
+        Easy,
+        Medium,
+        Hard,
+        Brutal
     };
 
     namespace Graphics
@@ -42,6 +46,7 @@ namespace Engine
             High,
             Ultra
         };
+
         enum class CursorType
         {
             Standard,
@@ -53,13 +58,13 @@ namespace Engine
 
     namespace Entity
     {
-        enum class Type : int
+        enum class Type : uint8_t
         {
-            NONE = 0,
-            UNIT = 1,
-            BUILDING = 2,
-            RESOURCE = 3,
-            DEBRIS = 4
+            None = 0,
+            Unit,
+            Building,
+            Resource,
+            Debris
         };
     }
 
@@ -67,42 +72,43 @@ namespace Engine
     {
         enum class Action
         {
-            MOVE_UP = 0,
-            MOVE_DOWN = 1,
-            MOVE_LEFT = 2,
-            MOVE_RIGHT = 3,
-            STOP = 4,
-            GUARD = 5,
-            SCATTER = 6,
-            ZOOM_OUT = 7,
-            ZOOM_IN = 8,
-            ZOOM_IN_ALT = 9
+            MoveUp,
+            MoveDown,
+            MoveLeft,
+            MoveRight,
+            Stop,
+            Guard,
+            Scatter,
+            ZoomOut,
+            ZoomIn,
+            ZoomInAlt
         };
 
         enum class KeyCode : int
         {
-            UP_ARROW = Qt::Key_Up,
-            DOWN_ARROW = Qt::Key_Down,
-            LEFT_ARROW = Qt::Key_Left,
-            RIGHT_ARROW = Qt::Key_Right,
-            STOP = Qt::Key_S,
-            GUARD = Qt::Key_G,
-            SCATTER = Qt::Key_X,
-            ENTER = Qt::Key_Return,
-            ESC = Qt::Key_Escape,
-            ZOOM_OUT = Qt::Key_Minus,
-            ZOOM_IN = Qt::Key_Plus,
-            ZOOM_IN_ALT = Qt::Key_Equal
+            UpArrow = Qt::Key_Up,
+            DownArrow = Qt::Key_Down,
+            LeftArrow = Qt::Key_Left,
+            RightArrow = Qt::Key_Right,
+            Stop = Qt::Key_S,
+            Guard = Qt::Key_G,
+            Scatter = Qt::Key_X,
+            Enter = Qt::Key_Return,
+            Escape = Qt::Key_Escape,
+            ZoomOut = Qt::Key_Minus,
+            ZoomIn = Qt::Key_Plus,
+            ZoomInAlt = Qt::Key_Equal
         };
 
         struct RawEvent
         {
             enum class Type
             {
-                Keyboard = 0,
-                MouseClick = 1,
-                MouseMove = 2
+                Keyboard,
+                MouseClick,
+                MouseMove
             };
+
             Type type;
             int keyCode = 0;
             QPoint position;
@@ -110,13 +116,17 @@ namespace Engine
         };
     }
 
-    namespace ANSIColors
+    namespace ConsoleColor
     {
-        constexpr const char *RESET = "\033[0m";
-        constexpr const char *RED_BOLD = "\033[1;31m";
-        constexpr const char *YELLOW_BOLD = "\033[1;33m";
-        constexpr const char *GREEN_NORMAL = "\033[0;32m";
+        using ColorCode = const char *;
+        constexpr ColorCode Reset = "\033[0m";
+        constexpr ColorCode RedBold = "\033[1;31m";
+        constexpr ColorCode YellowBold = "\033[1;33m";
+        constexpr ColorCode GreenNormal = "\033[0;32m";
     }
 }
+
+Q_DECLARE_METATYPE(Engine::GameState)
+Q_DECLARE_METATYPE(Engine::GameSpeed)
 
 #endif

@@ -104,11 +104,11 @@ void MenuManager::handleGameStateChange(int newState)
 {
     AbstractScreen *nextScreen = nullptr;
 
-    if (newState == static_cast<int>(Engine::State::MENU))
+    if (newState == static_cast<int>(Engine::GameState::Menu))
     {
         nextScreen = new MenuScreen(m_mainWindow);
     }
-    else if (newState == static_cast<int>(Engine::State::GAMEOVER))
+    else if (newState == static_cast<int>(Engine::GameState::GameOver))
     {
         bool winStatus = GameEngine::getInstance().didPlayerWin();
         nextScreen = new GameOverScreen(winStatus, m_mainWindow);

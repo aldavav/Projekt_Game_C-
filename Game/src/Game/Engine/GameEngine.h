@@ -37,9 +37,9 @@ public:
 
     void loadMatch(const QString &mapName);
 
-    void setState(Engine::State newState);
+    void setState(Engine::GameState newState);
 
-    Engine::State getState() const { return m_currentState; }
+    Engine::GameState getState() const { return m_currentState; }
 
     bool didPlayerWin() const { return m_playerWon; }
 
@@ -57,15 +57,13 @@ private slots:
 private:
     explicit GameEngine(QObject *parent = nullptr);
 
-    virtual ~GameEngine() override = default;
-
     void initializeSystems();
 
     void updateSimulation(float fixedStep);
 
     void updateCameraMovement(float fixedStep);
 
-    Engine::State m_currentState = Engine::State::MENU;
+    Engine::GameState m_currentState = Engine::GameState::Menu;
 
     bool m_isRunning = false;
 

@@ -35,14 +35,6 @@ private:
 public:
     static ResourceManager &getInstance();
 
-    ResourceManager(const ResourceManager &) = delete;
-
-    void operator=(const ResourceManager &) = delete;
-
-    ResourceManager(ResourceManager &&) = delete;
-
-    ResourceManager &operator=(ResourceManager &&) = delete;
-
     TexturePtr getTexture(const QString &resourceId);
 
     AudioPtr getAudio(const QString &resourceId);

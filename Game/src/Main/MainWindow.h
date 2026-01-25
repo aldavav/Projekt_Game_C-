@@ -65,13 +65,13 @@ private:
 
     void centerOnScreen();
 
-    QWidget *m_centralWidget;
+    QWidget *m_centralWidget = nullptr;
 
     bool m_isFullscreen = false;
 
-    QMediaPlayer *m_bgmPlayer;
+    QMediaPlayer *m_bgmPlayer = nullptr;
 
-    QAudioOutput *m_audioOutput;
+    QAudioOutput *m_audioOutput = nullptr;
 };
 
 #endif

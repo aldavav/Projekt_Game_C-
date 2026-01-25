@@ -14,7 +14,7 @@ public:
     
     static QFont getFont(int size = 12, bool bold = false);
     
-    static QCursor getCursor(Engine::Graphics::CursorType type);
+    static QCursor getCursor(Engine::Graphics::CursorType type = Engine::Graphics::CursorType::Standard);
 };
 
 #endif

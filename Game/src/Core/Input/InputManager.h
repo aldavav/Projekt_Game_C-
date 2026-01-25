@@ -2,17 +2,12 @@
 #define INPUTMANAGER_H
 
 #include <Core/Settings/ControlsSettingsManager.h>
-#include <Game/Actions/GuardUnitAction.h>
-#include <Game/Actions/StopUnitAction.h>
-#include <Game/Actions/MoveUnitAction.h>
-#include <Game/Actions/CameraActions.h>
 #include <Core/Config/Configuration.h>
 #include <Core/Common/ICommand.h>
-#include <qmutex.h>
 #include <QObject>
+#include <QMutex>
 #include <QQueue>
 #include <QPoint>
-#include <QDebug>
 #include <set>
 
 class InputManager : public QObject
@@ -43,17 +38,15 @@ signals:
 private:
     explicit InputManager(QObject *parent = nullptr);
 
-    void setupDefaultBindings();
+    void queueCommand(CommandPtr command);
 
     CommandPtr translateRawInput(const Engine::Input::RawEvent &event);
 
-    mutable QMutex m_inputMutex;
+    mutable QMutex m_mutex;
 
     QQueue<CommandPtr> m_commandQueue;
 
     std::set<int> m_activeKeys;
-
-    std::map<int, QString> m_keyBindings;
 };
 
 #endif

@@ -229,13 +229,13 @@ void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
                 continue;
 
             float h = Config::World::HEIGHT_OFFSET;
-            if (tile.type == World::TileType::MOUNTAIN)
+            if (tile.type == World::TileType::Mountain)
                 h = Config::World::MOUNTAIN_HEIGHT;
-            else if (tile.type == World::TileType::GRASS)
+            else if (tile.type == World::TileType::Grass)
                 h = Config::World::GRASS_HEIGHT;
-            else if (tile.type == World::TileType::DIRT)
+            else if (tile.type == World::TileType::Dirt)
                 h = Config::World::DIRT_HEIGHT;
-            else if (tile.type == World::TileType::WATER)
+            else if (tile.type == World::TileType::Water)
                 h = Config::World::WATER_HEIGHT;
 
             visibleTiles.push_back({q, r, screenPos, h * zoom});
@@ -424,19 +424,19 @@ QColor GameScreen::getTileVisualColor(const World::Tile &tile, float gameTime, b
 
     switch (tile.type)
     {
-    case World::TileType::WATER:
+    case World::TileType::Water:
     {
         float wave = std::sin(gameTime * Config::World::WATER_WAVE_SPEED) * 0.5f + 0.5f;
         baseColor = m_waterColor.lighter(Config::World::WATER_BRIGHTNESS_BASE + wave * Config::World::WATER_BRIGHTNESS_SWING);
         break;
     }
-    case World::TileType::GRASS:
+    case World::TileType::Grass:
         baseColor = m_grassColor;
         break;
-    case World::TileType::MOUNTAIN:
+    case World::TileType::Mountain:
         baseColor = m_mountainColor;
         break;
-    case World::TileType::DIRT:
+    case World::TileType::Dirt:
         baseColor = m_dirtColor;
         break;
     default:

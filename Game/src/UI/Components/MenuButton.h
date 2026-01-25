@@ -31,15 +31,15 @@ private:
 
     void setupAnimations();
 
-    QPushButton *m_btn;
+    QPushButton *m_btn = nullptr;
 
-    QLabel *m_arrow;
+    QLabel *m_arrow = nullptr;
 
-    QParallelAnimationGroup *m_hoverAnimation;
+    QParallelAnimationGroup *m_hoverAnimation = nullptr;
 
-    QPropertyAnimation *m_moveAnim;
+    QPropertyAnimation *m_moveAnim = nullptr;
 
-    QPropertyAnimation *m_sizeAnim;
+    QPropertyAnimation *m_sizeAnim = nullptr;
 };
 
 #endif

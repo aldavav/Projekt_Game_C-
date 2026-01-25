@@ -39,8 +39,6 @@ public:
 private:
     Map() = default;
 
-    ~Map() = default;
-
     uint64_t getChunkKey(int cx, int cy) const;
 
     void generateChunk(World::Chunk *chunk);

@@ -52,13 +52,13 @@ void GameManager::setSpeed(Engine::GameSpeed speed)
     m_currentSpeed = speed;
     switch (m_currentSpeed)
     {
-    case Engine::GameSpeed::SLOW:
+    case Engine::GameSpeed::Slow:
         m_timeScale = Config::Simulation::SPEED_SLOW;
         break;
-    case Engine::GameSpeed::NORMAL:
+    case Engine::GameSpeed::Normal:
         m_timeScale = Config::Simulation::SPEED_NORMAL;
         break;
-    case Engine::GameSpeed::FAST:
+    case Engine::GameSpeed::Fast:
         m_timeScale = Config::Simulation::SPEED_FAST;
         break;
     }
@@ -109,11 +109,11 @@ void GameManager::handleHudButton(int index)
     {
         m_isPaused = false;
         if (index == 1)
-            setSpeed(Engine::GameSpeed::SLOW);
+            setSpeed(Engine::GameSpeed::Slow);
         else if (index == 2)
-            setSpeed(Engine::GameSpeed::NORMAL);
+            setSpeed(Engine::GameSpeed::Normal);
         else if (index == 3)
-            setSpeed(Engine::GameSpeed::FAST);
+            setSpeed(Engine::GameSpeed::Fast);
     }
 }
 
@@ -128,7 +128,7 @@ GameManager::GameManager(QObject *parent)
       m_gameTime(0.0f),
       m_timeScale(1.0f),
       m_isPaused(false),
-      m_currentSpeed(Engine::GameSpeed::NORMAL)
+      m_currentSpeed(Engine::GameSpeed::Normal)
 {
     m_hud = new TacticalHUD(this);
 

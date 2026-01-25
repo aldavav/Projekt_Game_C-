@@ -186,3 +186,10 @@ void Camera::setViewportSize(int w, int h)
     m_viewportWidth = static_cast<float>(w);
     m_viewportHeight = static_cast<float>(h);
 }
+
+void Camera::setZoom(float newZoom)
+{
+    m_zoom = std::clamp(newZoom,
+                        Config::World::MIN_ZOOM,
+                        Config::World::MAX_ZOOM);
+}

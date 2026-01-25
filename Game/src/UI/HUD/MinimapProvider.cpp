@@ -62,16 +62,16 @@ void MinimapProvider::updateCache(int size, int screenWidth, int screenHeight, b
             QColor dotColor;
             switch (tile.type)
             {
-            case World::TileType::WATER:
+            case World::TileType::Water:
                 dotColor = QColor(Config::UI::COLOR_WATER);
                 break;
-            case World::TileType::GRASS:
+            case World::TileType::Grass:
                 dotColor = QColor(Config::UI::COLOR_GRASS);
                 break;
-            case World::TileType::MOUNTAIN:
+            case World::TileType::Mountain:
                 dotColor = QColor(Config::UI::COLOR_MOUNTAIN);
                 break;
-            case World::TileType::DIRT:
+            case World::TileType::Dirt:
                 dotColor = QColor(Config::UI::COLOR_DIRT);
                 break;
             default:

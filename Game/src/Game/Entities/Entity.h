@@ -14,8 +14,6 @@ class Entity
 public:
     Entity() = default;
 
-    virtual ~Entity() = default;
-
     virtual void update(float deltaTime);
 
     QPointF getPosition() const { return m_position; }
@@ -45,7 +43,7 @@ protected:
 
     std::string m_symbol;
 
-    Engine::Entity::Type m_type = Engine::Entity::Type::UNIT;
+    Engine::Entity::Type m_type = Engine::Entity::Type::Unit;
 
     Player *m_owner = nullptr;
 

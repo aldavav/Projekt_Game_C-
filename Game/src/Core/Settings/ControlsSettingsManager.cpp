@@ -24,11 +24,11 @@ QString ControlsSettingsManager::getKeyName(Engine::Input::Action action) const
 
 ControlsSettingsManager::ControlsSettingsManager()
 {
-    m_bindings[Engine::Input::Action::MOVE_UP] = Engine::Input::KeyCode::UP_ARROW;
-    m_bindings[Engine::Input::Action::MOVE_DOWN] = Engine::Input::KeyCode::DOWN_ARROW;
-    m_bindings[Engine::Input::Action::MOVE_LEFT] = Engine::Input::KeyCode::LEFT_ARROW;
-    m_bindings[Engine::Input::Action::MOVE_RIGHT] = Engine::Input::KeyCode::RIGHT_ARROW;
-    m_bindings[Engine::Input::Action::STOP] = Engine::Input::KeyCode::STOP;
-    m_bindings[Engine::Input::Action::GUARD] = Engine::Input::KeyCode::GUARD;
-    m_bindings[Engine::Input::Action::SCATTER] = Engine::Input::KeyCode::SCATTER;
+    m_bindings[Engine::Input::Action::MoveUp] = Engine::Input::KeyCode::UpArrow;
+    m_bindings[Engine::Input::Action::MoveDown] = Engine::Input::KeyCode::DownArrow;
+    m_bindings[Engine::Input::Action::MoveLeft] = Engine::Input::KeyCode::LeftArrow;
+    m_bindings[Engine::Input::Action::MoveRight] = Engine::Input::KeyCode::RightArrow;
+    m_bindings[Engine::Input::Action::Stop] = Engine::Input::KeyCode::Stop;
+    m_bindings[Engine::Input::Action::Guard] = Engine::Input::KeyCode::Guard;
+    m_bindings[Engine::Input::Action::Scatter] = Engine::Input::KeyCode::Scatter;
 }

@@ -8,7 +8,7 @@ ConfigManager &ConfigManager::getInstance()
 
 ConfigManager::ConfigManager()
 {
-    m_configPath = QCoreApplication::applicationDirPath() + "/game_settings.ini";
+    m_configPath = QCoreApplication::applicationDirPath() + "/" + Config::System::CONFIG_FILE_NAME;
 }
 
 void ConfigManager::saveConfiguration()
@@ -23,13 +23,13 @@ void ConfigManager::saveConfiguration()
     settings.endGroup();
 
     settings.beginGroup("Controls");
-    settings.setValue("MOVE_UP", static_cast<int>(csm.getKey(Engine::Input::Action::MOVE_UP)));
-    settings.setValue("MOVE_DOWN", static_cast<int>(csm.getKey(Engine::Input::Action::MOVE_DOWN)));
-    settings.setValue("MOVE_LEFT", static_cast<int>(csm.getKey(Engine::Input::Action::MOVE_LEFT)));
-    settings.setValue("MOVE_RIGHT", static_cast<int>(csm.getKey(Engine::Input::Action::MOVE_RIGHT)));
-    settings.setValue("STOP", static_cast<int>(csm.getKey(Engine::Input::Action::STOP)));
-    settings.setValue("GUARD", static_cast<int>(csm.getKey(Engine::Input::Action::GUARD)));
-    settings.setValue("SCATTER", static_cast<int>(csm.getKey(Engine::Input::Action::SCATTER)));
+    settings.setValue("MOVE_UP", static_cast<int>(csm.getKey(Engine::Input::Action::MoveUp)));
+    settings.setValue("MOVE_DOWN", static_cast<int>(csm.getKey(Engine::Input::Action::MoveDown)));
+    settings.setValue("MOVE_LEFT", static_cast<int>(csm.getKey(Engine::Input::Action::MoveLeft)));
+    settings.setValue("MOVE_RIGHT", static_cast<int>(csm.getKey(Engine::Input::Action::MoveRight)));
+    settings.setValue("STOP", static_cast<int>(csm.getKey(Engine::Input::Action::Stop)));
+    settings.setValue("GUARD", static_cast<int>(csm.getKey(Engine::Input::Action::Guard)));
+    settings.setValue("SCATTER", static_cast<int>(csm.getKey(Engine::Input::Action::Scatter)));
     settings.endGroup();
 
     settings.beginGroup("Display");
@@ -70,13 +70,13 @@ void ConfigManager::loadConfiguration()
         int val = settings.value(key, static_cast<int>(def)).toInt();
         csm.setKey(action, static_cast<Engine::Input::KeyCode>(val));
     };
-    loadKey("MOVE_UP", Engine::Input::Action::MOVE_UP, Engine::Input::KeyCode::UP_ARROW);
-    loadKey("MOVE_DOWN", Engine::Input::Action::MOVE_DOWN, Engine::Input::KeyCode::DOWN_ARROW);
-    loadKey("MOVE_LEFT", Engine::Input::Action::MOVE_LEFT, Engine::Input::KeyCode::LEFT_ARROW);
-    loadKey("MOVE_RIGHT", Engine::Input::Action::MOVE_RIGHT, Engine::Input::KeyCode::RIGHT_ARROW);
-    loadKey("STOP", Engine::Input::Action::STOP, Engine::Input::KeyCode::STOP);
-    loadKey("GUARD", Engine::Input::Action::GUARD, Engine::Input::KeyCode::GUARD);
-    loadKey("SCATTER", Engine::Input::Action::SCATTER, Engine::Input::KeyCode::SCATTER);
+    loadKey("MOVE_UP", Engine::Input::Action::MoveUp, Engine::Input::KeyCode::UpArrow);
+    loadKey("MOVE_DOWN", Engine::Input::Action::MoveDown, Engine::Input::KeyCode::DownArrow);
+    loadKey("MOVE_LEFT", Engine::Input::Action::MoveLeft, Engine::Input::KeyCode::LeftArrow);
+    loadKey("MOVE_RIGHT", Engine::Input::Action::MoveRight, Engine::Input::KeyCode::RightArrow);
+    loadKey("STOP", Engine::Input::Action::Stop, Engine::Input::KeyCode::Stop);
+    loadKey("GUARD", Engine::Input::Action::Guard, Engine::Input::KeyCode::Guard);
+    loadKey("SCATTER", Engine::Input::Action::Scatter, Engine::Input::KeyCode::Scatter);
     settings.endGroup();
 
     settings.beginGroup("Display");
@@ -101,13 +101,13 @@ void ConfigManager::loadConfiguration()
 void ConfigManager::resetToDefaults()
 {
     auto &csm = ControlsSettingsManager::getInstance();
-    csm.setKey(Engine::Input::Action::MOVE_UP, Engine::Input::KeyCode::UP_ARROW);
-    csm.setKey(Engine::Input::Action::MOVE_DOWN, Engine::Input::KeyCode::DOWN_ARROW);
-    csm.setKey(Engine::Input::Action::MOVE_LEFT, Engine::Input::KeyCode::LEFT_ARROW);
-    csm.setKey(Engine::Input::Action::MOVE_RIGHT, Engine::Input::KeyCode::RIGHT_ARROW);
-    csm.setKey(Engine::Input::Action::STOP, Engine::Input::KeyCode::STOP);
-    csm.setKey(Engine::Input::Action::GUARD, Engine::Input::KeyCode::GUARD);
-    csm.setKey(Engine::Input::Action::SCATTER, Engine::Input::KeyCode::SCATTER);
+    csm.setKey(Engine::Input::Action::MoveUp, Engine::Input::KeyCode::UpArrow);
+    csm.setKey(Engine::Input::Action::MoveDown, Engine::Input::KeyCode::DownArrow);
+    csm.setKey(Engine::Input::Action::MoveLeft, Engine::Input::KeyCode::LeftArrow);
+    csm.setKey(Engine::Input::Action::MoveRight, Engine::Input::KeyCode::RightArrow);
+    csm.setKey(Engine::Input::Action::Stop, Engine::Input::KeyCode::Stop);
+    csm.setKey(Engine::Input::Action::Guard, Engine::Input::KeyCode::Guard);
+    csm.setKey(Engine::Input::Action::Scatter, Engine::Input::KeyCode::Scatter);
 
     QString langCode = (m_cachedSettings.languageIndex == 1) ? "cz" : "en";
     GameSettingsManager::getInstance().setLanguage(langCode);
