@@ -5,11 +5,14 @@ MinimapProvider::MinimapProvider()
     m_throttleTimer.start();
 }
 
-QPixmap MinimapProvider::getMinimap(int size, int screenWidth, int screenHeight, float gameTime)
+QPixmap MinimapProvider::getMinimap(int size, int screenWidth, int screenHeight, bool override)
 {
-    if (m_needsUpdate || m_throttleTimer.elapsed() > Config::World::MINIMAP_UPDATE_MS)
+    if (override != m_lastOverride || m_needsUpdate || m_throttleTimer.elapsed() > Config::World::MINIMAP_UPDATE_MS)
     {
-        updateCache(size, screenWidth, screenHeight, gameTime);
+        m_lastOverride = override;
+
+        updateCache(size, screenWidth, screenHeight, override);
+
         m_needsUpdate = false;
         m_throttleTimer.restart();
     }
@@ -59,24 +62,7 @@ void MinimapProvider::updateCache(int size, int screenWidth, int screenHeight, b
         {
             World::Tile &tile = map.getTileAt(q, r);
 
-            QColor dotColor;
-            switch (tile.type)
-            {
-            case World::TileType::Water:
-                dotColor = QColor(Config::UI::COLOR_WATER);
-                break;
-            case World::TileType::Grass:
-                dotColor = QColor(Config::UI::COLOR_GRASS);
-                break;
-            case World::TileType::Mountain:
-                dotColor = QColor(Config::UI::COLOR_MOUNTAIN);
-                break;
-            case World::TileType::Dirt:
-                dotColor = QColor(Config::UI::COLOR_DIRT);
-                break;
-            default:
-                continue;
-            }
+            QColor dotColor = getTileVisualColor(tile, override);
 
             float worldX = tileS * (1.5f * q);
             float worldY = tileS * (0.866f * q + 1.732f * r);
@@ -96,4 +82,39 @@ void MinimapProvider::updateCache(int size, int screenWidth, int screenHeight, b
     float viewH = (screenHeight / zoom) / viewPortWidth * size;
     painter.setPen(QPen(Qt::white, 1));
     painter.drawRect(QRectF((size - viewW) / 2.0f, (size - viewH) / 2.0f, viewW, viewH));
+}
+
+QColor MinimapProvider::getTileVisualColor(const World::Tile &tile, bool override)
+{
+    QColor baseColor;
+
+    switch (tile.type)
+    {
+    case World::TileType::Water:
+        baseColor = Config::UI::COLOR_WATER;
+        break;
+    case World::TileType::Grass:
+        baseColor = Config::UI::COLOR_GRASS;
+        break;
+    case World::TileType::Mountain:
+        baseColor = Config::UI::COLOR_MOUNTAIN;
+        break;
+    case World::TileType::Dirt:
+        baseColor = Config::UI::COLOR_DIRT;
+        break;
+    default:
+        baseColor = Config::UI::COLOR_WATER;
+        break;
+    }
+
+    if (override || tile.discovered)
+    {
+        return baseColor;
+    }
+    else
+    {
+        return baseColor.darker(250);
+    }
+
+    return Qt::black;
 }

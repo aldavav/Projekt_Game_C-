@@ -25,18 +25,6 @@ class GameScreen : public AbstractScreen
 {
     Q_OBJECT
 
-    Q_PROPERTY(QColor grassColor MEMBER m_grassColor)
-
-    Q_PROPERTY(QColor waterColor MEMBER m_waterColor)
-
-    Q_PROPERTY(QColor mountainColor MEMBER m_mountainColor)
-
-    Q_PROPERTY(QColor dirtColor MEMBER m_dirtColor)
-
-    Q_PROPERTY(QColor selectionColor MEMBER m_selectionColor)
-
-    Q_PROPERTY(QColor fogColor MEMBER m_fogColor)
-
 public:
     explicit GameScreen(QWidget *parent = nullptr);
 
@@ -95,20 +83,6 @@ private:
     bool m_isDragging = false;
 
     bool m_is3D = false;
-
-    bool m_isDiscoveryActive = false;
-
-    QColor m_grassColor;
-
-    QColor m_waterColor;
-
-    QColor m_mountainColor;
-
-    QColor m_dirtColor;
-
-    QColor m_selectionColor;
-
-    QColor m_fogColor;
 };
 
 #endif

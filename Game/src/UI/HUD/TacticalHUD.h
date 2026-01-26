@@ -33,17 +33,19 @@ public:
 
     void setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos, uint32_t mapSeed);
 
+    void refreshMinimap() { m_minimapProvider.forceUpdate(); }
+
 signals:
     void hudButtonClicked(int buttonIndex);
 
     void minimapClicked(QPointF worldPos);
 
+    void homeButtonClicked();
+
 private:
     void drawResourceStats(QPainter &painter, int width, int height);
 
     void drawDayNightCycle(QPainter &painter, int width, int height);
-
-    void drawMinimap(QPainter &painter, int width, int height);
 
     void drawDiagnostics(QPainter &painter, int width, int height);
     
@@ -80,6 +82,8 @@ private:
     MinimapProvider m_minimapProvider;
 
     QRect m_minimapBox;
+
+    QRect m_homeButtonRect;
 };
 
 #endif

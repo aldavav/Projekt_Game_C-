@@ -24,15 +24,11 @@ public:
 
     void move(float dx, float dy);
 
-    void handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHeight, float deltaTime);
-
     void adjustZoom(float delta);
 
     void shake(float intensity) { m_shakeIntensity = intensity; }
 
     void setTargetPos(QPointF hexCoords);
-
-    void setTargetRawPos(QPointF worldPos);
 
     void setViewportSize(int w, int h);
 

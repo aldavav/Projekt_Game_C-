@@ -9,6 +9,18 @@ GameScreen::GameScreen(QWidget *parent)
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
     connect(m_updateTimer, &QTimer::timeout, this, &GameScreen::updateGameDisplay);
+
+    auto *hud = GameManager::getInstance().getHUD();
+    if (hud)
+    {
+        connect(hud, &TacticalHUD::homeButtonClicked, this, [this]()
+                {
+            Camera::getInstance().setTargetPos(QPointF(0,0));
+            update(); });
+
+        connect(hud, &TacticalHUD::hudButtonClicked, this, [this](int index)
+                { update(); });
+    }
 }
 
 void GameScreen::onEnter()
@@ -126,6 +138,7 @@ void GameScreen::keyPressEvent(QKeyEvent *event)
         {
             gm.getHUD()->toggleDiagnostics();
             gm.switchIsDiscoveryActive();
+            gm.getHUD()->refreshMinimap();
             update();
         }
     }
@@ -449,20 +462,20 @@ QColor GameScreen::getTileVisualColor(const World::Tile &tile, float gameTime, b
     case World::TileType::Water:
     {
         float wave = std::sin(gameTime * Config::World::WATER_WAVE_SPEED) * 0.5f + 0.5f;
-        baseColor = m_waterColor.lighter(Config::World::WATER_BRIGHTNESS_BASE + wave * Config::World::WATER_BRIGHTNESS_SWING);
+        baseColor = QColor(Config::UI::COLOR_WATER).lighter(Config::World::WATER_BRIGHTNESS_BASE + wave * Config::World::WATER_BRIGHTNESS_SWING);
         break;
     }
     case World::TileType::Grass:
-        baseColor = m_grassColor;
+        baseColor = Config::UI::COLOR_GRASS;
         break;
     case World::TileType::Mountain:
-        baseColor = m_mountainColor;
+        baseColor = Config::UI::COLOR_MOUNTAIN;
         break;
     case World::TileType::Dirt:
-        baseColor = m_dirtColor;
+        baseColor = Config::UI::COLOR_DIRT;
         break;
     default:
-        baseColor = m_grassColor;
+        baseColor = Config::UI::COLOR_WATER;
         break;
     }
 

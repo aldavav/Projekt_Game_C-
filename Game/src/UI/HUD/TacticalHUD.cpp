@@ -24,6 +24,7 @@ void TacticalHUD::update(float gameTime, bool isPaused, Engine::GameSpeed speed)
 
 void TacticalHUD::draw(QPainter &painter, int width, int height)
 {
+    auto &gm = GameManager::getInstance();
     painter.setRenderHint(QPainter::Antialiasing, false);
 
     if (m_showDiagnostics)
@@ -39,7 +40,7 @@ void TacticalHUD::draw(QPainter &painter, int width, int height)
     int mmY = mmMargin;
     m_minimapBox = QRect(mmX, mmY, mmSize, mmSize);
 
-    QPixmap mmCache = m_minimapProvider.getMinimap(mmSize, width, height, m_gameTime);
+    QPixmap mmCache = m_minimapProvider.getMinimap(mmSize, width, height, gm.getIsDiscoveryActive());
     painter.drawPixmap(mmX, mmY, mmCache);
 
     painter.setPen(QPen(QColor(Config::UI::COLOR_TACTICAL_BLUE), 2));
@@ -66,6 +67,12 @@ bool TacticalHUD::handleMousePress(QMouseEvent *event, int width, int height)
             emit hudButtonClicked(i);
             return true;
         }
+    }
+
+    if (m_homeButtonRect.contains(event->pos()))
+    {
+        emit homeButtonClicked();
+        return true;
     }
 
     if (m_minimapBox.contains(event->pos()))
@@ -182,76 +189,6 @@ void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
     }
 }
 
-void TacticalHUD::drawMinimap(QPainter &painter, int width, int height)
-{
-    auto &map = Map::getInstance();
-    auto &cam = Camera::getInstance();
-
-    int mmSize = Config::UI::HUD_MINIMAP_SIZE, mmMargin = Config::UI::HUD_MARGIN;
-    int mmX = width - mmSize - mmMargin;
-    int mmY = mmMargin;
-
-    painter.setBrush(QColor(0, 0, 0, 200));
-    painter.setPen(QPen(QColor("#444444"), 2));
-    painter.drawRect(mmX, mmY, mmSize, mmSize);
-
-    painter.save();
-    painter.setClipRect(mmX, mmY, mmSize, mmSize);
-
-    const int MM_RANGE = Config::World::MINIMAP_RANGE;
-    float dotSize = static_cast<float>(mmSize) / (MM_RANGE * 2);
-
-    QPointF camCenter = cam.screenToWorld(QPoint(width / 2, height / 2));
-    const float size = 32.0f;
-    float cq = (2.0f / 3.0f * camCenter.x()) / size;
-    float cr = (-1.0f / 3.0f * camCenter.x() + std::sqrt(3.0f) / 3.0f * camCenter.y()) / size;
-
-    for (int q = cq - MM_RANGE; q <= cq + MM_RANGE; ++q)
-    {
-        for (int r = cr - MM_RANGE; r <= cr + MM_RANGE; ++r)
-        {
-            World::Tile &tile = map.getTileAt(q, r);
-            if (!tile.visible)
-                continue;
-
-            QColor dotColor;
-            switch (tile.type)
-            {
-            case World::TileType::Water:
-                dotColor = QColor(Config::UI::COLOR_WATER);
-                break;
-            case World::TileType::Grass:
-                dotColor = QColor(Config::UI::COLOR_GRASS);
-                break;
-            case World::TileType::Mountain:
-                dotColor = QColor(Config::UI::COLOR_MOUNTAIN);
-                break;
-            default:
-                dotColor = QColor(Config::UI::COLOR_UNKNOWN);
-                break;
-            }
-
-            float worldX = (1.5f * q);
-            float worldY = (std::sqrt(3.0f) / 2.0f * q + std::sqrt(3.0f) * r);
-            float centerX = (1.5f * cq);
-            float centerY = (std::sqrt(3.0f) / 2.0f * cq + std::sqrt(3.0f) * cr);
-
-            float screenX = (worldX - centerX) * dotSize;
-            float screenY = (worldY - centerY) * dotSize;
-
-            painter.setBrush(dotColor);
-            painter.setPen(Qt::NoPen);
-            painter.drawRect(QRectF(mmX + (mmSize / 2) + screenX, mmY + (mmSize / 2) + screenY, dotSize + 1.0f, dotSize + 1.0f));
-        }
-    }
-
-    painter.setBrush(Qt::NoBrush);
-    painter.setPen(QPen(Qt::white, 1));
-    int viSize = 15;
-    painter.drawRect(mmX + (mmSize / 2) - (viSize / 2), mmY + (mmSize / 2) - (viSize / 2), viSize, viSize);
-    painter.restore();
-}
-
 void TacticalHUD::drawDayNightCycle(QPainter &painter, int width, int height)
 {
     float timeOffset = 45.0f;
@@ -286,12 +223,13 @@ void TacticalHUD::drawDayNightCycle(QPainter &painter, int width, int height)
     }
 
     int margin = 20;
-    int boxW = 230, boxH = 75;
+    int boxW = 285, boxH = 75;
     int rectX = margin, rectY = height - boxH - margin;
 
     painter.setBrush(QColor(0, 0, 0, 200));
     painter.setPen(QPen(phaseColor, 2));
     painter.drawRect(rectX, rectY, boxW, boxH);
+    drawScanlines(painter, QRect(rectX, rectY, boxW, boxH));
 
     painter.save();
     painter.translate(rectX + 20, rectY + 20);
@@ -302,13 +240,17 @@ void TacticalHUD::drawDayNightCycle(QPainter &painter, int width, int height)
     painter.restore();
 
     painter.setPen(Qt::white);
+    painter.setFont(QFont("Consolas", 9, QFont::Bold));
     painter.drawText(rectX + 40, rectY + 25, phaseText);
 
     QString labels[] = {"||", "x0.5", "x1.0", "x2.0"};
     int btnW = 42, btnH = 25, btnSpacing = 6;
+    int currentX = rectX + 15;
+
     for (int i = 0; i < 4; ++i)
     {
-        QRect btnRect(rectX + 15 + (i * (btnW + btnSpacing)), rectY + 38, btnW, btnH);
+        QRect btnRect(currentX + (i * (btnW + btnSpacing)), rectY + 38, btnW, btnH);
+
         bool isActive = (i == 0 && m_isPaused) ||
                         (i == 1 && !m_isPaused && m_currentSpeed == Engine::GameSpeed::Slow) ||
                         (i == 2 && !m_isPaused && m_currentSpeed == Engine::GameSpeed::Normal) ||
@@ -319,7 +261,32 @@ void TacticalHUD::drawDayNightCycle(QPainter &painter, int width, int height)
         painter.drawRect(btnRect);
         painter.setPen(Qt::white);
         painter.drawText(btnRect, Qt::AlignCenter, labels[i]);
+
+        if (i == 3)
+            currentX = btnRect.right();
     }
+
+    m_homeButtonRect = QRect(currentX + 12, rectY + 38, btnW, btnH);
+
+    painter.setBrush(QColor(40, 45, 60));
+    painter.setPen(QPen(QColor(Config::UI::COLOR_TACTICAL_BLUE), 1));
+    painter.drawRect(m_homeButtonRect);
+
+    painter.setPen(QPen(Qt::white, 1.5));
+    painter.setBrush(Qt::NoBrush);
+
+    int cx = m_homeButtonRect.center().x();
+    int cy = m_homeButtonRect.center().y();
+
+    QPolygon house;
+    house << QPoint(cx - 7, cy + 5)
+          << QPoint(cx - 7, cy - 1)
+          << QPoint(cx, cy - 7)
+          << QPoint(cx + 7, cy - 1)
+          << QPoint(cx + 7, cy + 5);
+
+    painter.drawPolyline(house);
+    painter.drawLine(cx - 7, cy + 5, cx + 7, cy + 5);
 
     if (m_isPaused)
     {

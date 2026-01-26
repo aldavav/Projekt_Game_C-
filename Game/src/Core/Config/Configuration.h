@@ -82,7 +82,7 @@ namespace Config
 
     namespace Log
     {
-        const size_t MAX_ARCHIVE_FILES = 5;
+        const size_t MAX_ARCHIVE_FILES = 10;
         const std::string DIRECTORY = "logs";
         const std::string LATEST_FILE = "latest.log";
         const std::string ARCHIVE_FILE_PREFIX = "log_";
