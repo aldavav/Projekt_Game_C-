@@ -51,7 +51,7 @@ void GameScreen::mousePressEvent(QMouseEvent *event)
     {
         m_isDragging = true;
         m_lastMousePos = event->pos();
-        gm.handleMouseClick(event->pos());
+        gm.handleMouseClick(event->pos(), m_is3D);
     }
 
     update();
@@ -194,6 +194,7 @@ void GameScreen::setupUI(QPainter &painter)
 void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
 {
     auto &cam = Camera::getInstance();
+    auto &gm = GameManager::getInstance();
     auto &map = Map::getInstance();
     const float BASE_TILE = Config::World::BASE_TILE_SIZE;
     float zoom = cam.getZoom();
@@ -204,8 +205,8 @@ void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
     struct TileData
     {
         int q, r;
-        QPoint pos;
-        float h;
+        QPoint screenPos;
+        float heightOffset;
     };
     std::vector<TileData> visibleTiles;
 
@@ -229,37 +230,58 @@ void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
                 continue;
 
             float h = Config::World::HEIGHT_OFFSET;
-            if (tile.type == World::TileType::Mountain)
+            switch (tile.type)
+            {
+            case World::TileType::Mountain:
                 h = Config::World::MOUNTAIN_HEIGHT;
-            else if (tile.type == World::TileType::Grass)
+                break;
+            case World::TileType::Grass:
                 h = Config::World::GRASS_HEIGHT;
-            else if (tile.type == World::TileType::Dirt)
+                break;
+            case World::TileType::Dirt:
                 h = Config::World::DIRT_HEIGHT;
-            else if (tile.type == World::TileType::Water)
+                break;
+            case World::TileType::Water:
                 h = Config::World::WATER_HEIGHT;
+                break;
+            default:
+                break;
+            }
 
             visibleTiles.push_back({q, r, screenPos, h * zoom});
         }
     }
 
-    std::sort(visibleTiles.begin(), visibleTiles.end(), [](const TileData &a, const TileData &b)
-              { return a.pos.y() < b.pos.y(); });
+    std::sort(visibleTiles.begin(), visibleTiles.end(),
+              [](const TileData &a, const TileData &b)
+              { return a.screenPos.y() < b.screenPos.y(); });
 
-    float radius = (BASE_TILE * zoom) * Config::World::HEX_VISUAL_SCALE;
+    float visualRadius = (BASE_TILE * zoom) * Config::World::HEX_VISUAL_SCALE;
+
     for (const auto &d : visibleTiles)
     {
-        bool hovered = (d.q == currentHover.x() && d.r == currentHover.y());
-        bool selected = (GameManager::getInstance().hasSelection() &&
-                         d.q == GameManager::getInstance().getSelectedHex().x() &&
-                         d.r == GameManager::getInstance().getSelectedHex().y());
+        bool isHovered = (d.q == currentHover.x() && d.r == currentHover.y());
+        bool isSelected = (gm.hasSelection() && d.q == gm.getSelectedHex().x() && d.r == gm.getSelectedHex().y());
 
-        QColor color = getTileVisualColor(map.getTileAt(d.q, d.r), GameManager::getInstance().getGameTime(), GameManager::getInstance().getIsDiscoveryActive());
-        if (selected)
-            color = color.lighter(150);
-        else if (hovered)
-            color = color.lighter(120);
+        QColor tileColor = getTileVisualColor(map.getTileAt(d.q, d.r), gm.getGameTime(), gm.getIsDiscoveryActive());
 
-        drawHexagon(painter, d.pos, radius, color, d.h);
+        if (isSelected)
+        {
+            painter.setBrush(tileColor.lighter(150));
+            painter.setPen(QPen(QColor(0, 0, 0, 0), 2));
+        }
+        else if (isHovered)
+        {
+            painter.setBrush(tileColor.lighter(120));
+            painter.setPen(QPen(QColor(255, 255, 255, 180), 1));
+        }
+        else
+        {
+            painter.setBrush(tileColor);
+            painter.setPen(QPen(QColor(0, 0, 0, 40), 1));
+        }
+
+        drawHexagon(painter, d.screenPos, visualRadius, painter.brush().color(), d.heightOffset);
     }
 }
 
@@ -269,6 +291,7 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
     auto &gm = GameManager::getInstance();
     auto &map = Map::getInstance();
     const float BASE_TILE = Config::World::BASE_TILE_SIZE;
+    float zoom = cam.getZoom();
 
     QPointF topLeft = cam.screenToWorld(QPoint(0, 0), false);
     QPointF bottomRight = cam.screenToWorld(QPoint(width(), height()), false);
@@ -276,7 +299,6 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
     int minQ = static_cast<int>(floor((2.0f / 3.0f * topLeft.x()) / BASE_TILE)) - 2;
     int maxQ = static_cast<int>(ceil((2.0f / 3.0f * bottomRight.x()) / BASE_TILE)) + 2;
 
-    float zoom = cam.getZoom();
     float visualRadius = (BASE_TILE * zoom) * Config::World::HEX_VISUAL_SCALE;
     QColor selectionColor = property("selectionColor").value<QColor>();
 
@@ -299,12 +321,12 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
             bool isSelected = (gm.hasSelection() && q == gm.getSelectedHex().x() && r == gm.getSelectedHex().y());
             bool isHovered = (q == currentHover.x() && r == currentHover.y());
 
-            QColor tileColor = getTileVisualColor(tile, gm.getGameTime(), GameManager::getInstance().getIsDiscoveryActive());
+            QColor tileColor = getTileVisualColor(tile, gm.getGameTime(), gm.getIsDiscoveryActive());
 
             if (isSelected)
             {
                 painter.setBrush(tileColor.lighter(150));
-                painter.setPen(QPen(selectionColor, 2));
+                painter.setPen(QPen(QColor(0, 0, 0, 0), 2));
             }
             else if (isHovered)
             {

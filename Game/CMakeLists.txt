@@ -46,6 +46,8 @@ set(SRC_GAME
     src/Game/Actions/GuardUnitAction.h
     src/Game/Actions/MoveUnitAction.cpp
     src/Game/Actions/MoveUnitAction.h
+    src/Game/Actions/ScatterUnitAction.cpp
+    src/Game/Actions/ScatterUnitAction.h
     src/Game/Actions/StopUnitAction.cpp
     src/Game/Actions/StopUnitAction.h
     src/Game/Actions/ZoomAction.cpp

@@ -32,7 +32,7 @@ public:
 
     void setPaused(bool paused);
 
-    void handleMouseClick(QPoint screenPos);
+    void handleMouseClick(QPoint screenPos, bool m_is3D = false);
 
     bool hasSelection() const;
 

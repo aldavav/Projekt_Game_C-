@@ -256,9 +256,9 @@ STRATEGIC OBJECTIVE:
         constexpr int MINIMAP_RANGE = 40;
         constexpr int SCANLINE_SPACING = 3;
         constexpr int WORLD_BOUNDS_INT = 50;
-        constexpr int MOUNTAIN_HEIGHT = 15;
-        constexpr int GRASS_HEIGHT = 10;
-        constexpr int DIRT_HEIGHT = 5;
+        constexpr int MOUNTAIN_HEIGHT = 20;
+        constexpr int GRASS_HEIGHT = 5;
+        constexpr int DIRT_HEIGHT = 0;
         constexpr int WATER_HEIGHT = 0;
     }
 }

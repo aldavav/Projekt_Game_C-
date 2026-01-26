@@ -6,8 +6,6 @@ InputManager &InputManager::getInstance()
     return instance;
 }
 
-InputManager::InputManager(QObject *parent) : QObject(parent) {}
-
 bool InputManager::isKeyPressed(int keyCode) const
 {
     QMutexLocker locker(&m_mutex);
@@ -76,6 +74,7 @@ void InputManager::onMouseMove(const QPoint &pos)
         Engine::Input::RawEvent event;
         event.type = Engine::Input::RawEvent::Type::MouseMove;
         event.position = pos;
+
         queueCommand(translateRawInput(event));
     }
 }
@@ -86,29 +85,30 @@ CommandPtr InputManager::translateRawInput(const Engine::Input::RawEvent &event)
 
     if (event.type == Engine::Input::RawEvent::Type::Keyboard)
     {
-        /*auto action = settings.getActionForKey(event.keyCode);
+        Engine::Input::Action action = settings.getActionForKey(event.keyCode);
 
         switch (action)
         {
         case Engine::Input::Action::Stop:
-            return CommandPtr::create<StopUnitAction>();
+            return QSharedPointer<StopUnitAction>::create(0, QPoint(0, 0));
         case Engine::Input::Action::Guard:
-            return CommandPtr::create<GuardUnitAction>();
+            return QSharedPointer<GuardUnitAction>::create(0, QPoint(0, 0));
         case Engine::Input::Action::ZoomOut:
-            return CommandPtr::create<ZoomAction>(-Config::Gameplay::ZOOM_STEP);
+            return QSharedPointer<ZoomAction>::create(-Config::Gameplay::ZOOM_STEP);
         case Engine::Input::Action::ZoomIn:
-        case Engine::Input::Action::ZoomInAlt:
-            return CommandPtr::create<ZoomAction>(Config::Gameplay::ZOOM_STEP);
+            return QSharedPointer<ZoomAction>::create(Config::Gameplay::ZOOM_STEP);
+        case Engine::Input::Action::Scatter:
+            return QSharedPointer<ScatterUnitAction>::create(0, QPoint(0, 0));
         default:
             break;
-        }*/
+        }
     }
 
     if (event.type == Engine::Input::RawEvent::Type::MouseClick)
     {
         if (event.button == Config::Input::BTN_MOVE)
         {
-            ///return CommandPtr::create<MoveUnitAction>(event.position);
+            return QSharedPointer<MoveUnitAction>::create(0, event.position);
         }
     }
 

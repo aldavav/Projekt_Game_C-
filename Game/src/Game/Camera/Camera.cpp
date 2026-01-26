@@ -39,43 +39,21 @@ void Camera::update(float deltaTime)
     }
 }
 
-void Camera::handleEdgePanning(const QPoint &mousePos, int viewWidth, int viewHeight, float deltaTime)
-{
-    float moveAmount = (Config::World::EDGE_PAN_SPEED / m_zoom) * deltaTime;
-    float dx = 0, dy = 0;
-
-    if (mousePos.x() < 0 || mousePos.y() < 0 || mousePos.x() > viewWidth || mousePos.y() > viewHeight)
-        return;
-
-    if (mousePos.x() < Config::World::EDGE_MARGIN)
-        dx = -moveAmount;
-    else if (mousePos.x() > viewWidth - Config::World::EDGE_MARGIN)
-        dx = moveAmount;
-
-    if (mousePos.y() < Config::World::EDGE_MARGIN)
-        dy = -moveAmount;
-    else if (mousePos.y() > viewHeight - Config::World::EDGE_MARGIN)
-        dy = moveAmount;
-
-    if (dx != 0 || dy != 0)
-        move(dx, dy);
-}
-
 QPointF Camera::screenToWorld(const QPoint &screenPos, bool is3D) const
 {
-    float worldX = (screenPos.x() - m_viewportWidth / 2.0f) / m_zoom + m_currentPos.x();
+    float dx = screenPos.x() - (m_viewportWidth / 2.0f);
+    float dy = screenPos.y() - (m_viewportHeight / 2.0f);
 
-    float screenY_Relative = (screenPos.y() - m_viewportHeight / 2.0f) / m_zoom;
+    float relX = dx / m_zoom;
+    float relY = dy / m_zoom;
 
-    float worldY;
     if (is3D)
     {
-        worldY = (screenY_Relative * 2.0f) + m_currentPos.y();
+        relY *= 2.0f;
     }
-    else
-    {
-        worldY = screenY_Relative + m_currentPos.y();
-    }
+
+    float worldX = relX + m_currentPos.x();
+    float worldY = relY + m_currentPos.y();
 
     return QPointF(worldX, worldY);
 }
@@ -161,17 +139,12 @@ void Camera::move(float dx, float dy)
 
 void Camera::setTargetPos(QPointF hexCoords)
 {
-    const float size = 32.0f;
+    const float size = Config::World::BASE_TILE_SIZE;
 
     float x = size * (3.0f / 2.0f * hexCoords.x());
     float y = size * (std::sqrt(3.0f) / 2.0f * hexCoords.x() + std::sqrt(3.0f) * hexCoords.y());
 
     m_targetPos = QPointF(x, y);
-}
-
-void Camera::setTargetRawPos(QPointF worldPos)
-{
-    m_targetPos = worldPos;
 }
 
 void Camera::adjustZoom(float delta)
