@@ -74,17 +74,13 @@ void GameManager::setPaused(bool paused)
     m_isPaused = paused;
 }
 
-void GameManager::handleMouseClick(QPoint screenPos)
+void GameManager::handleMouseClick(QPoint screenPos, bool m_is3D)
 {
     auto &cam = Camera::getInstance();
-    QPointF worldPos = cam.screenToWorld(screenPos);
 
-    const float size = Config::World::BASE_TILE_SIZE;
-    float q = (2.0f / 3.0f * worldPos.x()) / size;
-    float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size;
+    QPoint currentHover = cam.screenToHex(screenPos, m_is3D);
 
-    QPoint selection = cam.hexRound(q, r).toPoint();
-    m_selectedHex = QPointF(selection.x(), selection.y());
+    m_selectedHex = QPointF(currentHover.x(), currentHover.y());
     m_hasSelection = true;
     m_hud->setSelection(m_selectedHex, true);
 }

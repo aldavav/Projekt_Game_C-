@@ -40,7 +40,7 @@ signals:
     void commandQueued();
 
 private:
-    explicit InputManager(QObject *parent = nullptr);
+    explicit InputManager(QObject *parent = nullptr) : QObject(parent) {};
 
     void queueCommand(CommandPtr command);
 

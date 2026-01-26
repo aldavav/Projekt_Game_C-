@@ -6,8 +6,6 @@ InputManager &InputManager::getInstance()
     return instance;
 }
 
-InputManager::InputManager(QObject *parent) : QObject(parent) {}
-
 bool InputManager::isKeyPressed(int keyCode) const
 {
     QMutexLocker locker(&m_mutex);
