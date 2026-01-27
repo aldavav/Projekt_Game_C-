@@ -8,6 +8,7 @@
 #include <qcoreapplication.h>
 #include <Game/Map/Map.h>
 #include <QSettings>
+#include <qrandom.h>
 #include <QObject>
 #include <QString>
 #include <QTimer>
@@ -31,7 +32,7 @@ public:
 
     void triggerEndGame(bool victory);
 
-    void setupMatch(QString mapName, uint32_t seed);
+    void setupMatch(QString mapName, uint32_t seed, int difficulty, int mapType);
 
     void saveCurrentMatch();
 
@@ -80,6 +81,10 @@ private:
     float m_accumulator = 0.0f;
 
     std::vector<std::unique_ptr<Entity>> m_entities;
+
+    int m_difficulty = 0;
+
+    int m_mapType = 0;
 };
 
 #endif

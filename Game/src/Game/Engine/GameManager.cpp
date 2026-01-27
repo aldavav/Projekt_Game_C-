@@ -115,7 +115,7 @@ void GameManager::handleHudButton(int index)
 
 void GameManager::handleMinimapNavigation(QPointF worldPos)
 {
-    Map::getInstance().clearAllDiscovered();
+    //Map::getInstance().clearAllVisible();
     Camera::getInstance().setTargetPos(worldPos);
 }
 

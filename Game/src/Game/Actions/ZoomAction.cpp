@@ -7,7 +7,7 @@ bool ZoomAction::execute(GameEngine &engine)
     float currentZoom = cam.getZoom();
     float newZoom = currentZoom + (m_zoomDelta * Config::Gameplay::ZOOM_STEP);
 
-    newZoom = std::clamp(newZoom, Config::World::MIN_ZOOM, Config::World::MAX_ZOOM);
+    newZoom = std::clamp(newZoom, Config::World::MAX_IN_ZOOM, Config::World::MAX_OUT_ZOOM);
 
     cam.setZoom(newZoom);
     return true;

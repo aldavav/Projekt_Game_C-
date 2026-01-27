@@ -14,7 +14,7 @@ class Map
 public:
     static Map &getInstance();
 
-    void initializeNewMap(const std::string &name = Config::Gameplay::DEFAULT_MISSION_NAME.toStdString(), Engine::Difficulty difficulty = Config::Gameplay::DEFAULT_DIFFICULTY);
+    void initializeNewMap(const std::string &name, Engine::Difficulty difficulty, uint32_t seed, int type);
 
     void clear();
 
@@ -24,7 +24,7 @@ public:
 
     void revealRadiusWithCleanup(int centerQ, int centerR, int radius);
 
-    void clearAllDiscovered();
+    void clearAllVisible();
 
     bool hasTileAt(int q, int r);
 
@@ -50,6 +50,8 @@ private:
     Engine::Difficulty m_difficulty = Config::Gameplay::DEFAULT_DIFFICULTY;
 
     std::unordered_map<uint64_t, World::Chunk *> m_chunks;
+
+    World::MapType m_mapType = World::MapType::ISLAND;
 };
 
 #endif
