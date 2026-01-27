@@ -227,15 +227,20 @@ STRATEGIC OBJECTIVE:
 
     namespace World
     {
-        const QRect WORLD_BOUNDS = QRect(-2000, -1500, 3500, 3000);
+        constexpr int WORLD_BOUNDS_INT = 10;
+        constexpr float BASE_TILE_SIZE = 32.0f;
+        static const int PX_WIDTH = static_cast<int>(BASE_TILE_SIZE * 1.5f * WORLD_BOUNDS_INT * 2);
+        static const int PX_HEIGHT = static_cast<int>(BASE_TILE_SIZE * 1.732f * WORLD_BOUNDS_INT * 2);
+        const QRect WORLD_BOUNDS = QRect(-PX_WIDTH / 2, -PX_HEIGHT / 2, PX_WIDTH, PX_HEIGHT);
+        constexpr float MINIMAP_VIEW_RADIUS = 128.0f;
         constexpr uint32_t DEFAULT_SEED = 123456789;
         constexpr bool DEFAULT_3D_VIEW = true;
-        constexpr float BASE_TILE_SIZE = 32.0f;
         constexpr int CHUNK_SIZE = 32;
         constexpr float NOISE_SCALE = 15.0f;
-        constexpr float THRESH_WATER = 0.2f;
-        constexpr float THRESH_DIRT = 0.3f;
-        constexpr float THRESH_GRASS = 0.65f;
+        constexpr float ISLAND_SIZE = static_cast<float>(WORLD_BOUNDS_INT) * 0.9f;
+        constexpr float THRESH_WATER = 0.35f;
+        constexpr float THRESH_DIRT = 0.45f;
+        constexpr float THRESH_GRASS = 0.70f;
         constexpr float HEIGHT_BIAS = 0.1f;
         constexpr int HEIGHT_OFFSET = 15;
         constexpr int REVEAL_RADIUS = 10;
@@ -244,7 +249,7 @@ STRATEGIC OBJECTIVE:
         constexpr float CAMERA_KEYBOARD_SPEED = 800.0f;
         constexpr float EDGE_PAN_SPEED = 500.0f;
         constexpr int EDGE_MARGIN = 30;
-        constexpr float MAX_OUT_ZOOM = 2.0f;
+        constexpr float MAX_OUT_ZOOM = 1.0f;
         constexpr float MAX_IN_ZOOM = 5.0f;
         constexpr float HEX_Y_SQUASH = 0.5f;
         constexpr float SHAKE_DECAY = 0.9f;
@@ -260,7 +265,6 @@ STRATEGIC OBJECTIVE:
         constexpr int MINIMAP_UPDATE_MS = 100;
         constexpr int MINIMAP_RANGE = 40;
         constexpr int SCANLINE_SPACING = 3;
-        constexpr int WORLD_BOUNDS_INT = 50;
         constexpr int MOUNTAIN_HEIGHT = 20;
         constexpr int GRASS_HEIGHT = 5;
         constexpr int DIRT_HEIGHT = 0;
