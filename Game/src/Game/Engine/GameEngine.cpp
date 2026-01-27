@@ -11,7 +11,7 @@ void GameEngine::startGame()
     if (m_isRunning)
         return;
 
-    Map::getInstance().initializeNewMap(Config::Gameplay::DEFAULT_MISSION_NAME.toStdString());
+    Map::getInstance().initializeNewMap(Config::Gameplay::DEFAULT_MISSION_NAME.toStdString(), Engine::Difficulty::Easy, 1234567, 0);
 
     m_lastTime = std::chrono::steady_clock::now();
     m_accumulator = 0.0f;
@@ -40,12 +40,19 @@ void GameEngine::triggerEndGame(bool victory)
     setState(Engine::GameState::GameOver);
 }
 
-void GameEngine::setupMatch(QString mapName, uint32_t seed)
+void GameEngine::setupMatch(QString mapName, uint32_t seed, int difficulty, int mapType)
 {
     m_currentMapName = mapName;
     m_currentSeed = seed;
 
-    Map::getInstance().initializeNewMap(mapName.toStdString(), Config::Gameplay::DEFAULT_DIFFICULTY);
+    m_difficulty = difficulty;
+    m_mapType = mapType;
+
+    Map::getInstance().initializeNewMap(
+        mapName.toStdString(),
+        static_cast<Engine::Difficulty>(difficulty),
+        seed,
+        mapType);
 }
 
 void GameEngine::saveCurrentMatch()
@@ -65,6 +72,8 @@ void GameEngine::saveCurrentMatch()
     saveFile.beginGroup("Metadata");
     saveFile.setValue("Version", Config::System::VERSION);
     saveFile.setValue("Seed", m_currentSeed);
+    saveFile.setValue("Difficulty", m_difficulty);
+    saveFile.setValue("MapType", m_mapType);
     saveFile.setValue("CamX", camPos.x());
     saveFile.setValue("CamY", camPos.y());
     saveFile.setValue("Timestamp", QDateTime::currentDateTime().toSecsSinceEpoch());
@@ -78,7 +87,7 @@ void GameEngine::loadMatch(const QString &mapName)
     m_currentMapName = mapName;
     QString path = QCoreApplication::applicationDirPath() +
                    Config::Paths::SAVE_DIR_NAME + "/" +
-                   mapName +
+                   mapName + "/" +
                    Config::Paths::INITIAL_SAVE_FILENAME;
 
     if (!QFile::exists(path))
@@ -87,9 +96,10 @@ void GameEngine::loadMatch(const QString &mapName)
     QSettings saveFile(path, QSettings::IniFormat);
 
     uint32_t seed = saveFile.value("Metadata/Seed").toUInt();
-    m_currentSeed = seed;
+    int diff = saveFile.value("Metadata/Difficulty", 0).toInt();
+    int type = saveFile.value("Metadata/MapType", 0).toInt();
 
-    setupMatch(mapName, m_currentSeed);
+    setupMatch(mapName, seed, diff, type);
 
     float cx = saveFile.value("Metadata/CamX", 0.0f).toFloat();
     float cy = saveFile.value("Metadata/CamY", 0.0f).toFloat();

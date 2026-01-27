@@ -149,8 +149,8 @@ void Camera::setTargetPos(QPointF hexCoords)
 
 void Camera::adjustZoom(float delta)
 {
-    float minZ = static_cast<float>(Config::World::MIN_ZOOM);
-    float maxZ = static_cast<float>(Config::World::MAX_ZOOM);
+    float minZ = static_cast<float>(Config::World::MAX_OUT_ZOOM);
+    float maxZ = static_cast<float>(Config::World::MAX_IN_ZOOM);
     m_zoom = std::clamp(m_zoom + delta, minZ, maxZ);
 }
 
@@ -163,6 +163,6 @@ void Camera::setViewportSize(int w, int h)
 void Camera::setZoom(float newZoom)
 {
     m_zoom = std::clamp(newZoom,
-                        Config::World::MIN_ZOOM,
-                        Config::World::MAX_ZOOM);
+                        Config::World::MAX_OUT_ZOOM,
+                        Config::World::MAX_IN_ZOOM);
 }

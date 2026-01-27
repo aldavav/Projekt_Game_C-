@@ -6,29 +6,22 @@ Map &Map::getInstance()
     return instance;
 }
 
-void Map::initializeNewMap(const std::string &name, Engine::Difficulty difficulty)
+void Map::initializeNewMap(const std::string &name, Engine::Difficulty difficulty, uint32_t seed, int type)
 {
     clear();
     m_mapName = name;
     m_difficulty = difficulty;
-    std::random_device rd;
-    m_seed = rd();
+    m_seed = seed;
+    m_mapType = static_cast<World::MapType>(type);
 
-    int radius = 6;
-    int q = 0;
-    int r = 0;
-    for (int i = q - radius; i <= q + radius; ++i)
+    int startRadius = 6;
+    for (int q = -startRadius; q <= startRadius; ++q)
     {
-        for (int j = r - radius; j <= r + radius; ++j)
+        for (int r = -startRadius; r <= startRadius; ++r)
         {
-            int dist = (std::abs(q - i) + 
-                        std::abs(q + r - i - j) + 
-                        std::abs(r - j)) / 2;
-
-            if (dist <= radius)
+            if ((std::abs(q) + std::abs(q + r) + std::abs(r)) / 2 <= startRadius)
             {
-                World::Tile &tile = getTileAt(i, j);
-                tile.discovered = true;
+                getTileAt(q, r).discovered = true;
             }
         }
     }
@@ -114,7 +107,7 @@ void Map::revealRadiusWithCleanup(int centerQ, int centerR, int radius)
     }
 }
 
-void Map::clearAllDiscovered()
+void Map::clearAllVisible()
 {
     for (auto &pair : m_chunks)
     {

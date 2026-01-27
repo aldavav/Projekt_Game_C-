@@ -218,6 +218,11 @@ STRATEGIC OBJECTIVE:
         const QStringList OPPONENTS = {
             "AI: NEURAL NETWORK",
             "HUMAN: UPLINK (NETWORK)"};
+        const QStringList MAP_TYPES = {
+            "SINGLE ISLAND",
+            "ARCHIPELAGO",
+            "CONTINENTS",
+            "PANGEA"};
     }
 
     namespace World
@@ -239,8 +244,8 @@ STRATEGIC OBJECTIVE:
         constexpr float CAMERA_KEYBOARD_SPEED = 800.0f;
         constexpr float EDGE_PAN_SPEED = 500.0f;
         constexpr int EDGE_MARGIN = 30;
-        constexpr float MIN_ZOOM = 2.0f;
-        constexpr float MAX_ZOOM = 5.0f;
+        constexpr float MAX_OUT_ZOOM = 2.0f;
+        constexpr float MAX_IN_ZOOM = 5.0f;
         constexpr float HEX_Y_SQUASH = 0.5f;
         constexpr float SHAKE_DECAY = 0.9f;
         constexpr float SHAKE_THRESHOLD = 0.1f;
