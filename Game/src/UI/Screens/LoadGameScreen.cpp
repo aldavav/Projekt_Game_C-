@@ -22,6 +22,8 @@ void LoadGameScreen::onLoadClicked()
     if (!m_saveList->currentItem())
         return;
 
+    m_loadBtn->setEnabled(false);
+
     QString selectedMap = m_saveList->currentItem()->text();
     auto *loading = new LoadingScreen();
     MenuManager::getInstance().setScreen(loading);
@@ -153,10 +155,6 @@ void LoadGameScreen::setupUI()
     m_deleteBtn->setObjectName("cancelButton");
     m_deleteBtn->setEnabled(false);
 
-    m_loadBtn = new QPushButton(tr("RESUME MISSION"));
-    m_loadBtn->setObjectName("applyButton");
-    m_loadBtn->setEnabled(false);
-
     btnLayout->addWidget(backBtn);
     btnLayout->addWidget(m_deleteBtn);
     btnLayout->addWidget(m_loadBtn);
@@ -182,8 +180,35 @@ void LoadGameScreen::refreshSaveList()
         dir.mkpath(".");
 
     QStringList folders = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+
+    QList<QPair<QDateTime, QString>> saveEntries;
+
     for (const QString &folder : folders)
     {
-        m_saveList->addItem(new QListWidgetItem(folder));
+        QString filePath = dir.absoluteFilePath(folder + "/level.dat");
+        QFileInfo fileInfo(filePath);
+
+        if (fileInfo.exists())
+        {
+            saveEntries.append({fileInfo.lastModified(), folder});
+        }
+        else
+        {
+            saveEntries.append({QFileInfo(dir.absoluteFilePath(folder)).lastModified(), folder});
+        }
+    }
+
+    std::sort(saveEntries.begin(), saveEntries.end(),
+              [](const QPair<QDateTime, QString> &a, const QPair<QDateTime, QString> &b)
+              {
+                  return a.first > b.first;
+              });
+
+    for (const auto &entry : saveEntries)
+    {
+        QListWidgetItem *item = new QListWidgetItem(entry.second);
+
+        item->setToolTip(tr("Last Played: ") + entry.first.toString("yyyy-MM-dd HH:mm"));
+        m_saveList->addItem(item);
     }
 }

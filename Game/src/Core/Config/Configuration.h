@@ -70,7 +70,7 @@ namespace Config
         constexpr Engine::Difficulty DEFAULT_DIFFICULTY = Engine::Difficulty::Medium;
         const QString TEXT_VICTORY = "VICTORY ACHIEVED";
         const QString TEXT_DEFEAT = "DEFEAT: SIGNAL LOST";
-        const QString DEFAULT_MISSION_NAME = "Sector_7";
+        const QString DEFAULT_MISSION_NAME = "Default_Mission";
         constexpr int DEFAULT_WINDOW_WIDTH = 1920;
         constexpr int DEFAULT_WINDOW_HEIGHT = 1080;
         constexpr int GAMMA_DEFAULT = 50;
@@ -215,9 +215,6 @@ STRATEGIC OBJECTIVE:
         constexpr int LOAD_STEP_RETRIEVE = 100;
         constexpr int LOAD_STEP_RECONSTRUCT = 200;
         const QStringList DIFFICULTIES = {"EASY", "NORMAL", "HARD", "BRUTAL"};
-        const QStringList OPPONENTS = {
-            "AI: NEURAL NETWORK",
-            "HUMAN: UPLINK (NETWORK)"};
         const QStringList MAP_TYPES = {
             "SINGLE ISLAND",
             "ARCHIPELAGO",

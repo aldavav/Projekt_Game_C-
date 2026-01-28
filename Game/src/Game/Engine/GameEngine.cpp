@@ -11,7 +11,11 @@ void GameEngine::startGame()
     if (m_isRunning)
         return;
 
-    Map::getInstance().initializeNewMap(Config::Gameplay::DEFAULT_MISSION_NAME.toStdString(), Engine::Difficulty::Easy, 1234567, 0);
+    Map::getInstance().initializeNewMap(
+        m_currentMapName.toStdString(),
+        static_cast<Engine::Difficulty>(m_difficulty),
+        m_currentSeed,
+        m_mapType);
 
     m_lastTime = std::chrono::steady_clock::now();
     m_accumulator = 0.0f;
@@ -19,6 +23,7 @@ void GameEngine::startGame()
     setState(Engine::GameState::Running);
 
     m_gameTimer.start();
+
     saveCurrentMatch();
 }
 
@@ -27,6 +32,7 @@ void GameEngine::stopGame()
     if (!m_isRunning)
         return;
 
+    saveCurrentMatch();
     m_gameTimer.stop();
     m_isRunning = false;
     m_currentState = Engine::GameState::GameOver;
@@ -44,10 +50,10 @@ void GameEngine::setupMatch(QString mapName, uint32_t seed, int difficulty, int 
 {
     m_currentMapName = mapName;
     m_currentSeed = seed;
-
     m_difficulty = difficulty;
     m_mapType = mapType;
 
+    Camera::getInstance().setTargetPos(QPointF(0,0));
     Map::getInstance().initializeNewMap(
         mapName.toStdString(),
         static_cast<Engine::Difficulty>(difficulty),
@@ -57,53 +63,78 @@ void GameEngine::setupMatch(QString mapName, uint32_t seed, int difficulty, int 
 
 void GameEngine::saveCurrentMatch()
 {
-    QString saveRoot = QCoreApplication::applicationDirPath() + Config::Paths::SAVE_DIR_NAME;
-    QString mapFolder = saveRoot + "/" + m_currentMapName;
+    QString worldDir = QCoreApplication::applicationDirPath() +
+                       Config::Paths::SAVE_DIR_NAME + "/" +
+                       m_currentMapName;
 
-    QDir dir;
-    if (!dir.exists(mapFolder))
-        dir.mkpath(mapFolder);
+    QDir().mkpath(worldDir);
+    QString filePath = worldDir + "/level.dat";
 
-    QString savePath = mapFolder + Config::Paths::INITIAL_SAVE_FILENAME;
-    QSettings saveFile(savePath, QSettings::IniFormat);
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly))
+        return;
 
-    QPointF camPos = Camera::getInstance().getCurrentPos();
+    QDataStream out(&file);
 
-    saveFile.beginGroup("Metadata");
-    saveFile.setValue("Version", Config::System::VERSION);
-    saveFile.setValue("Seed", m_currentSeed);
-    saveFile.setValue("Difficulty", m_difficulty);
-    saveFile.setValue("MapType", m_mapType);
-    saveFile.setValue("CamX", camPos.x());
-    saveFile.setValue("CamY", camPos.y());
-    saveFile.setValue("Timestamp", QDateTime::currentDateTime().toSecsSinceEpoch());
-    saveFile.endGroup();
+    out.setVersion(QDataStream::Qt_6_0);
 
-    saveFile.sync();
+    out << (quint32)0x48455847;
+    out << Config::System::VERSION;
+
+    out << m_currentSeed;
+    out << (qint32)m_difficulty;
+    out << (qint32)m_mapType;
+
+    auto &cam = Camera::getInstance();
+    QPointF currentHex = cam.worldToHex(cam.getCurrentPos());
+
+    out << currentHex;
+
+    file.close();
 }
 
 void GameEngine::loadMatch(const QString &mapName)
 {
-    m_currentMapName = mapName;
-    QString path = QCoreApplication::applicationDirPath() +
-                   Config::Paths::SAVE_DIR_NAME + "/" +
-                   mapName + "/" +
-                   Config::Paths::INITIAL_SAVE_FILENAME;
+    QString filePath = QCoreApplication::applicationDirPath() +
+                       Config::Paths::SAVE_DIR_NAME + "/" +
+                       mapName + "/level.dat";
 
-    if (!QFile::exists(path))
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly))
         return;
 
-    QSettings saveFile(path, QSettings::IniFormat);
+    QDataStream in(&file);
+    in.setVersion(QDataStream::Qt_6_0);
 
-    uint32_t seed = saveFile.value("Metadata/Seed").toUInt();
-    int diff = saveFile.value("Metadata/Difficulty", 0).toInt();
-    int type = saveFile.value("Metadata/MapType", 0).toInt();
+    quint32 magic;
+    QString fileVersion;
+    in >> magic;
+    in >> fileVersion;
+
+    if (magic != 0x48455847)
+    {
+        return;
+    }
+
+    if (fileVersion != Config::System::VERSION)
+    {
+        return;
+    }
+
+    uint32_t seed;
+    qint32 diff, type;
+    QPointF savedHexPos;
+
+    in >> seed;
+    in >> diff;
+    in >> type;
+    in >> savedHexPos;
+
+    file.close();
 
     setupMatch(mapName, seed, diff, type);
 
-    float cx = saveFile.value("Metadata/CamX", 0.0f).toFloat();
-    float cy = saveFile.value("Metadata/CamY", 0.0f).toFloat();
-    Camera::getInstance().setTargetPos(QPointF(cx, cy));
+    Camera::getInstance().setTargetPos(savedHexPos);
 
     m_lastTime = std::chrono::steady_clock::now();
     m_accumulator = 0.0f;
@@ -175,6 +206,20 @@ void GameEngine::updateSimulation(float fixedStep)
     }
 
     updateCameraMovement(fixedStep);
+    Camera::getInstance().update(fixedStep);
+
+    m_autoSaveAccumulator += fixedStep;
+    if (m_autoSaveAccumulator >= 60.0f)
+    {
+        saveCurrentMatch();
+        m_autoSaveAccumulator = 0.0f;
+    }
+
+    m_cleanupAccumulator += fixedStep;
+    if (m_cleanupAccumulator >= 5.0f)
+    {
+        m_cleanupAccumulator = 0.0f;
+    }
 
     for (auto it = m_entities.begin(); it != m_entities.end();)
     {
@@ -188,14 +233,13 @@ void GameEngine::updateSimulation(float fixedStep)
             it = m_entities.erase(it);
         }
     }
-
-    Camera::getInstance().update(fixedStep);
 }
 
 void GameEngine::updateCameraMovement(float fixedStep)
 {
     auto &input = InputManager::getInstance();
     auto &cam = Camera::getInstance();
+    auto &gm = GameManager::getInstance();
 
     QPointF velocity(0, 0);
 
@@ -210,7 +254,8 @@ void GameEngine::updateCameraMovement(float fixedStep)
 
     if (!velocity.isNull())
     {
-        QPointF delta = velocity * Config::World::CAMERA_KEYBOARD_SPEED * fixedStep;
+        float speedMultiplier = (gm.getSpeed() == Engine::GameSpeed::Fast) ? 2.0f : 1.0f;
+        QPointF delta = velocity * Config::World::CAMERA_KEYBOARD_SPEED * fixedStep * speedMultiplier;
         cam.move(delta.x(), delta.y());
     }
 }

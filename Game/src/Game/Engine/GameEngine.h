@@ -3,6 +3,7 @@
 
 #include <Core/Config/Configuration.h>
 #include <Core/Input/InputManager.h>
+#include <Game/Engine/GameManager.h>
 #include <Game/Entities/Entity.h>
 #include <Game/Camera/Camera.h>
 #include <qcoreapplication.h>
@@ -84,6 +85,10 @@ private:
     int m_difficulty = 0;
 
     int m_mapType = 0;
+
+    float m_autoSaveAccumulator = 0.0f;
+    
+    float m_cleanupAccumulator = 0.0f;
 };
 
 #endif
