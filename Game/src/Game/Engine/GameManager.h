@@ -8,6 +8,7 @@
 #include <QPointF>
 
 class TacticalHUD;
+class QPoint;
 
 class GameManager : public QObject
 {
@@ -18,13 +19,19 @@ public:
 
     void update();
 
-    float getGameTime() const;
+    float getGameTime() const { return m_gameTime; }
 
-    bool isPaused() const;
+    bool isPaused() const { return m_isPaused; }
 
-    Engine::GameSpeed getSpeed() const;
+    Engine::GameSpeed getSpeed() const { return m_currentSpeed; }
 
-    TacticalHUD *getHUD() const;
+    TacticalHUD *getHUD() const { return m_hud; }
+
+    bool hasSelection() const { return m_hasSelection; }
+
+    QPointF getSelectedHex() const { return m_selectedHex; }
+
+    bool getIsDiscoveryActive() const { return m_isDiscoveryActive; }
 
     void setSpeed(Engine::GameSpeed speed);
 
@@ -32,15 +39,17 @@ public:
 
     void setPaused(bool paused);
 
-    void handleMouseClick(QPoint screenPos, bool m_is3D = false);
+    void switchIsDiscoveryActive() { m_isDiscoveryActive = !m_isDiscoveryActive; }
 
-    bool hasSelection() const;
+    void handleMouseClick(QPoint screenPos, bool is3D = false);
 
-    QPointF getSelectedHex() const;
+    GameManager(const GameManager &) = delete;
 
-    void switchIsDiscoveryActive() { m_isDiscoveryActive = !m_isDiscoveryActive; };
+    GameManager &operator=(const GameManager &) = delete;
 
-    bool getIsDiscoveryActive() { return m_isDiscoveryActive; };
+    GameManager(GameManager &&other) noexcept = delete;
+
+    GameManager &operator=(GameManager &&other) noexcept = delete;
 
 public slots:
     void handleHudButton(int index);
@@ -48,13 +57,15 @@ public slots:
     void handleMinimapNavigation(QPointF worldPos);
 
 private:
-    GameManager(QObject *parent = nullptr);
+    explicit GameManager(QObject *parent = nullptr);
 
     float m_gameTime = 0.0f;
 
     float m_timeScale = 1.0f;
 
     bool m_isPaused = false;
+
+    bool m_isDiscoveryActive = false;
 
     Engine::GameSpeed m_currentSpeed = Engine::GameSpeed::Normal;
 
@@ -63,8 +74,6 @@ private:
     bool m_hasSelection = false;
 
     TacticalHUD *m_hud = nullptr;
-
-    bool m_isDiscoveryActive = false;
 };
 
 #endif

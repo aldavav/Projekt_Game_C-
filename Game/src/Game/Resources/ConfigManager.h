@@ -24,6 +24,14 @@ public:
 
     Config::System::PlayerSettings &getSettings() { return m_cachedSettings; }
 
+    ConfigManager(const ConfigManager &) = delete;
+
+    ConfigManager &operator=(const ConfigManager &) = delete;
+
+    ConfigManager(ConfigManager &&other) noexcept = default;
+
+    ConfigManager &operator=(ConfigManager &&other) noexcept = default;
+
 private:
     ConfigManager();
 

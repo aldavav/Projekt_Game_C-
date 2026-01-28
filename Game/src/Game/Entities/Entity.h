@@ -38,6 +38,14 @@ public:
 
     static std::unique_ptr<Entity> createEntityFromFile(std::ifstream &file);
 
+    Entity(const Entity &) = delete;
+
+    Entity &operator=(const Entity &) = delete;
+
+    Entity(Entity &&other) noexcept = default;
+
+    Entity &operator=(Entity &&other) noexcept = default;
+
 protected:
     std::string m_name;
 

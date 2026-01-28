@@ -63,9 +63,8 @@ private:
 
     void drawClouds(QPainter &painter, Camera &cam, float gameTime, float zoom);
 
-    QColor getTileVisualColor(const World::Tile &tile, float gameTime, bool override = false);
+    QColor getTileVisualColor(const World::Tile &tile, float gameTime, bool colorOverride = false);
 
-private:
     QTimer *m_updateTimer = nullptr;
 
     QPixmap m_cloudTexture;

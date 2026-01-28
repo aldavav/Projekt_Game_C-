@@ -18,6 +18,7 @@
 #include <QDir>
 
 class Entity;
+class QDir;
 
 class GameEngine : public QObject
 {
@@ -43,6 +44,14 @@ public:
     Engine::GameState getState() const { return m_currentState; }
 
     bool didPlayerWin() const { return m_playerWon; }
+
+    GameEngine(const GameEngine &) = delete;
+
+    GameEngine &operator=(const GameEngine &) = delete;
+
+    GameEngine(GameEngine &&other) noexcept = delete;
+
+    GameEngine &operator=(GameEngine &&other) noexcept = delete;
 
 signals:
     void gameLoopUpdate(float deltaTime);
@@ -70,9 +79,13 @@ private:
 
     bool m_playerWon = false;
 
-    QString m_currentMapName = Config::Gameplay::DEFAULT_MISSION_NAME;
+    QString m_currentMapName;
 
-    uint32_t m_currentSeed = Config::World::DEFAULT_SEED;
+    uint32_t m_currentSeed = 0;
+
+    int m_difficulty = 0;
+
+    int m_mapType = 0;
 
     QTimer m_gameTimer;
 
@@ -80,15 +93,11 @@ private:
 
     float m_accumulator = 0.0f;
 
-    std::vector<std::unique_ptr<Entity>> m_entities;
-
-    int m_difficulty = 0;
-
-    int m_mapType = 0;
-
     float m_autoSaveAccumulator = 0.0f;
-    
+
     float m_cleanupAccumulator = 0.0f;
+
+    std::vector<std::unique_ptr<Entity>> m_entities;
 };
 
 #endif

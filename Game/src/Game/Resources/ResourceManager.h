@@ -19,6 +19,23 @@ using AudioPtr = QSharedPointer<QSoundEffect>;
 
 class ResourceManager
 {
+public:
+    static ResourceManager &getInstance();
+
+    TexturePtr getTexture(const QString &resourceId);
+
+    AudioPtr getAudio(const QString &resourceId);
+
+    void clearCache();
+
+    ResourceManager(const ResourceManager &) = delete;
+
+    ResourceManager &operator=(const ResourceManager &) = delete;
+
+    ResourceManager(ResourceManager &&other) noexcept = default;
+
+    ResourceManager &operator=(ResourceManager &&other) noexcept = default;
+
 private:
     ResourceManager() = default;
 
@@ -31,15 +48,6 @@ private:
     AudioPtr loadAudioFromFile(const QString &filePath);
 
     mutable QMutex m_mutex;
-
-public:
-    static ResourceManager &getInstance();
-
-    TexturePtr getTexture(const QString &resourceId);
-
-    AudioPtr getAudio(const QString &resourceId);
-
-    void clearCache();
 };
 
 #endif

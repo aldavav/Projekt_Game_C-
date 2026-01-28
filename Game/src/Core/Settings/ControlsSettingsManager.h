@@ -22,6 +22,14 @@ public:
 
     QString getKeyName(Engine::Input::Action action) const;
 
+    ControlsSettingsManager(const ControlsSettingsManager &) = delete;
+
+    ControlsSettingsManager &operator=(const ControlsSettingsManager &) = delete;
+
+    ControlsSettingsManager(ControlsSettingsManager &&other) noexcept = delete;
+
+    ControlsSettingsManager &operator=(ControlsSettingsManager &&other) noexcept = delete;
+
 private:
     ControlsSettingsManager();
 

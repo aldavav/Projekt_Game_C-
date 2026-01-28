@@ -27,6 +27,14 @@ public:
 
     CommandPtr getNextCommand();
 
+    InputManager(const InputManager &) = delete;
+
+    InputManager &operator=(const InputManager &) = delete;
+
+    InputManager(InputManager &&other) noexcept = delete;
+
+    InputManager &operator=(InputManager &&other) noexcept = delete;
+
 public slots:
     void onKeyPress(int keyCode);
 

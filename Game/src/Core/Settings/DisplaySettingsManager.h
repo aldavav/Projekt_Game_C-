@@ -19,6 +19,14 @@ public:
 
     void applySettings();
 
+    DisplaySettingsManager(const DisplaySettingsManager &) = delete;
+
+    DisplaySettingsManager &operator=(const DisplaySettingsManager &) = delete;
+
+    DisplaySettingsManager(DisplaySettingsManager &&other) noexcept = delete;
+
+    DisplaySettingsManager &operator=(DisplaySettingsManager &&other) noexcept = delete;
+
 signals:
     void displayChanged();
 

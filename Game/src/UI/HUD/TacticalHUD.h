@@ -14,6 +14,9 @@
 #include <QPointF>
 #include <QString>
 
+class QMouseEvent;
+class QPainter;
+
 class TacticalHUD : public QObject
 {
     Q_OBJECT
@@ -23,17 +26,18 @@ public:
 
     void update(float gameTime, bool isPaused, Engine::GameSpeed speed);
 
-    void draw(QPainter &painter, int width, int height);
+    void refreshMinimap() { m_minimapProvider.forceUpdate(); }
 
     bool handleMousePress(QMouseEvent *event, int width, int height);
 
     void setSelection(QPointF hexCoords, bool hasSelection);
 
+    void draw(QPainter &painter, int width, int height);
+
     void toggleDiagnostics() { m_showDiagnostics = !m_showDiagnostics; }
 
-    void setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos, uint32_t mapSeed);
-
-    void refreshMinimap() { m_minimapProvider.forceUpdate(); }
+    void setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos,
+                            const QPoint &mouseScreenPos, uint32_t mapSeed);
 
 signals:
     void hudButtonClicked(int buttonIndex);
@@ -48,7 +52,7 @@ private:
     void drawDayNightCycle(QPainter &painter, int width, int height);
 
     void drawDiagnostics(QPainter &painter, int width, int height);
-    
+
     void drawScanlines(QPainter &painter, QRect rect);
 
     QString getTileTypeName(World::TileType type) const;
@@ -57,11 +61,13 @@ private:
 
     bool m_isPaused = false;
 
+    bool m_hasSelection = false;
+
+    bool m_showDiagnostics = false;
+
     Engine::GameSpeed m_currentSpeed = Engine::GameSpeed::Normal;
 
     QPointF m_selectedHex;
-
-    bool m_hasSelection = false;
 
     QPoint m_hoveredHex;
 
@@ -69,9 +75,7 @@ private:
 
     QPoint m_mouseScreenPos;
 
-    uint32_t m_mapSeed = Config::World::DEFAULT_SEED;
-
-    bool m_showDiagnostics = false;
+    uint32_t m_mapSeed = 0;
 
     QElapsedTimer m_fpsTimer;
 

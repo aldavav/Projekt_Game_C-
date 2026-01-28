@@ -35,6 +35,14 @@ public:
 
     void updateMetadata();
 
+    MenuManager(const MenuManager &) = delete;
+
+    MenuManager &operator=(const MenuManager &) = delete;
+
+    MenuManager(MenuManager &&other) noexcept = delete;
+
+    MenuManager &operator=(MenuManager &&other) noexcept = delete;
+
 public slots:
     void handleGameStateChange(int newState);
 

@@ -25,26 +25,6 @@ void GameManager::update()
     m_hud->update(m_gameTime, m_isPaused, m_currentSpeed);
 }
 
-float GameManager::getGameTime() const
-{
-    return m_gameTime;
-}
-
-bool GameManager::isPaused() const
-{
-    return m_isPaused;
-}
-
-Engine::GameSpeed GameManager::getSpeed() const
-{
-    return m_currentSpeed;
-}
-
-TacticalHUD *GameManager::getHUD() const
-{
-    return m_hud;
-}
-
 void GameManager::setSpeed(Engine::GameSpeed speed)
 {
     m_currentSpeed = speed;
@@ -81,16 +61,6 @@ void GameManager::handleMouseClick(QPoint screenPos, bool m_is3D)
     m_selectedHex = QPointF(currentHover.x(), currentHover.y());
     m_hasSelection = true;
     m_hud->setSelection(m_selectedHex, true);
-}
-
-bool GameManager::hasSelection() const
-{
-    return m_hasSelection;
-}
-
-QPointF GameManager::getSelectedHex() const
-{
-    return m_selectedHex;
 }
 
 void GameManager::handleHudButton(int index)

@@ -36,22 +36,32 @@ public:
 
     std::unordered_map<uint64_t, World::Chunk *> getChunks() { return m_chunks; }
 
+    Map(const Map &) = delete;
+
+    Map &operator=(const Map &) = delete;
+
+    Map(Map &&other) noexcept = delete;
+
+    Map &operator=(Map &&other) noexcept = delete;
+
 private:
     Map() = default;
+
+    ~Map() { clear(); }
 
     uint64_t getChunkKey(int cx, int cy) const;
 
     void generateChunk(World::Chunk *chunk);
 
-    std::string m_mapName = Config::Gameplay::DEFAULT_MISSION_NAME.toStdString();
+    std::string m_mapName;
 
-    uint32_t m_seed = Config::World::DEFAULT_SEED;
+    uint32_t m_seed = 0;
 
-    Engine::Difficulty m_difficulty = Config::Gameplay::DEFAULT_DIFFICULTY;
-
-    std::unordered_map<uint64_t, World::Chunk *> m_chunks;
+    Engine::Difficulty m_difficulty = Engine::Difficulty::Medium;
 
     World::MapType m_mapType = World::MapType::ISLAND;
+
+    std::unordered_map<uint64_t, World::Chunk *> m_chunks;
 };
 
 #endif

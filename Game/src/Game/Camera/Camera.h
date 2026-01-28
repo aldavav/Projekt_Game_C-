@@ -18,7 +18,7 @@ public:
 
     QPoint screenToHex(const QPoint &screenPos, bool is3D = Config::World::DEFAULT_3D_VIEW) const;
 
-    QPointF worldToHex(const QPointF& worldPos) const;
+    QPointF worldToHex(const QPointF &worldPos) const;
 
     QPoint toScreen(int q, int r, int tileSize = Config::World::BASE_TILE_SIZE, bool is3D = Config::World::DEFAULT_3D_VIEW) const;
 
@@ -41,6 +41,14 @@ public:
     int getViewportWidth() const { return static_cast<int>(m_viewportWidth); }
 
     void setZoom(float newZoom);
+
+    Camera(const Camera &) = delete;
+
+    Camera &operator=(const Camera &) = delete;
+
+    Camera(Camera &&other) noexcept = delete;
+
+    Camera &operator=(Camera &&other) noexcept = delete;
 
 private:
     Camera() = default;

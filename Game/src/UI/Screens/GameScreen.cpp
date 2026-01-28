@@ -132,6 +132,10 @@ void GameScreen::keyPressEvent(QKeyEvent *event)
         m_is3D = !m_is3D;
         update();
     }
+    else if (event->key() == Qt::Key_F5)
+    {
+        GameEngine::getInstance().saveCurrentMatch();
+    }
     if (event->key() == Qt::Key_F3)
     {
         auto &gm = GameManager::getInstance();

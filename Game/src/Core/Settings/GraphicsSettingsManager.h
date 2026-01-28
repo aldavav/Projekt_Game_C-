@@ -16,6 +16,14 @@ public:
 
     float getGammaValue() const;
 
+    GraphicsSettingsManager(const GraphicsSettingsManager &) = delete;
+
+    GraphicsSettingsManager &operator=(const GraphicsSettingsManager &) = delete;
+
+    GraphicsSettingsManager(GraphicsSettingsManager &&other) noexcept = delete;
+
+    GraphicsSettingsManager &operator=(GraphicsSettingsManager &&other) noexcept = delete;
+
 signals:
     void graphicsUpdated();
 
