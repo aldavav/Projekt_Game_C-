@@ -16,7 +16,8 @@ GameScreen::GameScreen(QWidget *parent)
         connect(hud, &TacticalHUD::homeButtonClicked, this, [this]()
                 {
             Camera::getInstance().setTargetPos(QPointF(0,0));
-            update(); });
+            update();
+            Map::getInstance().clearAllVisible(); });
 
         connect(hud, &TacticalHUD::hudButtonClicked, this, [this](int index)
                 { update(); });
@@ -234,7 +235,7 @@ void GameScreen::drawMap3D(QPainter &painter, QPoint currentHover)
         for (int r = minR; r <= maxR; ++r)
         {
             World::Tile &tile = map.getTileAt(q, r);
-            if (!tile.visible && !tile.discovered)
+            if (!tile.visible)
                 continue;
 
             QPoint screenPos = cam.toScreen(q, r, BASE_TILE, true);
@@ -313,7 +314,6 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
     int maxQ = static_cast<int>(ceil((2.0f / 3.0f * bottomRight.x()) / BASE_TILE)) + 2;
 
     float visualRadius = (BASE_TILE * zoom) * Config::World::HEX_VISUAL_SCALE;
-    QColor selectionColor = property("selectionColor").value<QColor>();
 
     for (int q = minQ; q <= maxQ; ++q)
     {
@@ -323,7 +323,7 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
         for (int r = minR; r <= maxR; ++r)
         {
             World::Tile &tile = map.getTileAt(q, r);
-            if (!tile.visible && !tile.discovered)
+            if (!tile.visible)
                 continue;
 
             QPoint screenPos = cam.toScreen(q, r, BASE_TILE, false);

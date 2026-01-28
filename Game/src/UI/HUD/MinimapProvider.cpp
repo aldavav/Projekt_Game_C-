@@ -22,17 +22,16 @@ QPixmap MinimapProvider::getMinimap(int size, int screenWidth, int screenHeight,
 QPointF MinimapProvider::screenToWorld(const QPoint &clickPos, const QRect &mmRect)
 {
     auto &cam = Camera::getInstance();
+    const float tileS = Config::World::BASE_TILE_SIZE;
+    const float viewRadius = Config::World::MINIMAP_VIEW_RADIUS;
 
-    float relX = (clickPos.x() - (mmRect.x() + mmRect.width() / 2.0f)) / (float)mmRect.width();
-    float relY = (clickPos.y() - (mmRect.y() + mmRect.height() / 2.0f)) / (float)mmRect.height();
+    float minimapVisibleWorldSize = tileS * 1.5f * viewRadius * 2.0f;
+    float unitsPerPixel = minimapVisibleWorldSize / (float)mmRect.width();
 
-    float viewPortScale = cam.getViewportWidth() * Config::World::SCANLINE_SPACING;
-    QPointF currentCamPos = cam.getCurrentPos();
+    float dx = (clickPos.x() - mmRect.width() / 2.0f) * unitsPerPixel;
+    float dy = (clickPos.y() - mmRect.height() / 2.0f) * unitsPerPixel;
 
-    float targetWorldX = currentCamPos.x() + (relX * viewPortScale);
-    float targetWorldY = currentCamPos.y() + (relY * viewPortScale);
-
-    return QPointF(targetWorldX, targetWorldY);
+    return QPointF(cam.getCurrentPos().x() + dx, cam.getCurrentPos().y() + dy);
 }
 
 void MinimapProvider::updateCache(int size, int screenWidth, int screenHeight, bool override)
@@ -44,42 +43,59 @@ void MinimapProvider::updateCache(int size, int screenWidth, int screenHeight, b
 
     m_cache.fill(QColor(10, 10, 10, 200));
     QPainter painter(&m_cache);
+    painter.setRenderHint(QPainter::Antialiasing);
 
     auto &map = Map::getInstance();
     auto &cam = Camera::getInstance();
 
-    const int WORLD_BOUNDS = Config::World::WORLD_BOUNDS_INT;
     const float tileS = Config::World::BASE_TILE_SIZE;
     QPointF camPos = cam.getCurrentPos();
-    int viewPortWidth = cam.getViewportWidth() * Config::World::SCANLINE_SPACING;
+    const float radarWorldRadius = Config::World::MINIMAP_VIEW_RADIUS * tileS;
 
-    for (int q = -WORLD_BOUNDS * 2; q <= WORLD_BOUNDS * 2; ++q)
+    float dotBaseSize = (tileS / radarWorldRadius) * (size / 2.0f) * 1.5f;
+
+    float finalDotSize = dotBaseSize * 1.5f;
+
+    QPoint centerHex = cam.screenToHex(QPoint(screenWidth / 2, screenHeight / 2), false);
+
+    int scanRange = Config::World::SCAN_RANGE;
+
+    for (int q = centerHex.x() - scanRange; q <= centerHex.x() + scanRange; ++q)
     {
-        int rStart = -WORLD_BOUNDS - (q / 2) - 10;
-        int rEnd = WORLD_BOUNDS - (q / 2) + 10;
-
-        for (int r = rStart; r <= rEnd; ++r)
+        for (int r = centerHex.y() - scanRange; r <= centerHex.y() + scanRange; ++r)
         {
-            World::Tile &tile = map.getTileAt(q, r);
+            int dq = q - centerHex.x();
+            int dr = r - centerHex.y();
+            int hexDist = (std::abs(dq) + std::abs(dq + dr) + std::abs(dr)) / 2;
 
+            if (hexDist > 40)
+                continue;
+
+            if (!map.hasTileAt(q, r) && !override)
+                continue;
+
+            World::Tile &tile = map.getTileAt(q, r);
             QColor dotColor = getTileVisualColor(tile, override);
 
             float worldX = tileS * (1.5f * q);
-            float worldY = tileS * (0.866f * q + 1.732f * r);
+            float worldY = tileS * (std::sqrt(3.0f) / 2.0f * q + std::sqrt(3.0f) * r);
 
-            float mmX = (size / 2.0f) + ((worldX - camPos.x()) / viewPortWidth) * size;
-            float mmY = (size / 2.0f) + ((worldY - camPos.y()) / viewPortWidth) * size;
+            float mmX = (size / 2.0f) + ((worldX - camPos.x()) / radarWorldRadius) * (size / 2.0f);
+            float mmY = (size / 2.0f) + ((worldY - camPos.y()) / radarWorldRadius) * (size / 2.0f);
 
-            if (mmX >= 0 && mmX < size && mmY >= 0 && mmY < size)
+            if (mmX >= -dotBaseSize && mmX < size && mmY >= -dotBaseSize && mmY < size)
             {
-                painter.fillRect(QRectF(mmX, mmY, 2, 2), dotColor);
+
+                float offset = (dotBaseSize - finalDotSize) / 2.0f;
+                painter.fillRect(QRectF(mmX + offset, mmY + offset, finalDotSize, finalDotSize), dotColor);
             }
         }
     }
 
     float zoom = cam.getZoom();
-    float viewW = (screenWidth / zoom) / viewPortWidth * size;
-    float viewH = (screenHeight / zoom) / viewPortWidth * size;
+    float viewW = (screenWidth / zoom) / radarWorldRadius * (size / 2.0f);
+    float viewH = (screenHeight / zoom) / radarWorldRadius * (size / 2.0f);
+
     painter.setPen(QPen(Qt::white, 1));
     painter.drawRect(QRectF((size - viewW) / 2.0f, (size - viewH) / 2.0f, viewW, viewH));
 }

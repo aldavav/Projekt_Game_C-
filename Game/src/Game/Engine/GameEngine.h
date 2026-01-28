@@ -3,6 +3,7 @@
 
 #include <Core/Config/Configuration.h>
 #include <Core/Input/InputManager.h>
+#include <Game/Engine/GameManager.h>
 #include <Game/Entities/Entity.h>
 #include <Game/Camera/Camera.h>
 #include <qcoreapplication.h>
@@ -31,7 +32,7 @@ public:
 
     void triggerEndGame(bool victory);
 
-    void setupMatch(QString mapName, uint32_t seed);
+    void setupMatch(QString mapName, uint32_t seed, int difficulty, int mapType);
 
     void saveCurrentMatch();
 
@@ -80,6 +81,14 @@ private:
     float m_accumulator = 0.0f;
 
     std::vector<std::unique_ptr<Entity>> m_entities;
+
+    int m_difficulty = 0;
+
+    int m_mapType = 0;
+
+    float m_autoSaveAccumulator = 0.0f;
+    
+    float m_cleanupAccumulator = 0.0f;
 };
 
 #endif

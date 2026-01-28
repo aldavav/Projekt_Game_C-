@@ -66,11 +66,11 @@ namespace Config
     namespace Gameplay
     {
         constexpr float ZOOM_STEP = 0.1f;
-        constexpr float INITIAL_ZOOM = 5.0f;
+        constexpr float INITIAL_ZOOM = 1.5f;
         constexpr Engine::Difficulty DEFAULT_DIFFICULTY = Engine::Difficulty::Medium;
         const QString TEXT_VICTORY = "VICTORY ACHIEVED";
         const QString TEXT_DEFEAT = "DEFEAT: SIGNAL LOST";
-        const QString DEFAULT_MISSION_NAME = "Sector_7";
+        const QString DEFAULT_MISSION_NAME = "Default_Mission";
         constexpr int DEFAULT_WINDOW_WIDTH = 1920;
         constexpr int DEFAULT_WINDOW_HEIGHT = 1080;
         constexpr int GAMMA_DEFAULT = 50;
@@ -215,32 +215,36 @@ STRATEGIC OBJECTIVE:
         constexpr int LOAD_STEP_RETRIEVE = 100;
         constexpr int LOAD_STEP_RECONSTRUCT = 200;
         const QStringList DIFFICULTIES = {"EASY", "NORMAL", "HARD", "BRUTAL"};
-        const QStringList OPPONENTS = {
-            "AI: NEURAL NETWORK",
-            "HUMAN: UPLINK (NETWORK)"};
+        const QStringList MAP_TYPES = {
+            "SINGLE ISLAND",
+            "ARCHIPELAGO",
+            "CONTINENTS",
+            "PANGEA"};
     }
 
     namespace World
     {
-        const QRect WORLD_BOUNDS = QRect(-2000, -1500, 3500, 3000);
+        constexpr float BASE_TILE_SIZE = 64.0f;
+        constexpr float MINIMAP_VIEW_RADIUS = 48.0f;
+        constexpr int SCAN_RANGE = 45;
         constexpr uint32_t DEFAULT_SEED = 123456789;
-        constexpr bool DEFAULT_3D_VIEW = true;
-        constexpr float BASE_TILE_SIZE = 32.0f;
-        constexpr int CHUNK_SIZE = 32;
+        constexpr bool DEFAULT_3D_VIEW = false;
+        constexpr int CHUNK_SIZE = 64;
+        constexpr int DEFAULT_VIEW_RADIUS = 18;
+        constexpr int DEFAULT_DISCOVER_RADIUS = 6;
+        constexpr float HEX_VISUAL_SCALE = 0.98f;
         constexpr float NOISE_SCALE = 15.0f;
-        constexpr float THRESH_WATER = 0.2f;
-        constexpr float THRESH_DIRT = 0.3f;
-        constexpr float THRESH_GRASS = 0.65f;
+        constexpr float ISLAND_SIZE = 90.0f;
+        constexpr float THRESH_WATER = 0.35f;
+        constexpr float THRESH_DIRT = 0.45f;
+        constexpr float THRESH_GRASS = 0.70f;
         constexpr float HEIGHT_BIAS = 0.1f;
         constexpr int HEIGHT_OFFSET = 15;
-        constexpr int REVEAL_RADIUS = 10;
         constexpr float CAMERA_BASE_SPEED = 25.0f;
-        constexpr float CAMERA_SMOOTHING = 0.1f;
+        constexpr float CAMERA_SMOOTHING = 0.2f;
         constexpr float CAMERA_KEYBOARD_SPEED = 800.0f;
-        constexpr float EDGE_PAN_SPEED = 500.0f;
-        constexpr int EDGE_MARGIN = 30;
-        constexpr float MIN_ZOOM = 2.0f;
-        constexpr float MAX_ZOOM = 5.0f;
+        constexpr float MAX_OUT_ZOOM = 0.5f;
+        constexpr float MAX_IN_ZOOM = 2.5f;
         constexpr float HEX_Y_SQUASH = 0.5f;
         constexpr float SHAKE_DECAY = 0.9f;
         constexpr float SHAKE_THRESHOLD = 0.1f;
@@ -251,11 +255,9 @@ STRATEGIC OBJECTIVE:
         constexpr float CLOUD_SPEED_BASE = 5.0f;
         constexpr float CLOUD_SPEED_MULT = 15.0f;
         constexpr int CULLING_MARGIN = 50;
-        constexpr float HEX_VISUAL_SCALE = 0.98f;
         constexpr int MINIMAP_UPDATE_MS = 100;
         constexpr int MINIMAP_RANGE = 40;
         constexpr int SCANLINE_SPACING = 3;
-        constexpr int WORLD_BOUNDS_INT = 50;
         constexpr int MOUNTAIN_HEIGHT = 20;
         constexpr int GRASS_HEIGHT = 5;
         constexpr int DIRT_HEIGHT = 0;

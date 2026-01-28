@@ -50,6 +50,14 @@ namespace World
         bool walkable;
         bool buildable;
     };
+
+    enum class MapType
+    {
+        ISLAND = 0,
+        ARCHIPELAGO = 1,
+        CONTINENTS = 2,
+        PANGEA = 3
+    };
 }
 
 #endif

@@ -44,9 +44,9 @@ private:
 
     QComboBox *m_difficultyCombo = nullptr;
 
-    QComboBox *m_opponentCombo = nullptr;
-
     QSpinBox *m_aiLevelSpin = nullptr;
+
+    QComboBox *m_mapTypeCombo = nullptr;
 };
 
 #endif

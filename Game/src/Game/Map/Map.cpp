@@ -6,29 +6,22 @@ Map &Map::getInstance()
     return instance;
 }
 
-void Map::initializeNewMap(const std::string &name, Engine::Difficulty difficulty)
+void Map::initializeNewMap(const std::string &name, Engine::Difficulty difficulty, uint32_t seed, int type)
 {
     clear();
     m_mapName = name;
     m_difficulty = difficulty;
-    std::random_device rd;
-    m_seed = rd();
+    m_seed = seed;
+    m_mapType = static_cast<World::MapType>(type);
 
-    int radius = 6;
-    int q = 0;
-    int r = 0;
-    for (int i = q - radius; i <= q + radius; ++i)
+    int startRadius = Config::World::DEFAULT_DISCOVER_RADIUS;
+    for (int q = -startRadius; q <= startRadius; ++q)
     {
-        for (int j = r - radius; j <= r + radius; ++j)
+        for (int r = -startRadius; r <= startRadius; ++r)
         {
-            int dist = (std::abs(q - i) + 
-                        std::abs(q + r - i - j) + 
-                        std::abs(r - j)) / 2;
-
-            if (dist <= radius)
+            if ((std::abs(q) + std::abs(q + r) + std::abs(r)) / 2 <= startRadius)
             {
-                World::Tile &tile = getTileAt(i, j);
-                tile.discovered = true;
+                getTileAt(q, r).discovered = true;
             }
         }
     }
@@ -114,7 +107,7 @@ void Map::revealRadiusWithCleanup(int centerQ, int centerR, int radius)
     }
 }
 
-void Map::clearAllDiscovered()
+void Map::clearAllVisible()
 {
     for (auto &pair : m_chunks)
     {
@@ -203,9 +196,33 @@ void Map::generateChunk(World::Chunk *chunk)
             e += 0.25f * getNoise(q / (s / 0.25f), r / (s / 0.25f), m_seed);
             e /= 1.75f;
 
-            float dist = (std::abs(q) + std::abs(q + r) + std::abs(r)) / 2.0f;
-            float d = dist / Config::World::CHUNK_SIZE;
-            float height = (e + Config::World::HEIGHT_BIAS) - (d * d);
+            float height = e;
+
+            switch (m_mapType)
+            {
+            case World::MapType::ISLAND:
+            {
+                float dist = std::sqrt(q * q + r * r) / Config::World::ISLAND_SIZE;
+                height = (e + 0.1f) - (dist * dist);
+                break;
+            }
+            case World::MapType::ARCHIPELAGO:
+            {
+                height = e - 0.2f;
+                break;
+            }
+            case World::MapType::CONTINENTS:
+            {
+                float cluster = getNoise(q / 500.0f, r / 500.0f, m_seed + 1);
+                height = e + (cluster * 0.4f) - 0.2f;
+                break;
+            }
+            case World::MapType::PANGEA:
+            {
+                height = e + 0.2f;
+                break;
+            }
+            }
 
             World::Tile &tile = chunk->tiles[tx][ty];
             if (height < Config::World::THRESH_WATER)

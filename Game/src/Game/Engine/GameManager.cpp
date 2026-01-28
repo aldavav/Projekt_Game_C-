@@ -14,15 +14,13 @@ void GameManager::update()
     }
 
     auto &cam = Camera::getInstance();
-    cam.update(m_gameTime);
+    auto &map = Map::getInstance();
 
-    QPointF worldPos = cam.getCurrentPos();
-    const float size = Config::World::BASE_TILE_SIZE;
+    QPointF currentHexPos = cam.worldToHex(cam.getCurrentPos());
+    int q = static_cast<int>(currentHexPos.x());
+    int r = static_cast<int>(currentHexPos.y());
 
-    int q = std::round((2.0f / 3.0f * worldPos.x()) / size);
-    int r = std::round((-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size);
-
-    Map::getInstance().revealRadiusWithCleanup(q, r, Config::World::REVEAL_RADIUS);
+    map.revealRadiusWithCleanup(q, r, Config::World::DEFAULT_VIEW_RADIUS);
 
     m_hud->update(m_gameTime, m_isPaused, m_currentSpeed);
 }
@@ -115,7 +113,7 @@ void GameManager::handleHudButton(int index)
 
 void GameManager::handleMinimapNavigation(QPointF worldPos)
 {
-    Map::getInstance().clearAllDiscovered();
+    Map::getInstance().clearAllVisible();
     Camera::getInstance().setTargetPos(worldPos);
 }
 

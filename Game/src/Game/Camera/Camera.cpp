@@ -11,20 +11,6 @@ void Camera::update(float deltaTime)
     float lerpFactor = 1.0f - std::pow(Config::World::CAMERA_SMOOTHING, deltaTime * 60.0f);
     m_currentPos += (m_targetPos - m_currentPos) * lerpFactor;
 
-    if (!m_worldBounds.isNull())
-    {
-        float minX = static_cast<float>(m_worldBounds.left());
-        float maxX = static_cast<float>(m_worldBounds.right());
-        float minY = static_cast<float>(m_worldBounds.top());
-        float maxY = static_cast<float>(m_worldBounds.bottom());
-
-        m_currentPos.setX(std::clamp(static_cast<float>(m_currentPos.x()), minX, maxX));
-        m_currentPos.setY(std::clamp(static_cast<float>(m_currentPos.y()), minY, maxY));
-
-        m_targetPos.setX(std::clamp(static_cast<float>(m_targetPos.x()), minX, maxX));
-        m_targetPos.setY(std::clamp(static_cast<float>(m_targetPos.y()), minY, maxY));
-    }
-
     if (m_shakeIntensity > Config::World::SHAKE_THRESHOLD)
     {
         float rx = ((float)rand() / (float)RAND_MAX * 2.0f - 1.0f) * m_shakeIntensity;
@@ -56,6 +42,16 @@ QPointF Camera::screenToWorld(const QPoint &screenPos, bool is3D) const
     float worldY = relY + m_currentPos.y();
 
     return QPointF(worldX, worldY);
+}
+
+QPointF Camera::worldToHex(const QPointF &worldPos) const
+{
+    const float size = Config::World::BASE_TILE_SIZE;
+
+    float q = (2.0f / 3.0f * worldPos.x()) / size;
+    float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size;
+
+    return hexRound(q, r);
 }
 
 QPoint Camera::screenToHex(const QPoint &screenPos, bool is3D) const
@@ -149,8 +145,8 @@ void Camera::setTargetPos(QPointF hexCoords)
 
 void Camera::adjustZoom(float delta)
 {
-    float minZ = static_cast<float>(Config::World::MIN_ZOOM);
-    float maxZ = static_cast<float>(Config::World::MAX_ZOOM);
+    float minZ = static_cast<float>(Config::World::MAX_OUT_ZOOM);
+    float maxZ = static_cast<float>(Config::World::MAX_IN_ZOOM);
     m_zoom = std::clamp(m_zoom + delta, minZ, maxZ);
 }
 
@@ -163,6 +159,6 @@ void Camera::setViewportSize(int w, int h)
 void Camera::setZoom(float newZoom)
 {
     m_zoom = std::clamp(newZoom,
-                        Config::World::MIN_ZOOM,
-                        Config::World::MAX_ZOOM);
+                        Config::World::MAX_OUT_ZOOM,
+                        Config::World::MAX_IN_ZOOM);
 }

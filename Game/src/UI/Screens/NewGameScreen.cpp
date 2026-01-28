@@ -23,30 +23,41 @@ void NewGameScreen::keyPressEvent(QKeyEvent *event)
 
 void NewGameScreen::onLaunchClicked()
 {
-    QString mapName = m_mapNameEdit->text();
+    QString mapName = m_mapNameEdit->text().trimmed();
+    if (mapName.isEmpty())
+        return;
+
+    QString saveRoot = QCoreApplication::applicationDirPath() + Config::Paths::SAVE_DIR_NAME;
+    QDir dir(saveRoot + "/" + mapName);
+
+    if (dir.exists())
+    {
+        m_mapNameEdit->setStyleSheet("border: 1px solid red; background: #2a0000;");
+        return;
+    }
+
     uint seed = m_seedEdit->text().toUInt();
+    int difficulty = m_difficultyCombo->currentIndex();
+    int mapType = m_mapTypeCombo->currentIndex();
 
     auto *loading = new LoadingScreen();
     MenuManager::getInstance().setScreen(loading);
 
-    QTimer::singleShot(Config::UI::GENERATION_DELAY, loading, [loading, mapName, seed]()
+    QTimer::singleShot(Config::UI::GENERATION_DELAY, loading, [loading, mapName, seed, difficulty, mapType]()
                        {
         loading->setStatus(tr("GENERATING TERRAIN PROTOCOLS..."));
         loading->setProgress(30);
         
-        GameEngine::getInstance().setupMatch(mapName, seed);
+        GameEngine::getInstance().setupMatch(mapName, seed, difficulty, mapType);
 
         QTimer::singleShot(Config::UI::LOADING_STEP_DELAY, loading, [loading]() {
             loading->setStatus(tr("ESTABLISHING NEURAL LINK..."));
             loading->setProgress(70);
             
             GameEngine::getInstance().startGame();
-            MenuManager::getInstance().updateMetadata();
 
-            QTimer::singleShot(Config::UI::LOADING_FINAL_PAUSE, loading, []() {
-                auto* game = new GameScreen();
-                MenuManager::getInstance().setScreen(game);
-                game->setFocus();
+            QTimer::singleShot(Config::UI::LOADING_STEP_DELAY, loading, [loading]() {
+                MenuManager::getInstance().setScreen(new GameScreen());
             });
         }); });
 }
@@ -77,6 +88,7 @@ void NewGameScreen::setupUI()
 
     m_mapNameEdit = new QLineEdit(Config::Gameplay::DEFAULT_MISSION_NAME);
     m_mapNameEdit->setObjectName("missionInput");
+    m_mapNameEdit->setValidator(new QRegularExpressionValidator(QRegularExpression("^[a-zA-Z0-9_]*$"), this));
     form->addRow(tr("MAP IDENTIFIER:"), m_mapNameEdit);
 
     QHBoxLayout *seedLayout = new QHBoxLayout();
@@ -97,9 +109,10 @@ void NewGameScreen::setupUI()
     m_difficultyCombo->addItems(Config::UI::DIFFICULTIES);
     form->addRow(tr("COMBAT DIFFICULTY:"), m_difficultyCombo);
 
-    m_opponentCombo = new QComboBox();
-    m_opponentCombo->addItems(Config::UI::OPPONENTS);
-    form->addRow(tr("OPPONENT TYPE:"), m_opponentCombo);
+    m_mapTypeCombo = new QComboBox();
+    m_mapTypeCombo->addItems(Config::UI::MAP_TYPES);
+    m_mapTypeCombo->setObjectName("missionInput");
+    form->addRow(tr("WORLD TOPOLOGY:"), m_mapTypeCombo);
 
     layout->addLayout(form);
 
