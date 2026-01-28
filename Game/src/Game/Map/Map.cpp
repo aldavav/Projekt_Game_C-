@@ -14,7 +14,7 @@ void Map::initializeNewMap(const std::string &name, Engine::Difficulty difficult
     m_seed = seed;
     m_mapType = static_cast<World::MapType>(type);
 
-    int startRadius = 6;
+    int startRadius = Config::World::DEFAULT_DISCOVER_RADIUS;
     for (int q = -startRadius; q <= startRadius; ++q)
     {
         for (int r = -startRadius; r <= startRadius; ++r)

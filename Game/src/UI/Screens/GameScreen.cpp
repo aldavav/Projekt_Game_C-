@@ -314,7 +314,6 @@ void GameScreen::drawMap2D(QPainter &painter, QPoint currentHover)
     int maxQ = static_cast<int>(ceil((2.0f / 3.0f * bottomRight.x()) / BASE_TILE)) + 2;
 
     float visualRadius = (BASE_TILE * zoom) * Config::World::HEX_VISUAL_SCALE;
-    QColor selectionColor = property("selectionColor").value<QColor>();
 
     for (int q = minQ; q <= maxQ; ++q)
     {

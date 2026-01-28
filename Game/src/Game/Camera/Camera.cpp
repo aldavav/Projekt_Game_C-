@@ -44,6 +44,16 @@ QPointF Camera::screenToWorld(const QPoint &screenPos, bool is3D) const
     return QPointF(worldX, worldY);
 }
 
+QPointF Camera::worldToHex(const QPointF &worldPos) const
+{
+    const float size = Config::World::BASE_TILE_SIZE;
+
+    float q = (2.0f / 3.0f * worldPos.x()) / size;
+    float r = (-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size;
+
+    return hexRound(q, r);
+}
+
 QPoint Camera::screenToHex(const QPoint &screenPos, bool is3D) const
 {
     QPointF worldPos = screenToWorld(screenPos, is3D);

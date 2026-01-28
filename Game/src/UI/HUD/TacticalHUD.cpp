@@ -77,8 +77,10 @@ bool TacticalHUD::handleMousePress(QMouseEvent *event, int width, int height)
 
     if (m_minimapBox.contains(event->pos()))
     {
-        QPointF targetWorldPos = m_minimapProvider.screenToWorld(event->pos(), m_minimapBox);
-        emit minimapClicked(targetWorldPos);
+        QPoint localPos = event->pos() - m_minimapBox.topLeft();
+        QPointF targetWorldPos = m_minimapProvider.screenToWorld(localPos, m_minimapBox);
+        QPointF targetHexPos = Camera::getInstance().worldToHex(targetWorldPos);
+        emit minimapClicked(targetHexPos);
         return true;
     }
 

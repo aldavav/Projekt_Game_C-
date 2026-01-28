@@ -18,6 +18,8 @@ public:
 
     QPoint screenToHex(const QPoint &screenPos, bool is3D = Config::World::DEFAULT_3D_VIEW) const;
 
+    QPointF worldToHex(const QPointF& worldPos) const;
+
     QPoint toScreen(int q, int r, int tileSize = Config::World::BASE_TILE_SIZE, bool is3D = Config::World::DEFAULT_3D_VIEW) const;
 
     QPointF hexRound(float q, float r) const;
@@ -46,8 +48,6 @@ private:
     QPointF m_currentPos;
 
     QPointF m_targetPos;
-
-    QRect m_worldBounds = Config::World::WORLD_BOUNDS;
 
     float m_zoom = Config::Gameplay::INITIAL_ZOOM;
 

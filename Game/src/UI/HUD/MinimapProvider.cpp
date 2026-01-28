@@ -22,17 +22,16 @@ QPixmap MinimapProvider::getMinimap(int size, int screenWidth, int screenHeight,
 QPointF MinimapProvider::screenToWorld(const QPoint &clickPos, const QRect &mmRect)
 {
     auto &cam = Camera::getInstance();
+    const float tileS = Config::World::BASE_TILE_SIZE;
+    const float viewRadius = Config::World::MINIMAP_VIEW_RADIUS;
 
-    float relX = (clickPos.x() - (mmRect.x() + mmRect.width() / 2.0f)) / (float)mmRect.width();
-    float relY = (clickPos.y() - (mmRect.y() + mmRect.height() / 2.0f)) / (float)mmRect.height();
+    float minimapVisibleWorldSize = tileS * 1.5f * viewRadius * 2.0f;
+    float unitsPerPixel = minimapVisibleWorldSize / (float)mmRect.width();
 
-    float viewPortScale = cam.getViewportWidth() * Config::World::SCANLINE_SPACING;
-    QPointF currentCamPos = cam.getCurrentPos();
+    float dx = (clickPos.x() - mmRect.width() / 2.0f) * unitsPerPixel;
+    float dy = (clickPos.y() - mmRect.height() / 2.0f) * unitsPerPixel;
 
-    float targetWorldX = currentCamPos.x() + (relX * viewPortScale);
-    float targetWorldY = currentCamPos.y() + (relY * viewPortScale);
-
-    return QPointF(targetWorldX, targetWorldY);
+    return QPointF(cam.getCurrentPos().x() + dx, cam.getCurrentPos().y() + dy);
 }
 
 void MinimapProvider::updateCache(int size, int screenWidth, int screenHeight, bool override)
@@ -44,23 +43,33 @@ void MinimapProvider::updateCache(int size, int screenWidth, int screenHeight, b
 
     m_cache.fill(QColor(10, 10, 10, 200));
     QPainter painter(&m_cache);
+    painter.setRenderHint(QPainter::Antialiasing);
 
     auto &map = Map::getInstance();
     auto &cam = Camera::getInstance();
 
     const float tileS = Config::World::BASE_TILE_SIZE;
     QPointF camPos = cam.getCurrentPos();
-
     const float radarWorldRadius = Config::World::MINIMAP_VIEW_RADIUS * tileS;
+
+    float dotBaseSize = (tileS / radarWorldRadius) * (size / 2.0f) * 1.5f;
+
+    float finalDotSize = dotBaseSize * 1.5f;
 
     QPoint centerHex = cam.screenToHex(QPoint(screenWidth / 2, screenHeight / 2), false);
 
-    int scanRange = 40;
+    int scanRange = Config::World::SCAN_RANGE;
 
     for (int q = centerHex.x() - scanRange; q <= centerHex.x() + scanRange; ++q)
     {
         for (int r = centerHex.y() - scanRange; r <= centerHex.y() + scanRange; ++r)
         {
+            int dq = q - centerHex.x();
+            int dr = r - centerHex.y();
+            int hexDist = (std::abs(dq) + std::abs(dq + dr) + std::abs(dr)) / 2;
+
+            if (hexDist > 40)
+                continue;
 
             if (!map.hasTileAt(q, r) && !override)
                 continue;
@@ -74,9 +83,11 @@ void MinimapProvider::updateCache(int size, int screenWidth, int screenHeight, b
             float mmX = (size / 2.0f) + ((worldX - camPos.x()) / radarWorldRadius) * (size / 2.0f);
             float mmY = (size / 2.0f) + ((worldY - camPos.y()) / radarWorldRadius) * (size / 2.0f);
 
-            if (mmX >= 0 && mmX < size && mmY >= 0 && mmY < size)
+            if (mmX >= -dotBaseSize && mmX < size && mmY >= -dotBaseSize && mmY < size)
             {
-                painter.fillRect(QRectF(mmX, mmY, 2, 2), dotColor);
+
+                float offset = (dotBaseSize - finalDotSize) / 2.0f;
+                painter.fillRect(QRectF(mmX + offset, mmY + offset, finalDotSize, finalDotSize), dotColor);
             }
         }
     }
@@ -86,7 +97,6 @@ void MinimapProvider::updateCache(int size, int screenWidth, int screenHeight, b
     float viewH = (screenHeight / zoom) / radarWorldRadius * (size / 2.0f);
 
     painter.setPen(QPen(Qt::white, 1));
-
     painter.drawRect(QRectF((size - viewW) / 2.0f, (size - viewH) / 2.0f, viewW, viewH));
 }
 

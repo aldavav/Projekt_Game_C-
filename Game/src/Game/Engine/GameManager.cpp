@@ -22,7 +22,7 @@ void GameManager::update()
     int q = std::round((2.0f / 3.0f * worldPos.x()) / size);
     int r = std::round((-1.0f / 3.0f * worldPos.x() + std::sqrt(3.0f) / 3.0f * worldPos.y()) / size);
 
-    Map::getInstance().revealRadiusWithCleanup(q, r, Config::World::REVEAL_RADIUS);
+    Map::getInstance().revealRadiusWithCleanup(q, r, Config::World::DEFAULT_VIEW_RADIUS);
 
     m_hud->update(m_gameTime, m_isPaused, m_currentSpeed);
 }
