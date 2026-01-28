@@ -126,6 +126,7 @@ add_executable(Game
     ${SRC_UI_WIDGETS}
     ${SRC_UI_COMPONENTS}
     ${SRC_UI_HUD}
+    src/Game/Entities/unitbuilder.h src/Game/Entities/unitbuilder.cpp
 )
 
 target_include_directories(Game PRIVATE 

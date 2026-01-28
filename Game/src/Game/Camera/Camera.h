@@ -39,6 +39,10 @@ public:
     int getViewportWidth() const { return static_cast<int>(m_viewportWidth); }
 
     void setZoom(float newZoom);
+    //pridano
+    QPointF hexToWorld(const QPoint& hex) const;
+
+    QPointF screenToHexF(const QPoint& screenPos, bool is3D = false) const;
 
 private:
     Camera() = default;

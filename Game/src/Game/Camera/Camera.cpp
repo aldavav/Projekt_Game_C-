@@ -166,3 +166,18 @@ void Camera::setZoom(float newZoom)
                         Config::World::MIN_ZOOM,
                         Config::World::MAX_ZOOM);
 }
+
+QPointF Camera::hexToWorld(const QPoint& hex) const {
+    const float size = Config::World::BASE_TILE_SIZE;
+    return QPointF(
+        size * (3.0f / 2.0f * hex.x()),
+        size * (std::sqrt(3.0f) / 2.0f * hex.x() + std::sqrt(3.0f) * hex.y())
+        );
+}
+
+QPointF Camera::screenToHexF(const QPoint& screenPos, bool is3D) const {
+    QPointF worldPos = screenToWorld(screenPos, is3D);
+    float q = worldPos.x() / Config::World::BASE_TILE_SIZE;
+    float r = worldPos.y() / Config::World::BASE_TILE_SIZE;
+    return QPointF(q, r);
+}
