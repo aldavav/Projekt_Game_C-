@@ -81,7 +81,7 @@ private:
 
     bool m_isDragging = false;
 
-    bool m_is3D = false;
+    bool m_is3D = Config::World::DEFAULT_3D_VIEW;
 };
 
 #endif

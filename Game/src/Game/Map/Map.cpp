@@ -200,24 +200,24 @@ void Map::generateChunk(World::Chunk *chunk)
 
             switch (m_mapType)
             {
-            case World::MapType::ISLAND:
+            case World::MapType::Island:
             {
                 float dist = std::sqrt(q * q + r * r) / Config::World::ISLAND_SIZE;
                 height = (e + 0.1f) - (dist * dist);
                 break;
             }
-            case World::MapType::ARCHIPELAGO:
+            case World::MapType::Archipelago:
             {
                 height = e - 0.2f;
                 break;
             }
-            case World::MapType::CONTINENTS:
+            case World::MapType::Continents:
             {
                 float cluster = getNoise(q / 500.0f, r / 500.0f, m_seed + 1);
                 height = e + (cluster * 0.4f) - 0.2f;
                 break;
             }
-            case World::MapType::PANGEA:
+            case World::MapType::Pangea:
             {
                 height = e + 0.2f;
                 break;

@@ -37,6 +37,14 @@ namespace Engine
         Brutal
     };
 
+    enum class EntityType : uint8_t
+    {
+        Unit,
+        Building,
+        Resource,
+        Debris
+    };
+
     namespace Graphics
     {
         enum class Quality
@@ -53,18 +61,6 @@ namespace Engine
             Attack,
             Select,
             Wait
-        };
-    }
-
-    namespace Entity
-    {
-        enum class Type : uint8_t
-        {
-            None = 0,
-            Unit,
-            Building,
-            Resource,
-            Debris
         };
     }
 

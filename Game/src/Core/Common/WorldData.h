@@ -53,10 +53,10 @@ namespace World
 
     enum class MapType
     {
-        ISLAND = 0,
-        ARCHIPELAGO = 1,
-        CONTINENTS = 2,
-        PANGEA = 3
+        Island = 0,
+        Archipelago = 1,
+        Continents = 2,
+        Pangea = 3
     };
 }
 

@@ -36,8 +36,7 @@ public:
 
     void toggleDiagnostics() { m_showDiagnostics = !m_showDiagnostics; }
 
-    void setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos,
-                            const QPoint &mouseScreenPos, uint32_t mapSeed);
+    void setDiagnosticsData(const QPoint &hoveredHex, const QPointF &mouseWorldPos, const QPoint &mouseScreenPos, uint32_t mapSeed);
 
 signals:
     void hudButtonClicked(int buttonIndex);
@@ -75,7 +74,7 @@ private:
 
     QPoint m_mouseScreenPos;
 
-    uint32_t m_mapSeed = 0;
+    uint32_t m_mapSeed = Config::World::DEFAULT_SEED;
 
     QElapsedTimer m_fpsTimer;
 

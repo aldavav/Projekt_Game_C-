@@ -28,7 +28,7 @@ void Entity::setPosition(const QPointF &pos)
 
 std::unique_ptr<Entity> Entity::createEntityFromFile(std::ifstream &file)
 {
-    Engine::Entity::Type type;
+    Engine::EntityType type;
     if (!file.read(reinterpret_cast<char *>(&type), sizeof(type)))
     {
         return nullptr;
@@ -36,13 +36,13 @@ std::unique_ptr<Entity> Entity::createEntityFromFile(std::ifstream &file)
 
     switch (type)
     {
-    case Engine::Entity::Type::Unit:
+    case Engine::EntityType::Unit:
         return nullptr;
-    case Engine::Entity::Type::Building:
+    case Engine::EntityType::Building:
         return nullptr;
-    case Engine::Entity::Type::Resource:
+    case Engine::EntityType::Resource:
         return nullptr;
-    case Engine::Entity::Type::Debris:
+    case Engine::EntityType::Debris:
         return nullptr;
     default:
         return nullptr;

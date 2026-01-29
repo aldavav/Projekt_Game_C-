@@ -59,7 +59,7 @@ private:
 
     Engine::Difficulty m_difficulty = Engine::Difficulty::Medium;
 
-    World::MapType m_mapType = World::MapType::ISLAND;
+    World::MapType m_mapType = World::MapType::Island;
 
     std::unordered_map<uint64_t, World::Chunk *> m_chunks;
 };

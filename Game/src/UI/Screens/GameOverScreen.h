@@ -30,7 +30,6 @@ protected:
 private:
     void setupUI(bool victory);
 
-private:
     QLabel *m_titleLabel = nullptr;
 
     QLabel *m_statsLabel = nullptr;

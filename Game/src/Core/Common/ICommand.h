@@ -10,8 +10,6 @@ class GameEngine;
 class ICommand
 {
 public:
-    virtual ~ICommand() = default;
-
     virtual bool execute(GameEngine &engine) = 0;
 
     virtual bool undo(GameEngine &engine) { return false; }

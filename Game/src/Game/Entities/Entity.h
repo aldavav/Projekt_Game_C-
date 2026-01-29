@@ -20,7 +20,7 @@ public:
 
     QPointF getTarget() const { return m_targetPosition; }
 
-    Engine::Entity::Type getType() const { return m_type; }
+    Engine::EntityType getType() const { return m_type; }
 
     std::string getName() const { return m_name; }
 
@@ -51,7 +51,7 @@ protected:
 
     std::string m_symbol;
 
-    Engine::Entity::Type m_type = Engine::Entity::Type::Unit;
+    Engine::EntityType m_type = Engine::EntityType::Unit;
 
     Player *m_owner = nullptr;
 
