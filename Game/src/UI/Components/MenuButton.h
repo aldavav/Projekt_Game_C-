@@ -20,6 +20,8 @@ class MenuButton : public QWidget
 public:
     explicit MenuButton(const QString &text, bool isQuit = false, QWidget *parent = nullptr);
 
+    void setText(const QString &text);
+
 signals:
     void clicked();
 

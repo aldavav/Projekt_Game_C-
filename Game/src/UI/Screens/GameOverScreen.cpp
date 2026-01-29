@@ -41,8 +41,8 @@ void GameOverScreen::setupUI(bool victory)
 
     m_titleLabel = new QLabel(this);
 
-    m_titleLabel->setText(victory ? tr(Config::Gameplay::TEXT_VICTORY.toUtf8())
-                                  : tr(Config::Gameplay::TEXT_DEFEAT.toUtf8()));
+    m_titleLabel->setText(victory ? tr("VICTORY ACHIEVED")
+                                  : tr("DEFEAT: SIGNAL LOST"));
 
     m_titleLabel->setObjectName(victory ? "victoryTitle" : "defeatTitle");
     m_titleLabel->setAlignment(Qt::AlignCenter);
@@ -51,12 +51,12 @@ void GameOverScreen::setupUI(bool victory)
     m_statsLabel->setObjectName("statsBox");
 
     QString statsText = QString("%1\n\n%2 %3\n%4 %5\n%6 %7")
-                            .arg(tr(Config::UI::STATS_HEADER.toUtf8()))
-                            .arg(tr(Config::UI::STATS_UNITS.toUtf8()))
+                            .arg(tr("OPERATIONAL DATA:"))
+                            .arg(tr("UNITS PRODUCED:"))
                             .arg(24)
-                            .arg(tr(Config::UI::STATS_LOSSES.toUtf8()))
+                            .arg(tr("STRUCTURES LOST:"))
                             .arg(2)
-                            .arg(tr(Config::UI::STATS_TIME.toUtf8()))
+                            .arg(tr("TOTAL TIME:"))
                             .arg("18:45");
 
     m_statsLabel->setText(statsText);

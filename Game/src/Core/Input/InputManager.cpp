@@ -89,16 +89,11 @@ CommandPtr InputManager::translateRawInput(const Engine::Input::RawEvent &event)
 
         switch (action)
         {
-        case Engine::Input::Action::Stop:
-            return QSharedPointer<StopUnitAction>::create(0, QPoint(0, 0));
-        case Engine::Input::Action::Guard:
-            return QSharedPointer<GuardUnitAction>::create(0, QPoint(0, 0));
         case Engine::Input::Action::ZoomOut:
             return QSharedPointer<ZoomAction>::create(-Config::Gameplay::ZOOM_STEP);
         case Engine::Input::Action::ZoomIn:
             return QSharedPointer<ZoomAction>::create(Config::Gameplay::ZOOM_STEP);
-        case Engine::Input::Action::Scatter:
-            return QSharedPointer<ScatterUnitAction>::create(0, QPoint(0, 0));
+
         default:
             break;
         }

@@ -128,7 +128,7 @@ void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
 
     painter.setFont(QFont("Consolas", 9, QFont::Bold));
     painter.setPen(QColor(Config::UI::COLOR_TACTICAL_BLUE));
-    painter.drawText(textX, textY, "MISSION TIME:");
+    painter.drawText(textX, textY, tr("MISSION TIME:"));
 
     painter.setPen(Qt::white);
 
@@ -148,7 +148,7 @@ void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
         World::Tile &tile = Map::getInstance().getTileAt(sq, sr);
 
         painter.setPen(QColor(Config::UI::COLOR_TACTICAL_BLUE));
-        painter.drawText(textX, textY, ">> TACTICAL INTEL");
+        painter.drawText(textX, textY, tr(">> TACTICAL INTEL"));
 
         painter.setPen(Qt::white);
         painter.setFont(QFont("Consolas", 9));
@@ -184,7 +184,7 @@ void TacticalHUD::drawResourceStats(QPainter &painter, int width, int height)
     else
     {
         painter.setPen(QColor(100, 100, 100));
-        painter.drawText(textX, textY, ">> SYSTEM STANDBY");
+        painter.drawText(textX, textY, tr(">> SYSTEM STANDBY"));
         painter.setFont(QFont("Consolas", 8));
         painter.drawText(textX, textY + spacing, "NO ACTIVE SELECTION DETECTED...");
         painter.drawText(textX, textY + spacing * 2, "AWAITING TARGET COORDINATES");

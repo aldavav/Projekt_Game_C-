@@ -32,7 +32,6 @@ TexturePtr ResourceManager::loadTextureFromFile(const QString &filePath)
     QImage image;
     if (!image.load(filePath))
     {
-        qDebug() << "Failed to load texture from file:" << filePath;
         return TexturePtr();
     }
 

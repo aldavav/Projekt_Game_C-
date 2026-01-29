@@ -76,28 +76,25 @@ namespace Engine
             MoveDown,
             MoveLeft,
             MoveRight,
-            Stop,
-            Guard,
-            Scatter,
             ZoomOut,
             ZoomIn,
-            ZoomInAlt
+            ToggleMapMode,
+            ToggleDebug,
+            QuickSave
         };
 
         enum class KeyCode : int
         {
-            UpArrow = Qt::Key_Up,
-            DownArrow = Qt::Key_Down,
-            LeftArrow = Qt::Key_Left,
-            RightArrow = Qt::Key_Right,
-            Stop = Qt::Key_S,
-            Guard = Qt::Key_G,
-            Scatter = Qt::Key_X,
-            Enter = Qt::Key_Return,
+            W = Qt::Key_W,
+            A = Qt::Key_A,
+            S = Qt::Key_S,
+            D = Qt::Key_D,
             Escape = Qt::Key_Escape,
             ZoomOut = Qt::Key_Minus,
             ZoomIn = Qt::Key_Plus,
-            ZoomInAlt = Qt::Key_Equal
+            MapMode = Qt::Key_M,
+            DebugF3 = Qt::Key_F3,
+            SaveF5 = Qt::Key_F5
         };
 
         struct RawEvent

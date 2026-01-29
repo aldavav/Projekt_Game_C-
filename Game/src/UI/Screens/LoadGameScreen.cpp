@@ -185,7 +185,7 @@ void LoadGameScreen::refreshSaveList()
 
     for (const QString &folder : folders)
     {
-        QString filePath = dir.absoluteFilePath(folder + "/level.dat");
+        QString filePath = dir.absoluteFilePath(folder + Config::Paths::INITIAL_SAVE_FILENAME);
         QFileInfo fileInfo(filePath);
 
         if (fileInfo.exists())

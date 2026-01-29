@@ -68,9 +68,6 @@ namespace Config
         constexpr float ZOOM_STEP = 0.1f;
         constexpr float INITIAL_ZOOM = 1.5f;
         constexpr Engine::Difficulty DEFAULT_DIFFICULTY = Engine::Difficulty::Medium;
-        const QString TEXT_VICTORY = "VICTORY ACHIEVED";
-        const QString TEXT_DEFEAT = "DEFEAT: SIGNAL LOST";
-        const QString DEFAULT_MISSION_NAME = "Default_Mission";
         constexpr int DEFAULT_WINDOW_WIDTH = 1920;
         constexpr int DEFAULT_WINDOW_HEIGHT = 1080;
         constexpr int GAMMA_DEFAULT = 50;
@@ -96,7 +93,7 @@ namespace Config
     namespace Paths
     {
         const QString SAVE_DIR_NAME = "/saves";
-        const QString INITIAL_SAVE_FILENAME = "autosave_01.dat";
+        const QString INITIAL_SAVE_FILENAME = "/level.dat";
         const QString LANGUAGE_FILE = ":/i18n/assets/i18n/game_%1.qm";
         const QString STYLE_SHEET = ":/styles/assets/styles/style.qss";
         const QString CURSOR_DEFAULT = ":/ui/assets/ui/cursor_std.png";
@@ -134,8 +131,6 @@ namespace Config
         const QString LEAD_DEV = "Michael Szotkowski";
         const QStringList PROGRAMMING_TEAM = {LEAD_DEV, "Aleš Vavřinec"};
         const QStringList CONTRIBUTIONS = {"Marek Hovorka"};
-        const QString DEFAULT_UPLINK_TEXT = "ESTABLISHING UPLINK...";
-        const QString DEFAULT_STATUS_TEXT = "INITIALIZING ENGINE...";
     }
 
     namespace UI
@@ -190,36 +185,8 @@ namespace Config
         constexpr int END_SCREEN_BTN_HEIGHT = 50;
         constexpr int END_SCREEN_SPACING = 30;
         constexpr float LEGAL_SCROLL_THRESHOLD = 0.95f;
-        const QString STR_ABORT = "ABORT";
-        const QString STR_PROCEED = "PROCEED";
-        const QString MANUAL_TITLE = "SYSTEM MANUAL";
-        const QString MANUAL_TEXT = R"(CONTROLS:
- - Left Click: Select unit / structure / hex
- - Left Click Drag: Box select multiple units
- - Right Click: Issue command / move / interact
- - Right Click Drag: Pan camera
- - Scroll Wheel: Zoom in / out
-
-COMMANDS:
- - Attack: Right click on enemy target
- - Move: Right click on terrain
- - Stop: Cancel current order
-
-STRATEGIC OBJECTIVE:
- - Explore fogged areas to reveal the battlefield
- - Secure resources to expand your forces)";
-        const QString STATS_HEADER = "OPERATIONAL DATA:";
-        const QString STATS_UNITS = "UNITS PRODUCED:";
-        const QString STATS_LOSSES = "STRUCTURES LOST:";
-        const QString STATS_TIME = "TOTAL TIME:";
         constexpr int LOAD_STEP_RETRIEVE = 100;
         constexpr int LOAD_STEP_RECONSTRUCT = 200;
-        const QStringList DIFFICULTIES = {"EASY", "NORMAL", "HARD", "BRUTAL"};
-        const QStringList MAP_TYPES = {
-            "SINGLE ISLAND",
-            "ARCHIPELAGO",
-            "CONTINENTS",
-            "PANGEA"};
     }
 
     namespace World

@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
                             if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
                                 return QString::fromUtf8(file.readAll());
                             }
-                            return "CRITICAL ERROR: DOCUMENT NOT FOUND.";
+                            return tr("CRITICAL ERROR: DOCUMENT NOT FOUND.");
                         };
 
                         QString combinedLegal = QString(

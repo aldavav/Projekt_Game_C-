@@ -7,6 +7,11 @@ MenuButton::MenuButton(const QString &text, bool isQuit, QWidget *parent)
     setupAnimations();
 }
 
+void MenuButton::setText(const QString &text)
+{
+    m_btn->setText(text);
+}
+
 void MenuButton::setupAnimations()
 {
     m_hoverAnimation = new QParallelAnimationGroup(this);

@@ -24,13 +24,13 @@ QString ControlsSettingsManager::getKeyName(Engine::Input::Action action) const
 
 ControlsSettingsManager::ControlsSettingsManager()
 {
-    m_bindings[Engine::Input::Action::MoveUp] = Engine::Input::KeyCode::UpArrow;
-    m_bindings[Engine::Input::Action::MoveDown] = Engine::Input::KeyCode::DownArrow;
-    m_bindings[Engine::Input::Action::MoveLeft] = Engine::Input::KeyCode::LeftArrow;
-    m_bindings[Engine::Input::Action::MoveRight] = Engine::Input::KeyCode::RightArrow;
-    m_bindings[Engine::Input::Action::Stop] = Engine::Input::KeyCode::Stop;
-    m_bindings[Engine::Input::Action::Guard] = Engine::Input::KeyCode::Guard;
-    m_bindings[Engine::Input::Action::Scatter] = Engine::Input::KeyCode::Scatter;
+    m_bindings[Engine::Input::Action::MoveUp] = Engine::Input::KeyCode::W;
+    m_bindings[Engine::Input::Action::MoveDown] = Engine::Input::KeyCode::S;
+    m_bindings[Engine::Input::Action::MoveLeft] = Engine::Input::KeyCode::A;
+    m_bindings[Engine::Input::Action::MoveRight] = Engine::Input::KeyCode::D;
+    m_bindings[Engine::Input::Action::ToggleMapMode] = Engine::Input::KeyCode::MapMode;
+    m_bindings[Engine::Input::Action::ToggleDebug] = Engine::Input::KeyCode::DebugF3;
+    m_bindings[Engine::Input::Action::QuickSave] = Engine::Input::KeyCode::SaveF5;
 }
 
 Engine::Input::Action ControlsSettingsManager::getActionForKey(int qtKey) const

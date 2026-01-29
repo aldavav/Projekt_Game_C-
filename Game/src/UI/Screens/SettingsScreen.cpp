@@ -53,11 +53,15 @@ void SettingsScreen::onResetClicked()
     if (confirm.exec() == QDialog::Accepted)
     {
         ConfigManager::getInstance().resetToDefaults();
+        m_isDirty = false;
 
-        m_isDirty = true;
-
-        setupUI();
-        update();
+        auto &csm = ControlsSettingsManager::getInstance();
+        for (auto it = m_bindButtons.begin(); it != m_bindButtons.end(); ++it)
+        {
+            Engine::Input::Action action = it.key();
+            QPushButton *btn = it.value();
+            btn->setText(csm.getKeyName(action));
+        }
     }
 }
 
@@ -307,31 +311,57 @@ QWidget *SettingsScreen::createAudioTab()
 QWidget *SettingsScreen::createInputTab()
 {
     auto *w = new QWidget();
-    auto *layout = new QFormLayout(w);
+    auto *scrollArea = new QScrollArea(w);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setFrameShape(QFrame::NoFrame);
 
-    layout->addRow(new QLabel(tr("KEY BINDINGS")));
+    auto *container = new QWidget();
+    auto *layout = new QFormLayout(container);
 
     auto createBindRow = [this, layout](const QString &label, Engine::Input::Action action)
     {
         auto *btn = new QPushButton(ControlsSettingsManager::getInstance().getKeyName(action));
         btn->setObjectName("bindButton");
+        btn->setMinimumWidth(120);
+
+        m_bindButtons[action] = btn;
 
         connect(btn, &QPushButton::clicked, this, [this, btn, action]()
                 {
-            KeyCaptureDialog diag(this);
-            if (diag.exec() == QDialog::Accepted) {
-                markDirty(); 
-                ControlsSettingsManager::getInstance().setKey(action, static_cast<Engine::Input::KeyCode>(diag.getCapturedKey()));
-                btn->setText(ControlsSettingsManager::getInstance().getKeyName(action));
-            } });
+        KeyCaptureDialog diag(this);
+        if (diag.exec() == QDialog::Accepted) {
+            markDirty(); 
+            Engine::Input::KeyCode captured = static_cast<Engine::Input::KeyCode>(diag.getCapturedKey());
+            ControlsSettingsManager::getInstance().setKey(action, captured);
+            btn->setText(ControlsSettingsManager::getInstance().getKeyName(action));
+        } });
         layout->addRow(label, btn);
     };
 
+    QLabel *navHeader = new QLabel(tr("NAVIGATION"));
+    navHeader->setObjectName("settingsSubHeader");
+    layout->addRow(navHeader);
+
     createBindRow(tr("MOVE UP"), Engine::Input::Action::MoveUp);
     createBindRow(tr("MOVE DOWN"), Engine::Input::Action::MoveDown);
-    createBindRow(tr("UNIT: STOP"), Engine::Input::Action::Stop);
-    createBindRow(tr("UNIT: GUARD"), Engine::Input::Action::Guard);
-    createBindRow(tr("UNIT: SCATTER"), Engine::Input::Action::Scatter);
+    createBindRow(tr("MOVE LEFT"), Engine::Input::Action::MoveLeft);
+    createBindRow(tr("MOVE RIGHT"), Engine::Input::Action::MoveRight);
+
+    QLabel *unitHeader = new QLabel(tr("UNIT COMMANDS"));
+    unitHeader->setObjectName("settingsSubHeader");
+    layout->addRow(unitHeader);
+
+    QLabel *sysHeader = new QLabel(tr("SYSTEM"));
+    sysHeader->setObjectName("settingsSubHeader");
+    layout->addRow(sysHeader);
+
+    createBindRow(tr("TOGGLE MAP MODE (3D/2D)"), Engine::Input::Action::ToggleMapMode);
+    createBindRow(tr("QUICK SAVE DATA"), Engine::Input::Action::QuickSave);
+    createBindRow(tr("TOGGLE DIAGNOSTICS"), Engine::Input::Action::ToggleDebug);
+
+    scrollArea->setWidget(container);
+    auto *mainLayout = new QVBoxLayout(w);
+    mainLayout->addWidget(scrollArea);
 
     return w;
 }

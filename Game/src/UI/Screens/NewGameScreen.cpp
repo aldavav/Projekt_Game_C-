@@ -86,7 +86,7 @@ void NewGameScreen::setupUI()
     header->setObjectName("settingsTitle");
     layout->addWidget(header);
 
-    m_mapNameEdit = new QLineEdit(Config::Gameplay::DEFAULT_MISSION_NAME);
+    m_mapNameEdit = new QLineEdit(tr("Default_mission"));
     m_mapNameEdit->setObjectName("missionInput");
     m_mapNameEdit->setValidator(new QRegularExpressionValidator(QRegularExpression("^[a-zA-Z0-9_]*$"), this));
     form->addRow(tr("MAP IDENTIFIER:"), m_mapNameEdit);
@@ -106,11 +106,11 @@ void NewGameScreen::setupUI()
     form->addRow(tr("TERRAIN SEED:"), seedLayout);
 
     m_difficultyCombo = new QComboBox();
-    m_difficultyCombo->addItems(Config::UI::DIFFICULTIES);
+    m_difficultyCombo->addItems({tr("EASY"), tr("NORMAL"), tr("HARD"), tr("BRUTAL")});
     form->addRow(tr("COMBAT DIFFICULTY:"), m_difficultyCombo);
 
     m_mapTypeCombo = new QComboBox();
-    m_mapTypeCombo->addItems(Config::UI::MAP_TYPES);
+    m_mapTypeCombo->addItems({tr("SINGLE ISLAND"), tr("ARCHIPELAGO"), tr("CONTINENTS"), tr("PANGEA")});
     m_mapTypeCombo->setObjectName("missionInput");
     form->addRow(tr("WORLD TOPOLOGY:"), m_mapTypeCombo);
 

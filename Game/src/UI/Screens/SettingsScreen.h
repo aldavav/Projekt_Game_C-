@@ -72,6 +72,8 @@ private:
     QLabel *m_headerLabel = nullptr;
 
     bool m_isDirty = false;
+
+    QMap<Engine::Input::Action, QPushButton *> m_bindButtons;
 };
 
 #endif

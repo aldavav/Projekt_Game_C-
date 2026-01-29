@@ -53,7 +53,7 @@ void GameEngine::setupMatch(QString mapName, uint32_t seed, int difficulty, int 
     m_difficulty = difficulty;
     m_mapType = mapType;
 
-    Camera::getInstance().setTargetPos(QPointF(0,0));
+    Camera::getInstance().setTargetPos(QPointF(0, 0));
     Map::getInstance().initializeNewMap(
         mapName.toStdString(),
         static_cast<Engine::Difficulty>(difficulty),
@@ -68,7 +68,7 @@ void GameEngine::saveCurrentMatch()
                        m_currentMapName;
 
     QDir().mkpath(worldDir);
-    QString filePath = worldDir + "/level.dat";
+    QString filePath = worldDir + Config::Paths::INITIAL_SAVE_FILENAME;
 
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly))
@@ -97,7 +97,7 @@ void GameEngine::loadMatch(const QString &mapName)
 {
     QString filePath = QCoreApplication::applicationDirPath() +
                        Config::Paths::SAVE_DIR_NAME + "/" +
-                       mapName + "/level.dat";
+                       mapName + Config::Paths::INITIAL_SAVE_FILENAME;
 
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly))
@@ -238,22 +238,34 @@ void GameEngine::updateSimulation(float fixedStep)
 void GameEngine::updateCameraMovement(float fixedStep)
 {
     auto &input = InputManager::getInstance();
+    auto &controls = ControlsSettingsManager::getInstance();
     auto &cam = Camera::getInstance();
     auto &gm = GameManager::getInstance();
 
     QPointF velocity(0, 0);
 
-    if (input.isKeyPressed(Qt::Key_Up) || input.isKeyPressed(Qt::Key_W))
+    int keyUp = static_cast<int>(controls.getKey(Engine::Input::Action::MoveUp));
+    int keyDown = static_cast<int>(controls.getKey(Engine::Input::Action::MoveDown));
+    int keyLeft = static_cast<int>(controls.getKey(Engine::Input::Action::MoveLeft));
+    int keyRight = static_cast<int>(controls.getKey(Engine::Input::Action::MoveRight));
+
+    if (input.isKeyPressed(keyUp))
         velocity.setY(-1);
-    if (input.isKeyPressed(Qt::Key_Down) || input.isKeyPressed(Qt::Key_S))
+    if (input.isKeyPressed(keyDown))
         velocity.setY(1);
-    if (input.isKeyPressed(Qt::Key_Left) || input.isKeyPressed(Qt::Key_A))
+    if (input.isKeyPressed(keyLeft))
         velocity.setX(-1);
-    if (input.isKeyPressed(Qt::Key_Right) || input.isKeyPressed(Qt::Key_D))
+    if (input.isKeyPressed(keyRight))
         velocity.setX(1);
 
     if (!velocity.isNull())
     {
+
+        if (velocity.x() != 0 && velocity.y() != 0)
+        {
+            velocity *= 0.7071f;
+        }
+
         float speedMultiplier = (gm.getSpeed() == Engine::GameSpeed::Fast) ? 2.0f : 1.0f;
         QPointF delta = velocity * Config::World::CAMERA_KEYBOARD_SPEED * fixedStep * speedMultiplier;
         cam.move(delta.x(), delta.y());

@@ -99,6 +99,9 @@ void GameScreen::wheelEvent(QWheelEvent *event)
 
 void GameScreen::keyPressEvent(QKeyEvent *event)
 {
+    auto &controls = ControlsSettingsManager::getInstance();
+    Engine::Input::Action action = controls.getActionForKey(event->key());
+
     if (event->key() == Qt::Key_Escape)
     {
         TacticalDialog pauseMenu(tr("UPLINK SUSPENDED"),
@@ -120,6 +123,7 @@ void GameScreen::keyPressEvent(QKeyEvent *event)
                 loading->setStatus(tr("UPLINK TERMINATED"));
                 loading->setProgress(100);
                 
+                
                 QTimer::singleShot(Config::UI::LOADING_FINAL_PAUSE, [loading]() {
                     auto* mainMenu = new MenuScreen(loading->parentWidget());
                     MenuManager::getInstance().setScreen(mainMenu);
@@ -127,16 +131,19 @@ void GameScreen::keyPressEvent(QKeyEvent *event)
             return;
         }
     }
-    else if (event->key() == Qt::Key_M)
+
+    else if (action == Engine::Input::Action::ToggleMapMode)
     {
         m_is3D = !m_is3D;
         update();
     }
-    else if (event->key() == Qt::Key_F5)
+
+    else if (action == Engine::Input::Action::QuickSave)
     {
         GameEngine::getInstance().saveCurrentMatch();
     }
-    if (event->key() == Qt::Key_F3)
+
+    else if (action == Engine::Input::Action::ToggleDebug)
     {
         auto &gm = GameManager::getInstance();
         if (gm.getHUD())
@@ -167,23 +174,23 @@ void GameScreen::keyReleaseEvent(QKeyEvent *event)
 void GameScreen::updateGameDisplay()
 {
     auto &cam = Camera::getInstance();
+    auto &controls = ControlsSettingsManager::getInstance();
     float zoom = cam.getZoom();
 
     float speed = Config::World::CAMERA_BASE_SPEED / zoom;
 
-    static float lastZoom = -1.0f;
-    if (std::abs(zoom - lastZoom) > 0.01f)
-    {
-        lastZoom = zoom;
-    }
+    int keyUp = static_cast<int>(controls.getKey(Engine::Input::Action::MoveUp));
+    int keyDown = static_cast<int>(controls.getKey(Engine::Input::Action::MoveDown));
+    int keyLeft = static_cast<int>(controls.getKey(Engine::Input::Action::MoveLeft));
+    int keyRight = static_cast<int>(controls.getKey(Engine::Input::Action::MoveRight));
 
-    if (m_pressedKeys.contains(Qt::Key_W))
+    if (m_pressedKeys.contains(keyUp))
         cam.move(0, -speed);
-    if (m_pressedKeys.contains(Qt::Key_S))
+    if (m_pressedKeys.contains(keyDown))
         cam.move(0, speed);
-    if (m_pressedKeys.contains(Qt::Key_A))
+    if (m_pressedKeys.contains(keyLeft))
         cam.move(-speed, 0);
-    if (m_pressedKeys.contains(Qt::Key_D))
+    if (m_pressedKeys.contains(keyRight))
         cam.move(speed, 0);
 
     GameManager::getInstance().update();

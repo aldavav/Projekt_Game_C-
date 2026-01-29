@@ -53,13 +53,15 @@ private slots:
 
     void onQuitClicked();
 
+    void refreshTranslations();
+
 private:
     void setupUI();
 
     void setupBackground();
 
     void updatePanelContent(const QString &title, const QString &description);
-    
+
     QLabel *m_backgroundLabel = nullptr;
 
     QMovie *m_bgMovie = nullptr;
@@ -72,7 +74,7 @@ private:
 
     QVBoxLayout *m_buttonLayout = nullptr;
 
-    QList<MenuButton*> m_buttons;
+    QList<MenuButton *> m_buttons;
 };
 
 #endif

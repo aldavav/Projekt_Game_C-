@@ -76,9 +76,31 @@ void MenuManager::popScreen()
 
     if (!m_screenStack.isEmpty())
     {
-        AbstractScreen *nextScreen = m_screenStack.top();
-        layout->setCurrentWidget(nextScreen);
-        nextScreen->onEnter();
+        AbstractScreen *previousScreen = m_screenStack.top();
+        AbstractScreen *newFreshScreen = nullptr;
+
+        if (qobject_cast<MenuScreen *>(previousScreen))
+        {
+            newFreshScreen = new MenuScreen(m_mainWindow);
+        }
+
+        if (newFreshScreen)
+        {
+            m_screenStack.pop();
+            m_screenStack.push(newFreshScreen);
+
+            layout->removeWidget(previousScreen);
+            previousScreen->deleteLater();
+
+            layout->addWidget(newFreshScreen);
+            layout->setCurrentWidget(newFreshScreen);
+            newFreshScreen->onEnter();
+        }
+        else
+        {
+            layout->setCurrentWidget(previousScreen);
+            previousScreen->onEnter();
+        }
     }
 }
 

@@ -9,7 +9,6 @@
 #include <QString>
 #include <QPixmap>
 #include <QImage>
-#include <QDebug>
 #include <QFile>
 #include <QUrl>
 #include <QMap>

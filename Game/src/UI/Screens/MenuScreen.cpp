@@ -100,24 +100,42 @@ void MenuScreen::onSettingsClicked()
 
 void MenuScreen::onHelpClicked()
 {
-    updatePanelContent(Config::UI::MANUAL_TITLE, Config::UI::MANUAL_TEXT);
+    updatePanelContent(tr("SYSTEM MANUAL"), tr(R"(CONTROLS:
+ - Left Click: Select unit / structure / hex
+ - Left Click Drag: Box select multiple units
+ - Right Click: Issue command / move / interact
+ - Right Click Drag: Pan camera
+ - Scroll Wheel: Zoom in / out
+
+COMMANDS:
+ - Attack: Right click on enemy target
+ - Move: Right click on terrain
+ - Stop: Cancel current order
+
+STRATEGIC OBJECTIVE:
+ - Explore fogged areas to reveal the battlefield
+ - Secure resources to expand your forces)"));
 }
 
 void MenuScreen::onCreditsClicked()
 {
-    QString content = "LEAD PROGRAMMER\nLEAD GAME DESIGNER\nTECHNICAL ARCHITECT\n"
-                      "CORE SYSTEMS & GAMEPLAY\n- " +
+    QString content = tr("LEAD PROGRAMMER\n"
+                         "LEAD GAME DESIGNER\n"
+                         "TECHNICAL ARCHITECT\n"
+                         "CORE SYSTEMS & GAMEPLAY\n- ") +
                       Config::Strings::LEAD_DEV + "\n\n";
 
-    content += "PROGRAMMING SUPPORT\n- " + Config::Strings::PROGRAMMING_TEAM.join("\n- ") + "\n\n";
+    content += tr("PROGRAMMING SUPPORT\n- ") +
+               Config::Strings::PROGRAMMING_TEAM.join("\n- ") + "\n\n";
 
-    content += "ADDITIONAL CONTRIBUTIONS\n- " + Config::Strings::CONTRIBUTIONS.join("\n- ") + "\n\n";
+    content += tr("ADDITIONAL CONTRIBUTIONS\n- ") +
+               Config::Strings::CONTRIBUTIONS.join("\n- ") + "\n\n";
 
-    content += "ENGINE & FRAMEWORK:\nQt / C++\n\n"
-               "ASSETS:\nAssets by Pixelrepo (https://pixelrepo.com)\n\n"
-               "TESTING:\nDeveloped and tested by the team";
+    content += tr("ENGINE & FRAMEWORK:\nQt / C++\n\n"
+                  "ASSETS:\nAssets by Pixelrepo (https://pixelrepo.com)\n\n"
+                  "TESTING:\nDeveloped and tested by the team");
 
-    updatePanelContent("PERSONNEL DOSSIER", content);
+    updatePanelContent(tr("PERSONNEL DOSSIER"), content);
 }
 
 void MenuScreen::onQuitClicked()
@@ -125,6 +143,27 @@ void MenuScreen::onQuitClicked()
     if (window())
     {
         window()->close();
+    }
+}
+
+void MenuScreen::refreshTranslations()
+{
+    const QStringList texts = {
+        tr("NEW GAME"),
+        tr("LOAD GAME"),
+        tr("SETTINGS"),
+        tr("HELP"),
+        tr("CREDITS"),
+        tr("QUIT")};
+
+    for (int i = 0; i < m_buttons.size() && i < texts.size(); ++i)
+    {
+        m_buttons[i]->setText(texts[i]);
+    }
+
+    if (m_panelTitle)
+    {
+        m_panelTitle->setText(tr("INFORMATION"));
     }
 }
 
@@ -179,7 +218,7 @@ void MenuScreen::setupUI()
     panelLayout->setContentsMargins(15, 10, 15, 15);
 
     auto *headerLayout = new QHBoxLayout();
-    m_panelTitle = new QLabel("INFORMATION", m_sidePanel);
+    m_panelTitle = new QLabel(tr("INFORMATION"), m_sidePanel);
     m_panelTitle->setObjectName("panelTitle");
 
     auto *closeBtn = new QPushButton("X", m_sidePanel);
@@ -225,6 +264,8 @@ void MenuScreen::setupUI()
             firstBtn->setFocus();
         }
     }
+    connect(&GameSettingsManager::getInstance(), &GameSettingsManager::languageChanged,
+            this, &MenuScreen::refreshTranslations);
 }
 
 void MenuScreen::setupBackground()

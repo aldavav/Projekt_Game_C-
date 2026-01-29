@@ -23,13 +23,18 @@ void ConfigManager::saveConfiguration()
     settings.endGroup();
 
     settings.beginGroup("Controls");
+
     settings.setValue("MOVE_UP", static_cast<int>(csm.getKey(Engine::Input::Action::MoveUp)));
     settings.setValue("MOVE_DOWN", static_cast<int>(csm.getKey(Engine::Input::Action::MoveDown)));
     settings.setValue("MOVE_LEFT", static_cast<int>(csm.getKey(Engine::Input::Action::MoveLeft)));
     settings.setValue("MOVE_RIGHT", static_cast<int>(csm.getKey(Engine::Input::Action::MoveRight)));
-    settings.setValue("STOP", static_cast<int>(csm.getKey(Engine::Input::Action::Stop)));
-    settings.setValue("GUARD", static_cast<int>(csm.getKey(Engine::Input::Action::Guard)));
-    settings.setValue("SCATTER", static_cast<int>(csm.getKey(Engine::Input::Action::Scatter)));
+
+    settings.setValue("MAP_MODE", static_cast<int>(csm.getKey(Engine::Input::Action::ToggleMapMode)));
+    settings.setValue("DEBUG_VIEW", static_cast<int>(csm.getKey(Engine::Input::Action::ToggleDebug)));
+    settings.setValue("QUICK_SAVE", static_cast<int>(csm.getKey(Engine::Input::Action::QuickSave)));
+
+    settings.setValue("ZOOM_IN", static_cast<int>(csm.getKey(Engine::Input::Action::ZoomIn)));
+    settings.setValue("ZOOM_OUT", static_cast<int>(csm.getKey(Engine::Input::Action::ZoomOut)));
     settings.endGroup();
 
     settings.beginGroup("Display");
@@ -70,13 +75,18 @@ void ConfigManager::loadConfiguration()
         int val = settings.value(key, static_cast<int>(def)).toInt();
         csm.setKey(action, static_cast<Engine::Input::KeyCode>(val));
     };
-    loadKey("MOVE_UP", Engine::Input::Action::MoveUp, Engine::Input::KeyCode::UpArrow);
-    loadKey("MOVE_DOWN", Engine::Input::Action::MoveDown, Engine::Input::KeyCode::DownArrow);
-    loadKey("MOVE_LEFT", Engine::Input::Action::MoveLeft, Engine::Input::KeyCode::LeftArrow);
-    loadKey("MOVE_RIGHT", Engine::Input::Action::MoveRight, Engine::Input::KeyCode::RightArrow);
-    loadKey("STOP", Engine::Input::Action::Stop, Engine::Input::KeyCode::Stop);
-    loadKey("GUARD", Engine::Input::Action::Guard, Engine::Input::KeyCode::Guard);
-    loadKey("SCATTER", Engine::Input::Action::Scatter, Engine::Input::KeyCode::Scatter);
+
+    loadKey("MOVE_UP", Engine::Input::Action::MoveUp, Engine::Input::KeyCode::W);
+    loadKey("MOVE_DOWN", Engine::Input::Action::MoveDown, Engine::Input::KeyCode::S);
+    loadKey("MOVE_LEFT", Engine::Input::Action::MoveLeft, Engine::Input::KeyCode::A);
+    loadKey("MOVE_RIGHT", Engine::Input::Action::MoveRight, Engine::Input::KeyCode::D);
+
+    loadKey("MAP_MODE", Engine::Input::Action::ToggleMapMode, Engine::Input::KeyCode::MapMode);
+    loadKey("DEBUG_VIEW", Engine::Input::Action::ToggleDebug, Engine::Input::KeyCode::DebugF3);
+    loadKey("QUICK_SAVE", Engine::Input::Action::QuickSave, Engine::Input::KeyCode::SaveF5);
+
+    loadKey("ZOOM_IN", Engine::Input::Action::ZoomIn, Engine::Input::KeyCode::ZoomIn);
+    loadKey("ZOOM_OUT", Engine::Input::Action::ZoomOut, Engine::Input::KeyCode::ZoomOut);
     settings.endGroup();
 
     settings.beginGroup("Display");
@@ -101,17 +111,22 @@ void ConfigManager::loadConfiguration()
 void ConfigManager::resetToDefaults()
 {
     auto &csm = ControlsSettingsManager::getInstance();
-    csm.setKey(Engine::Input::Action::MoveUp, Engine::Input::KeyCode::UpArrow);
-    csm.setKey(Engine::Input::Action::MoveDown, Engine::Input::KeyCode::DownArrow);
-    csm.setKey(Engine::Input::Action::MoveLeft, Engine::Input::KeyCode::LeftArrow);
-    csm.setKey(Engine::Input::Action::MoveRight, Engine::Input::KeyCode::RightArrow);
-    csm.setKey(Engine::Input::Action::Stop, Engine::Input::KeyCode::Stop);
-    csm.setKey(Engine::Input::Action::Guard, Engine::Input::KeyCode::Guard);
-    csm.setKey(Engine::Input::Action::Scatter, Engine::Input::KeyCode::Scatter);
+
+    csm.setKey(Engine::Input::Action::MoveUp, Engine::Input::KeyCode::W);
+    csm.setKey(Engine::Input::Action::MoveDown, Engine::Input::KeyCode::S);
+    csm.setKey(Engine::Input::Action::MoveLeft, Engine::Input::KeyCode::A);
+    csm.setKey(Engine::Input::Action::MoveRight, Engine::Input::KeyCode::D);
+
+    csm.setKey(Engine::Input::Action::ToggleMapMode, Engine::Input::KeyCode::MapMode);
+    csm.setKey(Engine::Input::Action::ToggleDebug, Engine::Input::KeyCode::DebugF3);
+    csm.setKey(Engine::Input::Action::QuickSave, Engine::Input::KeyCode::SaveF5);
+
+    csm.setKey(Engine::Input::Action::ZoomIn, Engine::Input::KeyCode::ZoomIn);
+    csm.setKey(Engine::Input::Action::ZoomOut, Engine::Input::KeyCode::ZoomOut);
 
     QString langCode = (m_cachedSettings.languageIndex == 1) ? "cz" : "en";
     GameSettingsManager::getInstance().setLanguage(langCode);
-    GameSettingsManager::getInstance().setTooltipsEnabled(m_cachedSettings.showTooltips);
+    GameSettingsManager::getInstance().setTooltipsEnabled(true);
 
     AudioSettingsManager::getInstance().volumesChanged();
     DisplaySettingsManager::getInstance().applySettings();

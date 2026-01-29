@@ -27,7 +27,7 @@ void LoadingScreen::setupUI()
     auto *layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignCenter);
 
-    QLabel *title = new QLabel(tr(Config::Strings::DEFAULT_UPLINK_TEXT.toUtf8()), this);
+    QLabel *title = new QLabel(tr("ESTABLISHING UPLINK..."), this);
     title->setObjectName("loadingTitle");
     title->setAlignment(Qt::AlignCenter);
 
@@ -38,7 +38,7 @@ void LoadingScreen::setupUI()
     m_progressBar->setFixedSize(Config::UI::LOADING_BAR_WIDTH, Config::UI::LOADING_BAR_HEIGHT);
     m_progressBar->setTextVisible(false);
 
-    m_statusLabel = new QLabel(tr(Config::Strings::DEFAULT_STATUS_TEXT.toUtf8()), this);
+    m_statusLabel = new QLabel(tr("INITIALIZING ENGINE..."), this);
     m_statusLabel->setObjectName("statusLabel");
     m_statusLabel->setAlignment(Qt::AlignCenter);
 

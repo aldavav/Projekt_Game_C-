@@ -38,10 +38,10 @@ void TacticalDialog::setupUI(const QString &title, const QString &message)
     auto *btnLayout = new QHBoxLayout();
     btnLayout->setSpacing(15);
 
-    auto *cancelBtn = new QPushButton(Config::UI::STR_ABORT, this);
+    auto *cancelBtn = new QPushButton(tr("ABORT"), this);
     cancelBtn->setObjectName("secondaryButton");
 
-    auto *confirmBtn = new QPushButton(Config::UI::STR_PROCEED, this);
+    auto *confirmBtn = new QPushButton(tr("PROCEED"), this);
     confirmBtn->setObjectName("confirmBtn");
 
     connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
