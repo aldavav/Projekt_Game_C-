@@ -1,10 +1,19 @@
 #include "AssetManager.h"
 
+AssetManager &AssetManager::getInstance()
+{
+    static AssetManager instance;
+    return instance;
+}
+
 void AssetManager::loadFonts()
 {
     for (const QString &fontPath : Config::Paths::PATHS_FONTS)
     {
-        QFontDatabase::addApplicationFont(fontPath);
+        int id = QFontDatabase::addApplicationFont(fontPath);
+        if (id == -1)
+        {
+        }
     }
 }
 
@@ -18,6 +27,11 @@ QFont AssetManager::getFont(int size, bool bold)
 
 QCursor AssetManager::getCursor(Engine::Graphics::CursorType type)
 {
+    if (m_cursorCache.contains(type))
+    {
+        return m_cursorCache.value(type);
+    }
+
     QString path;
     switch (type)
     {
@@ -37,10 +51,19 @@ QCursor AssetManager::getCursor(Engine::Graphics::CursorType type)
     }
 
     QPixmap pix(path);
-    if (pix.isNull())
-        return QCursor(Qt::ArrowCursor);
+    QCursor finalCursor;
 
-    return QCursor(pix.scaled(Config::UI::CURSOR_SIZE, Config::UI::CURSOR_SIZE,
-                              Qt::KeepAspectRatio, Qt::SmoothTransformation),
-                   0, 0);
+    if (pix.isNull())
+    {
+        finalCursor = QCursor(Qt::ArrowCursor);
+    }
+    else
+    {
+        finalCursor = QCursor(pix.scaled(Config::UI::CURSOR_SIZE, Config::UI::CURSOR_SIZE,
+                                         Qt::KeepAspectRatio, Qt::SmoothTransformation),
+                              0, 0);
+    }
+
+    m_cursorCache.insert(type, finalCursor);
+    return finalCursor;
 }

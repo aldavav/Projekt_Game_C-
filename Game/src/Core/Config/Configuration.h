@@ -96,10 +96,10 @@ namespace Config
         const QString INITIAL_SAVE_FILENAME = "/level.dat";
         const QString LANGUAGE_FILE = ":/i18n/assets/i18n/game_%1.qm";
         const QString STYLE_SHEET = ":/styles/assets/styles/style.qss";
-        const QString CURSOR_DEFAULT = ":/ui/assets/ui/cursor_std.png";
-        const QString CURSOR_SELECT = ":/ui/assets/ui/cursor_sel.png";
-        const QString CURSOR_ATTACK = ":/ui/assets/ui/cursor_atk.png";
-        const QString CURSOR_WAIT = ":/ui/assets/ui/cursor_wait.png";
+        const QString CURSOR_DEFAULT = ":/images/assets/images/cursor_std.png";
+        const QString CURSOR_SELECT = ":/images/assets/images/cursor_sel.png";
+        const QString CURSOR_ATTACK = ":/images/assets/images/cursor_atk.png";
+        const QString CURSOR_WAIT = ":/images/assets/images/cursor_wait.png";
         const QString ICON = ":/images/assets/images/icon.png";
         const QString MISSING_TEXTURE = ":/images/assets/images/missing.png";
         const QString CLOUD_TEXTURE = ":/images/assets/images/cloud.png";

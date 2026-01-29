@@ -81,7 +81,7 @@ private:
 
     QString m_currentMapName;
 
-    uint32_t m_currentSeed = 0;
+    uint32_t m_currentSeed = Config::World::DEFAULT_SEED;
 
     int m_difficulty = 0;
 

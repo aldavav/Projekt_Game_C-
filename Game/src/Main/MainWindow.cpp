@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
         loading->setStatus(tr("LOADING ASSETS..."));
         loading->setProgress(30);
         
-        setCursor(AssetManager::getCursor(Engine::Graphics::CursorType::Standard));
+        setCursor(AssetManager::getInstance().getCursor(Engine::Graphics::CursorType::Standard));
         setupBackgroundMusic();
 
         QTimer::singleShot(Config::UI::LOADING_STEP_DELAY, loading, [this, loading]() {
@@ -187,7 +187,7 @@ void MainWindow::setupBackgroundMusic()
 
 void MainWindow::applyGlobalStyles()
 {
-    AssetManager::loadFonts();
+    AssetManager::getInstance().loadFonts();
 
     QFont orbitronFont("Orbitron");
     orbitronFont.setStyleStrategy(QFont::PreferAntialias);

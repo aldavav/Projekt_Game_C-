@@ -5,16 +5,20 @@
 #include <QFontDatabase>
 #include <QString>
 #include <QCursor>
+#include <QPixmap>
 #include <QFont>
+#include <QMap>
 
 class AssetManager
 {
 public:
-    static void loadFonts();
+    static AssetManager &getInstance();
 
-    static QFont getFont(int size = 12, bool bold = false);
+    void loadFonts();
 
-    static QCursor getCursor(Engine::Graphics::CursorType type = Engine::Graphics::CursorType::Standard);
+    QFont getFont(int size = 12, bool bold = false);
+
+    QCursor getCursor(Engine::Graphics::CursorType type = Engine::Graphics::CursorType::Standard);
 
     AssetManager(const AssetManager &) = delete;
 
@@ -23,6 +27,11 @@ public:
     AssetManager(AssetManager &&other) noexcept = default;
 
     AssetManager &operator=(AssetManager &&other) noexcept = default;
+
+private:
+    AssetManager() = default;
+
+    QMap<Engine::Graphics::CursorType, QCursor> m_cursorCache;
 };
 
 #endif

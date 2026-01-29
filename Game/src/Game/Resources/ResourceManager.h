@@ -38,13 +38,13 @@ public:
 private:
     ResourceManager() = default;
 
-    QMap<QString, TexturePtr> m_textureCache;
-
-    QMap<QString, AudioPtr> m_audioCache;
-
     TexturePtr loadTextureFromFile(const QString &filePath);
 
     AudioPtr loadAudioFromFile(const QString &filePath);
+
+    QMap<QString, TexturePtr> m_textureCache;
+
+    QMap<QString, AudioPtr> m_audioCache;
 
     mutable QMutex m_mutex;
 };

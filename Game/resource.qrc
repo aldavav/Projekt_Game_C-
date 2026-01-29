@@ -2,10 +2,11 @@
 <RCC>
   <qresource prefix="/images">
     <file>assets/images/arrow.png</file>
-    <file>assets/images/cursor.png</file>
     <file>assets/images/button.png</file>
     <file>assets/images/cloud.png</file>
     <file>assets/images/icon.png</file>
+    <file>assets/images/cursor_sel.png</file>
+    <file>assets/images/cursor_std.png</file>
   </qresource>
   <qresource prefix="/fonts">
     <file>assets/fonts/Orbitron-Medium.ttf</file>
@@ -14,7 +15,6 @@
     <file>assets/fonts/Orbitron-Regular.ttf</file>
     <file>assets/fonts/Orbitron-Black.ttf</file>
     <file>assets/fonts/Orbitron-SemiBold.ttf</file>
-    <file>assets/images/cursor.png</file>
   </qresource>
   <qresource prefix="/animations">
     <file>assets/animations/menu.gif</file>
